@@ -189,6 +189,10 @@
       <Project>{efb04682-eec3-4876-afeb-d313676632dd}</Project>
       <Name>DateWithCheckBox</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PricingWithCheckBox\PricingWithCheckBox.vbproj">
+      <Project>{CE238DB5-F04F-4C78-A034-BD4027B4199C}</Project>
+      <Name>PricingWithCheckBox</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TextBoxWithCheckBox\TextBoxWithCheckBox.vbproj">
       <Project>{e1b69b96-d73b-4113-9f29-3933cf055c11}</Project>
       <Name>TextBoxWithCheckBox</Name>

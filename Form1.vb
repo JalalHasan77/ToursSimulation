@@ -48,35 +48,6 @@ Public Class Form1
         LoadServicesIntoTab("Including")
         LoadServicesIntoTab("NotIncluding")
         '____________________________________________________________
-        ListView1.Columns.Add("ID", 60)
-        ListView1.Columns.Add("Name", 60 * 2)
-        ListView1.Columns.Add("Age", 60)
-        ListView1.Columns.Add("Email", 60 * 3)
-
-        Dim J As New myListViewItem
-        With J
-            .Text = "2271"
-            .SubItems.Add("Jaljool")
-            .SubItems.Add(50)
-            .SubItems.Add("Gmail")
-            .ExtraNames = "Fatima AlHaddad|Fatima Mohammed|Roqaya|Elmeera"
-            ListView1.Items.Add(J)
-
-        End With
-
-        Dim K As New myListViewItem
-        With K
-            .Text = "2323"
-            .SubItems.Add("Nawalooh")
-            .SubItems.Add(50)
-            .SubItems.Add("Hotmail")
-            .ExtraNames = "Nothing"
-            ListView1.Items.Add(K)
-
-        End With
-
-
-
     End Sub
 
 
@@ -774,17 +745,6 @@ Public Class Form1
         End If
 
     End Sub
-
-    Private Sub ListView1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListView1.SelectedIndexChanged
-        Try
-            Dim A As ListViewItem = ListView1.SelectedItems(0)
-            MsgBox(CType(A, myListViewItem).ExtraNames)
-        Catch ex As Exception
-
-        End Try
-
-    End Sub
-
     Private Sub Panel3_Paint(sender As Object, e As PaintEventArgs)
 
     End Sub
@@ -880,6 +840,8 @@ Public Class Form1
 
         End Try
     End Sub
+
+
 End Class
 
 Public Class Flight
@@ -1046,12 +1008,6 @@ Public Enum Categories
 End Enum
 
 
-Public Class myListViewItem
-    Inherits ListViewItem
-
-    Public Property ExtraNames As String
-
-End Class
 
 Public Class DatesAndDuration
     Public Property StartDate As Date

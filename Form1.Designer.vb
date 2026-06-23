@@ -58,17 +58,11 @@ Partial Class Form1
         Me.Label6 = New System.Windows.Forms.Label()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
-        Me.txbxTripSubTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
-        Me.txbxTripTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
         Me.TabControl5 = New System.Windows.Forms.TabControl()
         Me.TabPage16 = New System.Windows.Forms.TabPage()
         Me.Label15 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
-        Me.DateWithCheckBox7 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox8 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox6 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox5 = New DateWithCheckBox.DateWithCheckBox()
         Me.TabPage17 = New System.Windows.Forms.TabPage()
         Me.TextBox14 = New System.Windows.Forms.TextBox()
         Me.TextBox15 = New System.Windows.Forms.TextBox()
@@ -137,7 +131,6 @@ Partial Class Form1
         Me.DayByDay = New System.Windows.Forms.TabPage()
         Me.ListBox2 = New System.Windows.Forms.ListBox()
         Me.tabPricingpolicy = New System.Windows.Forms.TabPage()
-        Me.ListView1 = New System.Windows.Forms.ListView()
         Me.Additions = New System.Windows.Forms.TabPage()
         Me.TransferWays = New System.Windows.Forms.TabPage()
         Me.TabControl4 = New System.Windows.Forms.TabControl()
@@ -158,6 +151,47 @@ Partial Class Form1
         Me.ImageList2 = New System.Windows.Forms.ImageList(Me.components)
         Me.Button6 = New System.Windows.Forms.Button()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
+        Me.txbxTripSubTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txbxTripTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.DateWithCheckBox7 = New DateWithCheckBox.DateWithCheckBox()
+        Me.DateWithCheckBox8 = New DateWithCheckBox.DateWithCheckBox()
+        Me.DateWithCheckBox6 = New DateWithCheckBox.DateWithCheckBox()
+        Me.DateWithCheckBox5 = New DateWithCheckBox.DateWithCheckBox()
+        Me.PricingWithCheckBox10 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox9 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox8 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox7 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox6 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox5 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox4 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox3 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox2 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox1 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.UserControl11 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox11 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox12 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox13 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox14 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox15 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox16 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox17 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox18 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox19 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox20 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.PricingWithCheckBox21 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.TextBoxWithCheckBox3 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox2 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox1 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox4 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox6 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox7 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox8 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox9 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox10 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox11 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox12 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox13 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox14 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -175,6 +209,7 @@ Partial Class Form1
         Me.TabPage9.SuspendLayout()
         Me.DayByDay.SuspendLayout()
         Me.tabPricingpolicy.SuspendLayout()
+        Me.Additions.SuspendLayout()
         Me.TransferWays.SuspendLayout()
         Me.TabControl4.SuspendLayout()
         Me.SuspendLayout()
@@ -449,26 +484,6 @@ Partial Class Form1
         Me.TabPage1.Text = "TabPage1"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
-        'txbxTripSubTitle
-        '
-        Me.txbxTripSubTitle.BackColor = System.Drawing.Color.Transparent
-        Me.txbxTripSubTitle.lcTitle = Nothing
-        Me.txbxTripSubTitle.length = 0
-        Me.txbxTripSubTitle.Location = New System.Drawing.Point(24, 49)
-        Me.txbxTripSubTitle.Name = "txbxTripSubTitle"
-        Me.txbxTripSubTitle.Size = New System.Drawing.Size(177, 23)
-        Me.txbxTripSubTitle.TabIndex = 1
-        '
-        'txbxTripTitle
-        '
-        Me.txbxTripTitle.BackColor = System.Drawing.Color.Transparent
-        Me.txbxTripTitle.lcTitle = Nothing
-        Me.txbxTripTitle.length = 0
-        Me.txbxTripTitle.Location = New System.Drawing.Point(24, 20)
-        Me.txbxTripTitle.Name = "txbxTripTitle"
-        Me.txbxTripTitle.Size = New System.Drawing.Size(177, 23)
-        Me.txbxTripTitle.TabIndex = 0
-        '
         'TabPage6
         '
         Me.TabPage6.Controls.Add(Me.TabControl5)
@@ -532,42 +547,6 @@ Partial Class Form1
         Me.Label3.Size = New System.Drawing.Size(87, 13)
         Me.Label3.TabIndex = 4
         Me.Label3.Text = "Registeration:"
-        '
-        'DateWithCheckBox7
-        '
-        Me.DateWithCheckBox7.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox7.lcTitle = "To"
-        Me.DateWithCheckBox7.Location = New System.Drawing.Point(16, 150)
-        Me.DateWithCheckBox7.Name = "DateWithCheckBox7"
-        Me.DateWithCheckBox7.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox7.TabIndex = 3
-        '
-        'DateWithCheckBox8
-        '
-        Me.DateWithCheckBox8.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox8.lcTitle = "From"
-        Me.DateWithCheckBox8.Location = New System.Drawing.Point(16, 121)
-        Me.DateWithCheckBox8.Name = "DateWithCheckBox8"
-        Me.DateWithCheckBox8.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox8.TabIndex = 2
-        '
-        'DateWithCheckBox6
-        '
-        Me.DateWithCheckBox6.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox6.lcTitle = "To"
-        Me.DateWithCheckBox6.Location = New System.Drawing.Point(16, 64)
-        Me.DateWithCheckBox6.Name = "DateWithCheckBox6"
-        Me.DateWithCheckBox6.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox6.TabIndex = 1
-        '
-        'DateWithCheckBox5
-        '
-        Me.DateWithCheckBox5.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox5.lcTitle = "From"
-        Me.DateWithCheckBox5.Location = New System.Drawing.Point(16, 35)
-        Me.DateWithCheckBox5.Name = "DateWithCheckBox5"
-        Me.DateWithCheckBox5.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox5.TabIndex = 0
         '
         'TabPage17
         '
@@ -1235,7 +1214,17 @@ Partial Class Form1
         '
         'tabPricingpolicy
         '
-        Me.tabPricingpolicy.Controls.Add(Me.ListView1)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox10)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox9)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox8)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox7)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox6)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox5)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox4)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox3)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox2)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox1)
+        Me.tabPricingpolicy.Controls.Add(Me.UserControl11)
         Me.tabPricingpolicy.Location = New System.Drawing.Point(4, 22)
         Me.tabPricingpolicy.Name = "tabPricingpolicy"
         Me.tabPricingpolicy.Padding = New System.Windows.Forms.Padding(3)
@@ -1244,20 +1233,19 @@ Partial Class Form1
         Me.tabPricingpolicy.Text = "Pricing Policy"
         Me.tabPricingpolicy.UseVisualStyleBackColor = True
         '
-        'ListView1
-        '
-        Me.ListView1.FullRowSelect = True
-        Me.ListView1.GridLines = True
-        Me.ListView1.HideSelection = False
-        Me.ListView1.Location = New System.Drawing.Point(6, 7)
-        Me.ListView1.Name = "ListView1"
-        Me.ListView1.Size = New System.Drawing.Size(524, 555)
-        Me.ListView1.TabIndex = 0
-        Me.ListView1.UseCompatibleStateImageBehavior = False
-        Me.ListView1.View = System.Windows.Forms.View.Details
-        '
         'Additions
         '
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox11)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox12)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox13)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox14)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox15)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox16)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox17)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox18)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox19)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox20)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox21)
         Me.Additions.Location = New System.Drawing.Point(4, 22)
         Me.Additions.Name = "Additions"
         Me.Additions.Size = New System.Drawing.Size(953, 645)
@@ -1267,6 +1255,19 @@ Partial Class Form1
         '
         'TransferWays
         '
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox14)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox13)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox12)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox11)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox10)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox9)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox8)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox7)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox6)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox4)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox3)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox2)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox1)
         Me.TransferWays.Controls.Add(Me.TabControl4)
         Me.TransferWays.Location = New System.Drawing.Point(4, 22)
         Me.TransferWays.Name = "TransferWays"
@@ -1463,6 +1464,434 @@ Partial Class Form1
         Me.CheckBox1.ThreeState = True
         Me.CheckBox1.UseVisualStyleBackColor = True
         '
+        'txbxTripSubTitle
+        '
+        Me.txbxTripSubTitle.BackColor = System.Drawing.Color.Transparent
+        Me.txbxTripSubTitle.lcTitle = "Subtitle"
+        Me.txbxTripSubTitle.length = 400
+        Me.txbxTripSubTitle.Location = New System.Drawing.Point(24, 49)
+        Me.txbxTripSubTitle.Name = "txbxTripSubTitle"
+        Me.txbxTripSubTitle.Size = New System.Drawing.Size(477, 23)
+        Me.txbxTripSubTitle.TabIndex = 1
+        '
+        'txbxTripTitle
+        '
+        Me.txbxTripTitle.BackColor = System.Drawing.Color.Transparent
+        Me.txbxTripTitle.lcTitle = "Title"
+        Me.txbxTripTitle.length = 500
+        Me.txbxTripTitle.Location = New System.Drawing.Point(24, 20)
+        Me.txbxTripTitle.Name = "txbxTripTitle"
+        Me.txbxTripTitle.Size = New System.Drawing.Size(577, 23)
+        Me.txbxTripTitle.TabIndex = 0
+        '
+        'DateWithCheckBox7
+        '
+        Me.DateWithCheckBox7.BackColor = System.Drawing.SystemColors.Control
+        Me.DateWithCheckBox7.lcTitle = "To"
+        Me.DateWithCheckBox7.Location = New System.Drawing.Point(16, 150)
+        Me.DateWithCheckBox7.Name = "DateWithCheckBox7"
+        Me.DateWithCheckBox7.Size = New System.Drawing.Size(175, 23)
+        Me.DateWithCheckBox7.TabIndex = 3
+        '
+        'DateWithCheckBox8
+        '
+        Me.DateWithCheckBox8.BackColor = System.Drawing.SystemColors.Control
+        Me.DateWithCheckBox8.lcTitle = "From"
+        Me.DateWithCheckBox8.Location = New System.Drawing.Point(16, 121)
+        Me.DateWithCheckBox8.Name = "DateWithCheckBox8"
+        Me.DateWithCheckBox8.Size = New System.Drawing.Size(175, 23)
+        Me.DateWithCheckBox8.TabIndex = 2
+        '
+        'DateWithCheckBox6
+        '
+        Me.DateWithCheckBox6.BackColor = System.Drawing.SystemColors.Control
+        Me.DateWithCheckBox6.lcTitle = "To"
+        Me.DateWithCheckBox6.Location = New System.Drawing.Point(16, 64)
+        Me.DateWithCheckBox6.Name = "DateWithCheckBox6"
+        Me.DateWithCheckBox6.Size = New System.Drawing.Size(175, 23)
+        Me.DateWithCheckBox6.TabIndex = 1
+        '
+        'DateWithCheckBox5
+        '
+        Me.DateWithCheckBox5.BackColor = System.Drawing.SystemColors.Control
+        Me.DateWithCheckBox5.lcTitle = "From"
+        Me.DateWithCheckBox5.Location = New System.Drawing.Point(16, 35)
+        Me.DateWithCheckBox5.Name = "DateWithCheckBox5"
+        Me.DateWithCheckBox5.Size = New System.Drawing.Size(175, 23)
+        Me.DateWithCheckBox5.TabIndex = 0
+        '
+        'PricingWithCheckBox10
+        '
+        Me.PricingWithCheckBox10.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox10.IconPath = Nothing
+        Me.PricingWithCheckBox10.lcTitle = ""
+        Me.PricingWithCheckBox10.Location = New System.Drawing.Point(6, 557)
+        Me.PricingWithCheckBox10.Name = "PricingWithCheckBox10"
+        Me.PricingWithCheckBox10.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox10.SubTitle = ""
+        Me.PricingWithCheckBox10.TabIndex = 10
+        '
+        'PricingWithCheckBox9
+        '
+        Me.PricingWithCheckBox9.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox9.IconPath = Nothing
+        Me.PricingWithCheckBox9.lcTitle = ""
+        Me.PricingWithCheckBox9.Location = New System.Drawing.Point(6, 502)
+        Me.PricingWithCheckBox9.Name = "PricingWithCheckBox9"
+        Me.PricingWithCheckBox9.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox9.SubTitle = ""
+        Me.PricingWithCheckBox9.TabIndex = 9
+        '
+        'PricingWithCheckBox8
+        '
+        Me.PricingWithCheckBox8.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox8.IconPath = Nothing
+        Me.PricingWithCheckBox8.lcTitle = ""
+        Me.PricingWithCheckBox8.Location = New System.Drawing.Point(6, 447)
+        Me.PricingWithCheckBox8.Name = "PricingWithCheckBox8"
+        Me.PricingWithCheckBox8.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox8.SubTitle = ""
+        Me.PricingWithCheckBox8.TabIndex = 8
+        '
+        'PricingWithCheckBox7
+        '
+        Me.PricingWithCheckBox7.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox7.IconPath = Nothing
+        Me.PricingWithCheckBox7.lcTitle = ""
+        Me.PricingWithCheckBox7.Location = New System.Drawing.Point(6, 392)
+        Me.PricingWithCheckBox7.Name = "PricingWithCheckBox7"
+        Me.PricingWithCheckBox7.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox7.SubTitle = ""
+        Me.PricingWithCheckBox7.TabIndex = 7
+        '
+        'PricingWithCheckBox6
+        '
+        Me.PricingWithCheckBox6.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox6.IconPath = Nothing
+        Me.PricingWithCheckBox6.lcTitle = ""
+        Me.PricingWithCheckBox6.Location = New System.Drawing.Point(6, 337)
+        Me.PricingWithCheckBox6.Name = "PricingWithCheckBox6"
+        Me.PricingWithCheckBox6.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox6.SubTitle = ""
+        Me.PricingWithCheckBox6.TabIndex = 6
+        '
+        'PricingWithCheckBox5
+        '
+        Me.PricingWithCheckBox5.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox5.IconPath = Nothing
+        Me.PricingWithCheckBox5.lcTitle = ""
+        Me.PricingWithCheckBox5.Location = New System.Drawing.Point(6, 282)
+        Me.PricingWithCheckBox5.Name = "PricingWithCheckBox5"
+        Me.PricingWithCheckBox5.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox5.SubTitle = ""
+        Me.PricingWithCheckBox5.TabIndex = 5
+        '
+        'PricingWithCheckBox4
+        '
+        Me.PricingWithCheckBox4.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox4.IconPath = Nothing
+        Me.PricingWithCheckBox4.lcTitle = ""
+        Me.PricingWithCheckBox4.Location = New System.Drawing.Point(6, 227)
+        Me.PricingWithCheckBox4.Name = "PricingWithCheckBox4"
+        Me.PricingWithCheckBox4.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox4.SubTitle = ""
+        Me.PricingWithCheckBox4.TabIndex = 4
+        '
+        'PricingWithCheckBox3
+        '
+        Me.PricingWithCheckBox3.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox3.IconPath = Nothing
+        Me.PricingWithCheckBox3.lcTitle = ""
+        Me.PricingWithCheckBox3.Location = New System.Drawing.Point(6, 172)
+        Me.PricingWithCheckBox3.Name = "PricingWithCheckBox3"
+        Me.PricingWithCheckBox3.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox3.SubTitle = ""
+        Me.PricingWithCheckBox3.TabIndex = 3
+        '
+        'PricingWithCheckBox2
+        '
+        Me.PricingWithCheckBox2.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox2.IconPath = Nothing
+        Me.PricingWithCheckBox2.lcTitle = ""
+        Me.PricingWithCheckBox2.Location = New System.Drawing.Point(6, 117)
+        Me.PricingWithCheckBox2.Name = "PricingWithCheckBox2"
+        Me.PricingWithCheckBox2.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox2.SubTitle = ""
+        Me.PricingWithCheckBox2.TabIndex = 2
+        '
+        'PricingWithCheckBox1
+        '
+        Me.PricingWithCheckBox1.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox1.IconPath = Nothing
+        Me.PricingWithCheckBox1.lcTitle = ""
+        Me.PricingWithCheckBox1.Location = New System.Drawing.Point(6, 62)
+        Me.PricingWithCheckBox1.Name = "PricingWithCheckBox1"
+        Me.PricingWithCheckBox1.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox1.SubTitle = ""
+        Me.PricingWithCheckBox1.TabIndex = 1
+        '
+        'UserControl11
+        '
+        Me.UserControl11.BackColor = System.Drawing.Color.Transparent
+        Me.UserControl11.IconPath = Nothing
+        Me.UserControl11.lcTitle = ""
+        Me.UserControl11.Location = New System.Drawing.Point(6, 7)
+        Me.UserControl11.Name = "UserControl11"
+        Me.UserControl11.Size = New System.Drawing.Size(415, 49)
+        Me.UserControl11.SubTitle = ""
+        Me.UserControl11.TabIndex = 0
+        '
+        'PricingWithCheckBox11
+        '
+        Me.PricingWithCheckBox11.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox11.IconPath = Nothing
+        Me.PricingWithCheckBox11.lcTitle = ""
+        Me.PricingWithCheckBox11.Location = New System.Drawing.Point(3, 557)
+        Me.PricingWithCheckBox11.Name = "PricingWithCheckBox11"
+        Me.PricingWithCheckBox11.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox11.SubTitle = ""
+        Me.PricingWithCheckBox11.TabIndex = 21
+        '
+        'PricingWithCheckBox12
+        '
+        Me.PricingWithCheckBox12.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox12.IconPath = Nothing
+        Me.PricingWithCheckBox12.lcTitle = ""
+        Me.PricingWithCheckBox12.Location = New System.Drawing.Point(3, 502)
+        Me.PricingWithCheckBox12.Name = "PricingWithCheckBox12"
+        Me.PricingWithCheckBox12.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox12.SubTitle = ""
+        Me.PricingWithCheckBox12.TabIndex = 20
+        '
+        'PricingWithCheckBox13
+        '
+        Me.PricingWithCheckBox13.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox13.IconPath = Nothing
+        Me.PricingWithCheckBox13.lcTitle = ""
+        Me.PricingWithCheckBox13.Location = New System.Drawing.Point(3, 447)
+        Me.PricingWithCheckBox13.Name = "PricingWithCheckBox13"
+        Me.PricingWithCheckBox13.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox13.SubTitle = ""
+        Me.PricingWithCheckBox13.TabIndex = 19
+        '
+        'PricingWithCheckBox14
+        '
+        Me.PricingWithCheckBox14.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox14.IconPath = Nothing
+        Me.PricingWithCheckBox14.lcTitle = ""
+        Me.PricingWithCheckBox14.Location = New System.Drawing.Point(3, 392)
+        Me.PricingWithCheckBox14.Name = "PricingWithCheckBox14"
+        Me.PricingWithCheckBox14.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox14.SubTitle = ""
+        Me.PricingWithCheckBox14.TabIndex = 18
+        '
+        'PricingWithCheckBox15
+        '
+        Me.PricingWithCheckBox15.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox15.IconPath = Nothing
+        Me.PricingWithCheckBox15.lcTitle = ""
+        Me.PricingWithCheckBox15.Location = New System.Drawing.Point(3, 337)
+        Me.PricingWithCheckBox15.Name = "PricingWithCheckBox15"
+        Me.PricingWithCheckBox15.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox15.SubTitle = ""
+        Me.PricingWithCheckBox15.TabIndex = 17
+        '
+        'PricingWithCheckBox16
+        '
+        Me.PricingWithCheckBox16.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox16.IconPath = Nothing
+        Me.PricingWithCheckBox16.lcTitle = ""
+        Me.PricingWithCheckBox16.Location = New System.Drawing.Point(3, 282)
+        Me.PricingWithCheckBox16.Name = "PricingWithCheckBox16"
+        Me.PricingWithCheckBox16.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox16.SubTitle = ""
+        Me.PricingWithCheckBox16.TabIndex = 16
+        '
+        'PricingWithCheckBox17
+        '
+        Me.PricingWithCheckBox17.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox17.IconPath = Nothing
+        Me.PricingWithCheckBox17.lcTitle = ""
+        Me.PricingWithCheckBox17.Location = New System.Drawing.Point(3, 227)
+        Me.PricingWithCheckBox17.Name = "PricingWithCheckBox17"
+        Me.PricingWithCheckBox17.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox17.SubTitle = ""
+        Me.PricingWithCheckBox17.TabIndex = 15
+        '
+        'PricingWithCheckBox18
+        '
+        Me.PricingWithCheckBox18.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox18.IconPath = Nothing
+        Me.PricingWithCheckBox18.lcTitle = ""
+        Me.PricingWithCheckBox18.Location = New System.Drawing.Point(3, 172)
+        Me.PricingWithCheckBox18.Name = "PricingWithCheckBox18"
+        Me.PricingWithCheckBox18.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox18.SubTitle = ""
+        Me.PricingWithCheckBox18.TabIndex = 14
+        '
+        'PricingWithCheckBox19
+        '
+        Me.PricingWithCheckBox19.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox19.IconPath = Nothing
+        Me.PricingWithCheckBox19.lcTitle = ""
+        Me.PricingWithCheckBox19.Location = New System.Drawing.Point(3, 117)
+        Me.PricingWithCheckBox19.Name = "PricingWithCheckBox19"
+        Me.PricingWithCheckBox19.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox19.SubTitle = ""
+        Me.PricingWithCheckBox19.TabIndex = 13
+        '
+        'PricingWithCheckBox20
+        '
+        Me.PricingWithCheckBox20.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox20.IconPath = Nothing
+        Me.PricingWithCheckBox20.lcTitle = ""
+        Me.PricingWithCheckBox20.Location = New System.Drawing.Point(3, 62)
+        Me.PricingWithCheckBox20.Name = "PricingWithCheckBox20"
+        Me.PricingWithCheckBox20.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox20.SubTitle = ""
+        Me.PricingWithCheckBox20.TabIndex = 12
+        '
+        'PricingWithCheckBox21
+        '
+        Me.PricingWithCheckBox21.BackColor = System.Drawing.Color.Transparent
+        Me.PricingWithCheckBox21.IconPath = Nothing
+        Me.PricingWithCheckBox21.lcTitle = ""
+        Me.PricingWithCheckBox21.Location = New System.Drawing.Point(3, 7)
+        Me.PricingWithCheckBox21.Name = "PricingWithCheckBox21"
+        Me.PricingWithCheckBox21.Size = New System.Drawing.Size(415, 49)
+        Me.PricingWithCheckBox21.SubTitle = ""
+        Me.PricingWithCheckBox21.TabIndex = 11
+        '
+        'TextBoxWithCheckBox3
+        '
+        Me.TextBoxWithCheckBox3.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox3.lcTitle = Nothing
+        Me.TextBoxWithCheckBox3.length = 100
+        Me.TextBoxWithCheckBox3.Location = New System.Drawing.Point(14, 156)
+        Me.TextBoxWithCheckBox3.Name = "TextBoxWithCheckBox3"
+        Me.TextBoxWithCheckBox3.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox3.TabIndex = 34
+        '
+        'TextBoxWithCheckBox2
+        '
+        Me.TextBoxWithCheckBox2.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox2.lcTitle = Nothing
+        Me.TextBoxWithCheckBox2.length = 100
+        Me.TextBoxWithCheckBox2.Location = New System.Drawing.Point(14, 127)
+        Me.TextBoxWithCheckBox2.Name = "TextBoxWithCheckBox2"
+        Me.TextBoxWithCheckBox2.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox2.TabIndex = 33
+        '
+        'TextBoxWithCheckBox1
+        '
+        Me.TextBoxWithCheckBox1.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox1.lcTitle = Nothing
+        Me.TextBoxWithCheckBox1.length = 100
+        Me.TextBoxWithCheckBox1.Location = New System.Drawing.Point(14, 98)
+        Me.TextBoxWithCheckBox1.Name = "TextBoxWithCheckBox1"
+        Me.TextBoxWithCheckBox1.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox1.TabIndex = 32
+        '
+        'TextBoxWithCheckBox4
+        '
+        Me.TextBoxWithCheckBox4.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox4.lcTitle = Nothing
+        Me.TextBoxWithCheckBox4.length = 100
+        Me.TextBoxWithCheckBox4.Location = New System.Drawing.Point(14, 185)
+        Me.TextBoxWithCheckBox4.Name = "TextBoxWithCheckBox4"
+        Me.TextBoxWithCheckBox4.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox4.TabIndex = 35
+        '
+        'TextBoxWithCheckBox6
+        '
+        Me.TextBoxWithCheckBox6.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox6.lcTitle = Nothing
+        Me.TextBoxWithCheckBox6.length = 100
+        Me.TextBoxWithCheckBox6.Location = New System.Drawing.Point(14, 214)
+        Me.TextBoxWithCheckBox6.Name = "TextBoxWithCheckBox6"
+        Me.TextBoxWithCheckBox6.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox6.TabIndex = 36
+        '
+        'TextBoxWithCheckBox7
+        '
+        Me.TextBoxWithCheckBox7.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox7.lcTitle = Nothing
+        Me.TextBoxWithCheckBox7.length = 100
+        Me.TextBoxWithCheckBox7.Location = New System.Drawing.Point(14, 243)
+        Me.TextBoxWithCheckBox7.Name = "TextBoxWithCheckBox7"
+        Me.TextBoxWithCheckBox7.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox7.TabIndex = 37
+        '
+        'TextBoxWithCheckBox8
+        '
+        Me.TextBoxWithCheckBox8.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox8.lcTitle = Nothing
+        Me.TextBoxWithCheckBox8.length = 100
+        Me.TextBoxWithCheckBox8.Location = New System.Drawing.Point(14, 272)
+        Me.TextBoxWithCheckBox8.Name = "TextBoxWithCheckBox8"
+        Me.TextBoxWithCheckBox8.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox8.TabIndex = 38
+        '
+        'TextBoxWithCheckBox9
+        '
+        Me.TextBoxWithCheckBox9.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox9.lcTitle = Nothing
+        Me.TextBoxWithCheckBox9.length = 100
+        Me.TextBoxWithCheckBox9.Location = New System.Drawing.Point(14, 301)
+        Me.TextBoxWithCheckBox9.Name = "TextBoxWithCheckBox9"
+        Me.TextBoxWithCheckBox9.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox9.TabIndex = 39
+        '
+        'TextBoxWithCheckBox10
+        '
+        Me.TextBoxWithCheckBox10.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox10.lcTitle = Nothing
+        Me.TextBoxWithCheckBox10.length = 100
+        Me.TextBoxWithCheckBox10.Location = New System.Drawing.Point(14, 330)
+        Me.TextBoxWithCheckBox10.Name = "TextBoxWithCheckBox10"
+        Me.TextBoxWithCheckBox10.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox10.TabIndex = 40
+        '
+        'TextBoxWithCheckBox11
+        '
+        Me.TextBoxWithCheckBox11.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox11.lcTitle = Nothing
+        Me.TextBoxWithCheckBox11.length = 100
+        Me.TextBoxWithCheckBox11.Location = New System.Drawing.Point(14, 359)
+        Me.TextBoxWithCheckBox11.Name = "TextBoxWithCheckBox11"
+        Me.TextBoxWithCheckBox11.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox11.TabIndex = 41
+        '
+        'TextBoxWithCheckBox12
+        '
+        Me.TextBoxWithCheckBox12.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox12.lcTitle = Nothing
+        Me.TextBoxWithCheckBox12.length = 100
+        Me.TextBoxWithCheckBox12.Location = New System.Drawing.Point(14, 388)
+        Me.TextBoxWithCheckBox12.Name = "TextBoxWithCheckBox12"
+        Me.TextBoxWithCheckBox12.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox12.TabIndex = 42
+        '
+        'TextBoxWithCheckBox13
+        '
+        Me.TextBoxWithCheckBox13.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox13.lcTitle = Nothing
+        Me.TextBoxWithCheckBox13.length = 100
+        Me.TextBoxWithCheckBox13.Location = New System.Drawing.Point(14, 417)
+        Me.TextBoxWithCheckBox13.Name = "TextBoxWithCheckBox13"
+        Me.TextBoxWithCheckBox13.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox13.TabIndex = 43
+        '
+        'TextBoxWithCheckBox14
+        '
+        Me.TextBoxWithCheckBox14.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox14.lcTitle = Nothing
+        Me.TextBoxWithCheckBox14.length = 100
+        Me.TextBoxWithCheckBox14.Location = New System.Drawing.Point(14, 446)
+        Me.TextBoxWithCheckBox14.Name = "TextBoxWithCheckBox14"
+        Me.TextBoxWithCheckBox14.Size = New System.Drawing.Size(177, 23)
+        Me.TextBoxWithCheckBox14.TabIndex = 44
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1502,6 +1931,7 @@ Partial Class Form1
         Me.TabPage9.PerformLayout()
         Me.DayByDay.ResumeLayout(False)
         Me.tabPricingpolicy.ResumeLayout(False)
+        Me.Additions.ResumeLayout(False)
         Me.TransferWays.ResumeLayout(False)
         Me.TabControl4.ResumeLayout(False)
         Me.ResumeLayout(False)
@@ -1605,7 +2035,6 @@ Partial Class Form1
     Friend WithEvents LinkLabel2 As LinkLabel
     Friend WithEvents LinkLabel1 As LinkLabel
     Friend WithEvents tabPricingpolicy As TabPage
-    Friend WithEvents ListView1 As ListView
     Friend WithEvents TextBoxWithCheckBox5 As TextBoxWithCheckBox.TextBoxWithCheckBox
     Friend WithEvents ContextMenuStrip2 As ContextMenuStrip
     Friend WithEvents InludesToolStripMenuItem As ToolStripMenuItem
@@ -1650,4 +2079,39 @@ Partial Class Form1
     Friend WithEvents TabControl3 As TabControl
     Friend WithEvents TabPage8 As TabPage
     Friend WithEvents TabPage9 As TabPage
+    Friend WithEvents UserControl11 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox8 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox7 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox6 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox5 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox4 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox3 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox2 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox1 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox10 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox9 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox11 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox12 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox13 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox14 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox15 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox16 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox17 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox18 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox19 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox20 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents PricingWithCheckBox21 As PricingWithCheckBox.PricingWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox3 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox2 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox1 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox14 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox13 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox12 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox11 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox10 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox9 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox8 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox7 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox6 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox4 As TextBoxWithCheckBox.TextBoxWithCheckBox
 End Class
