@@ -1,5 +1,5 @@
 ﻿Public Class AddLocations
-    Public Parent As New Form
+    Public lcParent As New Form
 
 
     Public CountryID As Integer
@@ -23,7 +23,7 @@
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         Dim F As New AddLocations
-        F.Parent = Me
+        F.lcParent = Me
         F.ShowDialog()
 
     End Sub

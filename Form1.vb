@@ -486,7 +486,7 @@ Public Class Form1
         Dim L As LayOver = TryCast(selectedItem, LayOver)
 
         If F IsNot Nothing Then
-            Panel2.Visible = False
+
 
             ' Switch to Flight tab in TabControl2
             TabControl2.SelectedTab = TabControl2.TabPages("tab" & F.TransferMean)
@@ -527,7 +527,7 @@ Public Class Form1
             SetComboByID(cmbxArrivingLocation, F.ArrivalPoint)
 
         ElseIf L IsNot Nothing Then
-            Panel2.Visible = True
+
 
             ' Switch to LayOver tab in TabControl2
             TabControl2.SelectedTab = TabControl2.TabPages("tabLayOver")
@@ -558,13 +558,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button2_Click_1(sender As Object, e As EventArgs) Handles Button2.Click
-        If Panel2.Visible = False Then
-
-            If TabControl2.SelectedTab.Name = "tabLayOver" Then
-                Panel2.Visible = True
-            Else
-                Panel2.Visible = False
-            End If
+        If TabControl3.SelectedIndex = 0 Then
 
             Dim F As New Flight
             F.TransferMean = getChosedTransfer()
@@ -630,8 +624,6 @@ Public Class Form1
 
         End If
 
-
-
         ResetAllFields()
     End Sub
 
@@ -644,18 +636,18 @@ Public Class Form1
     Private Sub TabControl2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl2.SelectedIndexChanged
 
         Try
-            Panel2.Visible = False
-            cmbxAirLine.Visible = False
-            Label9.Visible = False
-            Select Case TabControl2.SelectedTab.Name
-                Case "tabLayOver"
-                    Panel2.Visible = True
-                Case "tabAirCraft"
-                    cmbxAirLine.Visible = True
-                    Label9.Visible = True
-                Case Else
+            'Panel2.Visible = False
+            'cmbxAirLine.Visible = False
+            'Label9.Visible = False
+            'Select Case TabControl2.SelectedTab.Name
+            '    Case "tabLayOver"
+            '        Panel2.Visible = True
+            '    Case "tabAirCraft"
+            '        cmbxAirLine.Visible = True
+            '        Label9.Visible = True
+            '    Case Else
 
-            End Select
+            'End Select
 
             LoadLocationComboBox(cmbxDepartureCity, cmbxDepartureLocation)
             LoadLocationComboBox(cmbxArrivingCity, cmbxArrivingLocation)
@@ -666,24 +658,7 @@ Public Class Form1
     End Sub
 
     Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
-        Try
 
-            If TabControl1.SelectedTab.Name = "DayByDay" And ListBox2.Items.Count = 0 Then
-                Dim S As Date = DateWithCheckBox4.lcDateTimePicker.Value
-
-                For I As Integer = 1 To CInt(TextBox12.Text)
-                    Dim day As String = String.Format("Day {0}", I)
-                    If TabControl5.SelectedTab.Name = "TabPage16" Then
-                        day = day & String.Format(" (" & S.ToString("yyyy-MM-dd") & ")")
-                    End If
-                    ListBox2.Items.Add(day)
-                    S = S.AddDays(1)
-                Next
-
-            End If
-        Catch ex As Exception
-
-        End Try
 
 
     End Sub
@@ -734,7 +709,7 @@ Public Class Form1
         Dim F As Flight = TryCast(lastItem, Flight)
         Dim L As LayOver = TryCast(lastItem, LayOver)
 
-        If Panel2.Visible = False Then
+        If TabControl3.SelectedIndex = 0 Then
             If F IsNot Nothing Then
                 'Flight is Found
                 DepartureDate.Value = F.ArrivalDate
@@ -875,6 +850,32 @@ Public Class Form1
             TextBox12.Text = EndDateTime.Subtract(StartDateTime).Days + 1
             TextBox13.Text = EndDateTime.Subtract(StartDateTime).Days
             ' ──────────────────────────────────────────────────────
+            TextBox12_TextChanged(TextBox12, EventArgs.Empty)
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    Private Sub TextBox13_TextChanged(sender As Object, e As EventArgs) Handles TextBox13.TextChanged
+
+    End Sub
+
+    Private Sub TextBox12_TextChanged(sender As Object, e As EventArgs) Handles TextBox12.TextChanged
+        Try
+
+
+            Dim S As Date = DateWithCheckBox8.lcDateTimePicker.Value
+
+            For I As Integer = 1 To CInt(TextBox13.Text)
+                Dim day As String = String.Format("Day {0}", I)
+                If TabControl5.SelectedTab.Name = "TabPage16" Then
+                    day = day & String.Format(" (" & S.ToString("yyyy-MM-dd") & ")")
+                End If
+                ListBox2.Items.Add(day)
+                S = S.AddDays(1)
+            Next
+
+
         Catch ex As Exception
 
         End Try
@@ -1027,7 +1028,7 @@ Class TravelOffers
                 Me.Countries = lcList
             Case Categories.Cities
                 Me.Cities = lcList
-            Case Categories.Cities
+            Case Categories.Stay
                 Me.Stay = lcList
             Case Categories.TravelWays
         End Select
