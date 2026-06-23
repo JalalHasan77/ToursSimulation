@@ -841,7 +841,20 @@ Public Class Form1
         End Try
     End Sub
 
+    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+        If PriceDialog.ShowDialog = DialogResult.OK Then
 
+            Dim Amount As String = CDbl(PriceDialog.TextBox1.Text).ToString("#,##0") & "                               "
+            Amount = Amount.Substring(0, 32)
+
+
+            ListBox3.Items.Add(Amount & PriceDialog.ComboBox1.SelectedItem.ToString)
+        End If
+    End Sub
+
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
+        ListBox3.Items.RemoveAt(ListBox3.SelectedIndex)
+    End Sub
 End Class
 
 Public Class Flight

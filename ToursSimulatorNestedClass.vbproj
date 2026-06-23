@@ -118,6 +118,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="PriceDialog.Designer.vb">
+      <DependentUpon>PriceDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="PriceDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Service.Designer.vb">
       <DependentUpon>Service.vb</DependentUpon>
     </Compile>
@@ -150,6 +156,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PriceDialog.resx">
+      <DependentUpon>PriceDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Service.resx">
       <DependentUpon>Service.vb</DependentUpon>
@@ -196,6 +205,10 @@
     <ProjectReference Include="..\TextBoxWithCheckBox\TextBoxWithCheckBox.vbproj">
       <Project>{e1b69b96-d73b-4113-9f29-3933cf055c11}</Project>
       <Name>TextBoxWithCheckBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TextBoxWithTypeAndCheckbox\TextBoxWithTypeAndCheckbox.vbproj">
+      <Project>{60052789-5B10-4040-BF74-5A113528C045}</Project>
+      <Name>TextBoxWithTypeAndCheckbox</Name>
     </ProjectReference>
     <ProjectReference Include="..\TimeWithCheckBox\TimeWithCheckBox.vbproj">
       <Project>{9b19ae0a-1352-4a54-9293-4b22a1b4c684}</Project>
