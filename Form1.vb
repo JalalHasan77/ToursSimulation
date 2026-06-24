@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports ToursSimulatorNestedClass.TravelForm.Models
 
 Public Class Form1
     Dim CHKSTT As Integer = CheckState.Unchecked
@@ -22,8 +23,8 @@ Public Class Form1
 
         ' Countries with airports (Departure)
         LoadComboBox(
-    cmbxDepartureFrom,
-    "SELECT DISTINCT c.CountryID, c.CountryNameen " &
+        cmbxDepartureFrom.ComboBox1,
+            "SELECT DISTINCT c.CountryID, c.CountryNameen " &
     "FROM DesCountry c " &
     "INNER JOIN AirPorts a ON a.CountryCode = c.CountryID " &
     "ORDER BY c.CountryNameen",
@@ -31,7 +32,7 @@ Public Class Form1
 
         ' Countries with airports (Arrival)
         LoadComboBox(
-    cmbxArrivingTo,
+    cmbxArrivingTo.ComboBox1,
     "SELECT DISTINCT c.CountryID, c.CountryNameen " &
     "FROM DesCountry c " &
     "INNER JOIN AirPorts a ON a.CountryCode = c.CountryID " &
@@ -40,7 +41,7 @@ Public Class Form1
 
         ' Airlines
         LoadComboBox(
-    cmbxAirLine,
+    cmbxAirLine.ComboBox1,
     "SELECT AirlineID, AirLineName FROM Airlines ORDER BY AirLineName",
     "AirlineID", "AirLineName")
 
@@ -304,6 +305,17 @@ Public Class Form1
 
         If SourceList.GetItemChecked(SourceList.SelectedIndex) Then
 
+            ' BUGFIX: SelectedIndexChanged can fire more than once for the
+            ' same already-checked item (e.g. CheckOnClick selecting AND
+            ' checking the row in the same click, or simply re-selecting a
+            ' city that is already checked). Without this guard, the title
+            ' + rows below get appended again on every extra firing, which
+            ' is exactly what produced the duplicated Stay / Attraction
+            ' entries. Clearing out anything already loaded for this parent
+            ' first makes the load idempotent no matter how many times this
+            ' runs for the same checked item.
+            RemoveItemsByParentID(TargetList, CurrentSelectedItem.ID)
+
             ' Add fake title
             Dim i As New TextValueParent(
                 Text:="----" & CurrentSelectedItem.Text & "----",
@@ -389,18 +401,74 @@ Public Class Form1
 
     End Sub
 
-    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs)
-        ' Countries with airports (Arrival)
-        LoadComboBox(
-        cmbxDepartureLocation,
-            "SELECT AirPortID,AirPortName " &
-            " FROM AirPorts " &
-            " where CountryCode = " & CType(cmbxDepartureFrom.SelectedItem, TextValueParent).ID,
-            "AirPortID", "AirPortName")
+    ''' <summary>
+    ''' Reads TabPage1 — Title, Sub Title, Countries (CheckedListBox1),
+    ''' Cities (CheckedListBox2, tri-state), Stay (CheckedListBox3) and
+    ''' Attraction (CheckedListBox4) — and packs ONLY the checked items
+    ''' from each list into a TravelFormData instance (TravelFormData.vb).
+    ''' Unchecked rows and the "----Header----" separator rows are skipped.
+    ''' </summary>
+    ''' <remarks>
+    ''' txbxTripTitle / txbxTripSubTitle are TextBoxWithCheckBox.TextBoxWithCheckBox
+    ''' controls. This assumes they expose public .Checked (the leading
+    ''' checkbox) and .Text (the textbox value) properties — rename those
+    ''' two property accesses below if the control's real members differ.
+    ''' </remarks>
+    Public Function SaveTabPage1Data() As TravelFormData
 
+        Dim data As New TravelFormData()
 
-    End Sub
+        ' ---- Title / Sub Title ---------------------------------------------
+        data.Title = New TitleField(txbxTripTitle.CheckBox1.Checked, txbxTripTitle.TextBox1.Text)
+        data.SubTitle = New TitleField(txbxTripSubTitle.CheckBox1.Checked, txbxTripSubTitle.TextBox1.Text)
 
+        ' ---- Countries (CheckedListBox1) — checked rows only ---------------
+        For idx As Integer = 0 To CheckedListBox1.Items.Count - 1
+            If Not CheckedListBox1.GetItemChecked(idx) Then Continue For
+
+            Dim tvp As TextValueParent = CType(CheckedListBox1.Items(idx), TextValueParent)
+            If tvp.ID = "" Then Continue For ' skip header rows, just in case
+
+            data.Countries.Add(New CheckListItem(name:=tvp.Text, isChecked:=True))
+        Next
+
+        ' ---- Cities (CheckedListBox2) — tri-state, skip Unchecked only -----
+        For idx As Integer = 0 To CheckedListBox2.Items.Count - 1
+            ' CheckState.Unchecked/Checked/Indeterminate share the same
+            ' underlying values (0/1/2) as our TriState enum, so this cast
+            ' carries the third (grayed) state across correctly.
+            Dim state As TriState = CType(CheckedListBox2.GetItemCheckState(idx), TriState)
+            If state = TriState.Unchecked Then Continue For
+
+            Dim tvp As TextValueParent = CType(CheckedListBox2.Items(idx), TextValueParent)
+            If tvp.ID = "" Then Continue For ' skip header rows, just in case
+
+            data.Cities.Add(New CityListItem(name:=tvp.Text, state:=state))
+        Next
+
+        ' ---- Stay (CheckedListBox3) — checked rows only ---------------------
+        For idx As Integer = 0 To CheckedListBox3.Items.Count - 1
+            If Not CheckedListBox3.GetItemChecked(idx) Then Continue For
+
+            Dim tvp As TextValueParent = CType(CheckedListBox3.Items(idx), TextValueParent)
+            If tvp.ID = "" Then Continue For ' skip header rows, just in case
+
+            data.Stays.Add(New CheckListItem(name:=tvp.Text, isChecked:=True))
+        Next
+
+        ' ---- Attraction (CheckedListBox4) — checked rows only ---------------
+        For idx As Integer = 0 To CheckedListBox4.Items.Count - 1
+            If Not CheckedListBox4.GetItemChecked(idx) Then Continue For
+
+            Dim tvp As TextValueParent = CType(CheckedListBox4.Items(idx), TextValueParent)
+            If tvp.ID = "" Then Continue For ' skip header rows, just in case
+
+            data.Attractions.Add(New CheckListItem(name:=tvp.Text, isChecked:=True))
+        Next
+
+        Return data
+
+    End Function
 
     Private Sub ResetAllFields()
         ' Reset all fields
@@ -408,38 +476,31 @@ Public Class Form1
 
         txbxDuration.Text = ""
 
-        DepartureDate.Value = Now
-        DepartureTime.Value = Now
-        ArrivalDate.Value = Now
-        ArrivalTime.Value = Now
+        cmbxDepartureDate.lcDateTimePicker.Value = Now
+        cmbxDepartureTime.lcTime.Value = Now
 
-        cmbxDepartureFrom.SelectedIndex = 0
-        cmbxDepartureLocation.SelectedIndex = 0
-        cmbxAirLine.SelectedIndex = 0
-        cmbxArrivingTo.SelectedIndex = 0
-        cmbxArrivingLocation.SelectedIndex = 0
+        ArrivalDate.lcDateTimePicker.Value = Now
+        cmbxArrivalTime.lcTime.Value = Now
+
+        cmbxDepartureFrom.ComboBox1.SelectedIndex = 0
+        cmbxDepartureCity.ComboBox1.SelectedIndex = 0
+        cmbxDepartureLocation.ComboBox1.SelectedIndex = 0
+
+        cmbxAirLine.ComboBox1.SelectedIndex = 0
+
+        cmbxArrivingTo.ComboBox1.SelectedIndex = 0
+        cmbxDepartureCity.ComboBox1.SelectedIndex = 0
+        cmbxArrivingLocation.ComboBox1.SelectedIndex = 0
     End Sub
 
-    Private Sub CmbxArrivingTo_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxArrivingTo.SelectedIndexChanged
-        If cmbxArrivingTo.SelectedItem Is Nothing Then Exit Sub
-        Dim countryID As String = CType(cmbxArrivingTo.SelectedItem, TextValueParent).ID
+
+
+    Private Sub CmbxDepartureFrom_SelectedIndexChanged(sender As Object, e As EventArgs)
+        If cmbxDepartureFrom.ComboBox1.SelectedItem Is Nothing Then Exit Sub
+        Dim countryID As String = CType(cmbxDepartureFrom.ComboBox1.SelectedItem, TextValueParent).ID
 
         LoadComboBox(
-        cmbxArrivingCity,
-        "SELECT DISTINCT c.CityID, c.CityNameEn " &
-        "FROM DesCities c " &
-        "INNER JOIN CityAirports ca ON ca.CityID = c.CityID " &
-        "WHERE c.CountryID = " & countryID &
-        " ORDER BY c.CityNameEn",
-        "CityID", "CityNameEn")
-    End Sub
-
-    Private Sub CmbxDepartureFrom_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxDepartureFrom.SelectedIndexChanged
-        If cmbxDepartureFrom.SelectedItem Is Nothing Then Exit Sub
-        Dim countryID As String = CType(cmbxDepartureFrom.SelectedItem, TextValueParent).ID
-
-        LoadComboBox(
-        cmbxDepartureCity,
+        cmbxDepartureCity.ComboBox1,
         "SELECT DISTINCT c.CityID, c.CityNameEn " &
         "FROM DesCities c " &
         "INNER JOIN CityAirports ca ON ca.CityID = c.CityID " &
@@ -457,51 +518,50 @@ Public Class Form1
         Dim L As LayOver = TryCast(selectedItem, LayOver)
 
         If F IsNot Nothing Then
-
-
             ' Switch to Flight tab in TabControl2
-            TabControl2.SelectedTab = TabControl2.TabPages("tab" & F.TransferMean)
+            TabControl3.SelectedTab = TabControl3.TabPages("TabPage8")
+            SelectRadioButtonByTag("Airplane")
 
             ' Text fields
             txtTitle.Text = F.Title
-            DepartureDate.Value = F.DepartureDate
-            DepartureTime.Value = DepartureDate.Value.Add(F.DepartureTime)
-            ArrivalDate.Value = F.ArrivalDate
-            ArrivalTime.Value = ArrivalDate.Value.Add(F.ArrivalTime)
+            cmbxDepartureDate.lcDateTimePicker.Value = F.DepartureDate
+            cmbxDepartureTime.lcTime.Value = cmbxDepartureDate.lcDateTimePicker.Value.Add(F.DepartureTime)
+            ArrivalDate.lcDateTimePicker.Value = F.ArrivalDate
+            cmbxArrivalTime.lcTime.Value = ArrivalDate.lcDateTimePicker.Value.Add(F.ArrivalTime)
             txbxDuration.Text = F.Duration
 
             ' --- DEPARTURE ---
             ' Step 1: Set Country → triggers CmbxDepartureFrom_SelectedIndexChanged
             '         which reloads cmbxDepartureCity
-            SetComboByID(cmbxDepartureFrom, F.DepartureFrom)
+            SetComboByID(cmbxDepartureFrom.ComboBox1, F.DepartureFrom)
 
             ' Step 2: Set City → triggers CmbxDepartureCity_SelectedIndexChanged
             '         which reloads cmbxDepartureAirPort
-            SetComboByID(cmbxDepartureCity, F.DepartureCity)
+            SetComboByID(cmbxDepartureCity.ComboBox1, F.DepartureCity)
 
             ' Step 3: Set Airport (list is now populated by step 2)
-            SetComboByID(cmbxDepartureLocation, F.DeparturePoint)
+            SetComboByID(cmbxDepartureLocation.ComboBox1, F.DeparturePoint)
 
             ' --- AIRLINE ---
-            SetComboByID(cmbxAirLine, F.AirLine)
+            SetComboByID(cmbxAirLine.ComboBox1, F.AirLine)
 
             ' --- ARRIVING ---
             ' Step 1: Set Country → triggers CmbxArrivingTo_SelectedIndexChanged
             '         which reloads cmbxArrivingCity
-            SetComboByID(cmbxArrivingTo, F.ArrivingTo)
+            SetComboByID(cmbxArrivingTo.ComboBox1, F.ArrivingTo)
 
             ' Step 2: Set City → triggers CmbxArrivingCity_SelectedIndexChanged
             '         which reloads cmbxArrivingPort
-            SetComboByID(cmbxArrivingCity, F.ArrivalCity)
+            SetComboByID(cmbxArrivingCity.ComboBox1, F.ArrivalCity)
 
             ' Step 3: Set Airport (list is now populated by step 2)
-            SetComboByID(cmbxArrivingLocation, F.ArrivalPoint)
+            SetComboByID(cmbxArrivingLocation.ComboBox1, F.ArrivalPoint)
 
         ElseIf L IsNot Nothing Then
 
 
             ' Switch to LayOver tab in TabControl2
-            TabControl2.SelectedTab = TabControl2.TabPages("tabLayOver")
+            TabControl3.SelectedTab = TabControl3.TabPages("TabPage9")
 
             txtTitle.Text = L.Title
             DateTimePicker1.Value = L.DepartureDate
@@ -510,6 +570,18 @@ Public Class Form1
             DateTimePicker4.Value = L.ArrivalDate.Add(L.ArrivalTime)
             txbxDuration.Text = L.Duration
         End If
+    End Sub
+
+    Private Sub SelectRadioButtonByTag(tagValue As Object)
+        Dim buttons As RadioButton() = {RadioButton1, RadioButton2, RadioButton3, RadioButton4,
+                                     RadioButton5, RadioButton6, RadioButton7, RadioButton8}
+
+        For Each rb As RadioButton In buttons
+            If Object.Equals(rb.Tag, tagValue) Then
+                rb.Checked = True
+                Exit Sub
+            End If
+        Next
     End Sub
 
 
@@ -524,7 +596,7 @@ Public Class Form1
         Next
     End Sub
 
-    Private Sub TabPage3_Click(sender As Object, e As EventArgs) Handles tabAirCraft.Click
+    Private Sub TabPage3_Click(sender As Object, e As EventArgs)
 
     End Sub
 
@@ -533,21 +605,23 @@ Public Class Form1
 
             Dim F As New Flight
             F.TransferMean = getChosedTransfer()
+            SelectRadioButtonByTag(F.TransferMean)
             F.Title = txtTitle.Text
-            F.DepartureFrom = CType(cmbxDepartureFrom.SelectedItem, TextValueParent)
-            F.DepartureCity = CType(cmbxDepartureCity.SelectedItem, TextValueParent)
-            F.DeparturePoint = CType(cmbxDepartureLocation.SelectedItem, TextValueParent)
-            F.DepartureDate = DepartureDate.Value.Date
-            F.DepartureTime = TimeSpan.Parse(DepartureTime.Text)
+            F.DepartureFrom = CType(cmbxDepartureFrom.ComboBox1.SelectedItem, TextValueParent)
+            F.DepartureCity = CType(cmbxDepartureCity.ComboBox1.SelectedItem, TextValueParent)
+            F.DeparturePoint = CType(cmbxDepartureLocation.ComboBox1.SelectedItem, TextValueParent)
+            F.DepartureDate = cmbxDepartureDate.lcDateTimePicker.Value.Date
+            F.DepartureTime = TimeSpan.Parse(cmbxDepartureTime.lcTime.Value.ToString("HH:mm"))
 
-            F.ArrivingTo = CType(cmbxArrivingTo.SelectedItem, TextValueParent)
-            F.ArrivalCity = CType(cmbxArrivingCity.SelectedItem, TextValueParent)
-            F.ArrivalPoint = CType(cmbxArrivingLocation.SelectedItem, TextValueParent)
-            F.ArrivalDate = ArrivalDate.Value.Date
-            F.ArrivalTime = TimeSpan.Parse(ArrivalTime.Text)
 
-            If TabControl2.SelectedTab.Name = "tabAirCraft" Then
-                F.AirLine = CType(cmbxAirLine.SelectedItem, TextValueParent)
+            F.ArrivingTo = CType(cmbxArrivingTo.ComboBox1.SelectedItem, TextValueParent)
+            F.ArrivalCity = CType(cmbxArrivingCity.ComboBox1.SelectedItem, TextValueParent)
+            F.ArrivalPoint = CType(cmbxArrivingLocation.ComboBox1.SelectedItem, TextValueParent)
+            F.ArrivalDate = ArrivalDate.lcDateTimePicker.Value.Date
+            F.ArrivalTime = TimeSpan.Parse(cmbxArrivalTime.lcTime.Value.ToString("HH:mm"))
+
+            If F.TransferMean = "Airplane" Then
+                F.AirLine = CType(cmbxAirLine.ComboBox1.SelectedItem, TextValueParent)
             Else
                 F.AirLine = Nothing
             End If
@@ -559,10 +633,10 @@ Public Class Form1
 
             ' Display in MaskedTextBox1 as dd:HH:mm:ss
             txbxDuration.Text = String.Format("{0:0}:{1:0}:{2:0}:{3:0}",
-                                        FlightDuration.Days,
-                                        FlightDuration.Hours,
-                                        FlightDuration.Minutes,
-                                        FlightDuration.Seconds)
+                                    FlightDuration.Days,
+                                    FlightDuration.Hours,
+                                    FlightDuration.Minutes,
+                                    FlightDuration.Seconds)
             ' ──────────────────────────────────────────────────────
             F.Duration = txbxDuration.Text
             ListBox1.Items.Add(F)
@@ -599,12 +673,14 @@ Public Class Form1
     End Sub
 
     Private Function getChosedTransfer() As String
-        Dim TransferMean As String = TabControl2.SelectedTab.Name
-        TransferMean = TransferMean.Replace("tab", "")
-        getChosedTransfer = TransferMean
+        'Dim TransferMean As String = TabControl2.SelectedTab.Name
+        'TransferMean = TransferMean.Replace("tab", "")
+        'getChosedTransfer = TransferMean
+
+        Return GetSelectedRadioButtonTag(TabPage8)
     End Function
 
-    Private Sub TabControl2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl2.SelectedIndexChanged
+    Private Sub TabControl2_SelectedIndexChanged(sender As Object, e As EventArgs)
 
         Try
             'Panel2.Visible = False
@@ -620,8 +696,8 @@ Public Class Form1
 
             'End Select
 
-            LoadLocationComboBox(cmbxDepartureCity, cmbxDepartureLocation)
-            LoadLocationComboBox(cmbxArrivingCity, cmbxArrivingLocation)
+            LoadLocationComboBox(cmbxDepartureCity.ComboBox1, cmbxDepartureLocation.ComboBox1)
+            LoadLocationComboBox(cmbxArrivingCity.ComboBox1, cmbxArrivingLocation.ComboBox1)
 
         Catch ex As Exception
 
@@ -637,13 +713,17 @@ Public Class Form1
     Private Sub DateTimePicker6_Leave(sender As Object, e As EventArgs)
     End Sub
 
-    Private Sub CmbxDepartureCity_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxDepartureCity.SelectedIndexChanged
-        LoadLocationComboBox(cmbxDepartureCity, cmbxDepartureLocation)
+    Private Sub CmbxDepartureCity_SelectedIndexChanged(sender As Object, e As EventArgs)
+        LoadLocationComboBox(cmbxDepartureCity.ComboBox1, cmbxDepartureLocation.ComboBox1)
     End Sub
 
-    Private Sub CmbxArrivingCity_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxArrivingCity.SelectedIndexChanged
-        LoadLocationComboBox(cmbxArrivingCity, cmbxArrivingLocation)
+    Private Sub ComboBoxWithCheckBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxDepartureCity.SelectedIndexChanged
+        LoadLocationComboBox(cmbxDepartureCity.ComboBox1, cmbxDepartureLocation.ComboBox1)
+    End Sub
 
+
+    Private Sub CmbxArrivingCity_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxArrivingCity.SelectedIndexChanged
+        LoadLocationComboBox(cmbxArrivingCity.ComboBox1, cmbxArrivingLocation.ComboBox1)
     End Sub
 
     Private Sub LoadLocationComboBox(cmbxCity As ComboBox, cmbxLocation As ComboBox)
@@ -653,9 +733,9 @@ Public Class Form1
         Dim cityID As String = CType(cmbxCity.SelectedItem, TextValueParent).ID
 
         Dim categoryFilter As String = ""
-        Select Case TabControl2.SelectedTab.Name
-            Case "tabAirCraft" : categoryFilter = " AND Category = 'AirPort'"
-            Case "tabTrain" : categoryFilter = " AND Category = 'Train'"
+        Select Case GetSelectedRadioButtonTag(TabPage8)
+            Case "Airplane" : categoryFilter = " AND Category = 'AirPort'"
+            Case "Train" : categoryFilter = " AND Category = 'Train'"
         End Select
 
         Dim SQL As String =
@@ -683,19 +763,19 @@ Public Class Form1
         If TabControl3.SelectedIndex = 0 Then
             If F IsNot Nothing Then
                 'Flight is Found
-                DepartureDate.Value = F.ArrivalDate
-                DepartureTime.Value = F.ArrivalDate.Add(F.ArrivalTime)
+                cmbxDepartureDate.lcDateTimePicker.Value = F.ArrivalDate
+                cmbxDepartureTime.lcTime.Value = F.ArrivalDate.Add(F.ArrivalTime)
             Else
-                DepartureDate.Value = L.ArrivalDate
-                DepartureTime.Value = L.ArrivalDate.Add(L.ArrivalTime)
+                cmbxDepartureDate.lcDateTimePicker.Value = L.ArrivalDate
+                cmbxDepartureTime.lcTime.Value = L.ArrivalDate.Add(L.ArrivalTime)
 
                 lastItem = ListBox1.Items(ListBox1.Items.Count - 2)
                 F = TryCast(lastItem, Flight)
             End If
 
-            SetComboByID(cmbxDepartureFrom, F.ArrivingTo)
-            SetComboByID(cmbxDepartureCity, F.ArrivalCity)
-            SetComboByID(cmbxDepartureLocation, F.ArrivalPoint)
+            SetComboByID(cmbxDepartureFrom.ComboBox1, F.ArrivingTo)
+            SetComboByID(cmbxDepartureCity.ComboBox1, F.ArrivalCity)
+            SetComboByID(cmbxDepartureLocation.ComboBox1, F.ArrivalPoint)
         Else
             DateTimePicker1.Value = F.ArrivalDate
             DateTimePicker2.Value = F.ArrivalDate.Add(F.ArrivalTime)
@@ -704,12 +784,12 @@ Public Class Form1
     End Sub
 
     Private Sub LinkLabel2_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel2.LinkClicked
-        OpenAddLocations(cmbxArrivingTo, cmbxArrivingCity, cmbxArrivingLocation)
+        OpenAddLocations(cmbxArrivingTo.ComboBox1, cmbxArrivingCity.ComboBox1, cmbxArrivingLocation.ComboBox1)
     End Sub
 
     Private Sub LinkLabel1_MouseClick(sender As Object, e As MouseEventArgs) Handles LinkLabel1.MouseClick
         ' For Departure
-        OpenAddLocations(cmbxDepartureFrom, cmbxDepartureCity, cmbxDepartureLocation)
+        OpenAddLocations(cmbxDepartureFrom.ComboBox1, cmbxDepartureCity.ComboBox1, cmbxDepartureLocation.ComboBox1)
     End Sub
 
     Private Sub OpenAddLocations(
@@ -728,10 +808,10 @@ Public Class Form1
         If F.ShowDialog() = DialogResult.OK Then
 
             Dim categoryFilter As String = ""
-            Select Case TabControl2.SelectedTab.Name
-                Case "tabFlight" : categoryFilter = " AND Category = 'AirPort'"
-                Case "tabTrain" : categoryFilter = " AND Category = 'Train'"
-                Case "tabBus" : categoryFilter = " AND Category = 'Bus'"
+            Select Case GetSelectedRadioButtonTag(TabPage8)
+                Case "Airplane" : categoryFilter = " AND Category = 'AirPort'"
+                Case "Train" : categoryFilter = " AND Category = 'Train'"
+                Case "Bus" : categoryFilter = " AND Category = 'Bus'"
             End Select
 
             Dim SQL As String =
@@ -854,6 +934,65 @@ Public Class Form1
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
         ListBox3.Items.RemoveAt(ListBox3.SelectedIndex)
+    End Sub
+
+    Private Sub ComboBoxWithCheckBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxDepartureFrom.SelectedIndexChanged
+        If cmbxDepartureFrom.ComboBox1.SelectedItem Is Nothing Then Exit Sub
+        Dim countryID As String = CType(cmbxDepartureFrom.ComboBox1.SelectedItem, TextValueParent).ID
+
+        LoadComboBox(
+        cmbxDepartureCity.ComboBox1,
+        "SELECT DISTINCT c.CityID, c.CityNameEn " &
+        "FROM DesCities c " &
+        "INNER JOIN CityAirports ca ON ca.CityID = c.CityID " &
+        "WHERE c.CountryID = " & countryID &
+        " ORDER BY c.CityNameEn",
+        "CityID", "CityNameEn")
+    End Sub
+
+    Private Sub CmbxArrivingTo_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxArrivingTo.SelectedIndexChanged
+        If cmbxArrivingTo.ComboBox1.SelectedItem Is Nothing Then Exit Sub
+        Dim countryID As String = CType(cmbxArrivingTo.ComboBox1.SelectedItem, TextValueParent).ID
+
+        LoadComboBox(
+        cmbxArrivingCity.ComboBox1,
+        "SELECT DISTINCT c.CityID, c.CityNameEn " &
+        "FROM DesCities c " &
+        "INNER JOIN CityAirports ca ON ca.CityID = c.CityID " &
+        "WHERE c.CountryID = " & countryID &
+        " ORDER BY c.CityNameEn",
+        "CityID", "CityNameEn")
+    End Sub
+
+    Private Sub CheckedListBox2_ItemCheck(sender As Object, e As ItemCheckEventArgs) Handles CheckedListBox2.ItemCheck
+        Select Case e.CurrentValue
+            Case CheckState.Unchecked
+                e.NewValue = CheckState.Checked
+            Case CheckState.Checked
+                e.NewValue = CheckState.Indeterminate
+            Case Else ' Indeterminate
+                e.NewValue = CheckState.Unchecked
+        End Select
+    End Sub
+
+    Private Function GetSelectedRadioButtonTag(container As Control) As Object
+        For Each ctrl As Control In container.Controls
+            Dim rb As RadioButton = TryCast(ctrl, RadioButton)
+            If rb IsNot Nothing AndAlso rb.Checked Then
+                Return rb.Tag
+            End If
+        Next
+        Return Nothing
+    End Function
+
+    Private Sub Button8_Click(sender As Object, e As EventArgs)
+        MsgBox(GetSelectedRadioButtonTag(TabPage8))
+    End Sub
+
+    Private Sub Button8_Click_1(sender As Object, e As EventArgs) Handles Button8.Click
+        Dim A As New TravelFormData
+        A = SaveTabPage1Data()
+
     End Sub
 End Class
 

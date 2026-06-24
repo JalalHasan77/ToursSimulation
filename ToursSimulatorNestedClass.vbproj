@@ -130,6 +130,7 @@
     <Compile Include="Service.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="TravelBasicInfo.vb" />
     <Compile Include="TwoPairs.vb" />
     <Compile Include="UserControl1.Designer.vb">
       <DependentUpon>UserControl1.vb</DependentUpon>
@@ -189,6 +190,10 @@
     <ProjectReference Include="..\CheckBoxWIconAndComment\CheckBoxWIconAndComment.vbproj">
       <Project>{4c9049cc-0a5d-42a7-b134-ad01b4143184}</Project>
       <Name>CheckBoxWIconAndComment</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ComboBoxWithCheckBox\ComboBoxWithCheckBox.vbproj">
+      <Project>{DBA6B569-79A5-444B-823B-B8DDC5F64BC2}</Project>
+      <Name>ComboBoxWithCheckBox</Name>
     </ProjectReference>
     <ProjectReference Include="..\DateTimeDuration\DateTimeDuration.vbproj">
       <Project>{89A3D393-A620-4670-B888-290B43C603F9}</Project>

@@ -42,6 +42,7 @@ Partial Class Form1
         Me.PriceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.CheckedListBox1 = New System.Windows.Forms.CheckedListBox()
@@ -57,14 +58,21 @@ Partial Class Form1
         Me.Label6 = New System.Windows.Forms.Label()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.Button8 = New System.Windows.Forms.Button()
+        Me.txbxTripSubTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txbxTripTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
         Me.TabControl5 = New System.Windows.Forms.TabControl()
         Me.TabPage16 = New System.Windows.Forms.TabPage()
-        Me.Label15 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.DateWithCheckBox7 = New DateWithCheckBox.DateWithCheckBox()
+        Me.DateWithCheckBox8 = New DateWithCheckBox.DateWithCheckBox()
+        Me.DateWithCheckBox6 = New DateWithCheckBox.DateWithCheckBox()
+        Me.DateWithCheckBox5 = New DateWithCheckBox.DateWithCheckBox()
         Me.TabPage17 = New System.Windows.Forms.TabPage()
-        Me.TextBox14 = New System.Windows.Forms.TextBox()
-        Me.TextBox15 = New System.Windows.Forms.TextBox()
+        Me.TextBoxWithCheckBox29 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.TextBoxWithCheckBox28 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.Label22 = New System.Windows.Forms.Label()
         Me.Label23 = New System.Windows.Forms.Label()
         Me.Label21 = New System.Windows.Forms.Label()
@@ -76,41 +84,30 @@ Partial Class Form1
         Me.Label24 = New System.Windows.Forms.Label()
         Me.TabControl3 = New System.Windows.Forms.TabControl()
         Me.TabPage8 = New System.Windows.Forms.TabPage()
-        Me.LinkLabel2 = New System.Windows.Forms.LinkLabel()
-        Me.cmbxDepartureCity = New System.Windows.Forms.ComboBox()
-        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
-        Me.Label28 = New System.Windows.Forms.Label()
-        Me.Label29 = New System.Windows.Forms.Label()
-        Me.TabControl2 = New System.Windows.Forms.TabControl()
-        Me.tabAirCraft = New System.Windows.Forms.TabPage()
-        Me.tabCaravan = New System.Windows.Forms.TabPage()
-        Me.tabGMC = New System.Windows.Forms.TabPage()
-        Me.tabBus = New System.Windows.Forms.TabPage()
-        Me.tabHike = New System.Windows.Forms.TabPage()
-        Me.tabTrain = New System.Windows.Forms.TabPage()
-        Me.tabMiniBus = New System.Windows.Forms.TabPage()
-        Me.tabCruise = New System.Windows.Forms.TabPage()
-        Me.tabLayOver = New System.Windows.Forms.TabPage()
+        Me.RadioButton8 = New System.Windows.Forms.RadioButton()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.ArrivalDate = New System.Windows.Forms.DateTimePicker()
-        Me.cmbxArrivingCity = New System.Windows.Forms.ComboBox()
-        Me.ArrivalTime = New System.Windows.Forms.DateTimePicker()
+        Me.cmbxArrivalTime = New TimeWithCheckBox.TimeWithCheckBox()
+        Me.RadioButton7 = New System.Windows.Forms.RadioButton()
+        Me.ArrivalDate = New DateWithCheckBox.DateWithCheckBox()
+        Me.RadioButton6 = New System.Windows.Forms.RadioButton()
+        Me.cmbxArrivingLocation = New ComboBoxWithCheckBox.ComboBoxWithCheckBox()
+        Me.RadioButton5 = New System.Windows.Forms.RadioButton()
+        Me.cmbxArrivingCity = New ComboBoxWithCheckBox.ComboBoxWithCheckBox()
+        Me.RadioButton4 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton3 = New System.Windows.Forms.RadioButton()
+        Me.cmbxArrivingTo = New ComboBoxWithCheckBox.ComboBoxWithCheckBox()
+        Me.RadioButton2 = New System.Windows.Forms.RadioButton()
+        Me.cmbxAirLine = New ComboBoxWithCheckBox.ComboBoxWithCheckBox()
+        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
+        Me.cmbxDepartureTime = New TimeWithCheckBox.TimeWithCheckBox()
+        Me.cmbxDepartureDate = New DateWithCheckBox.DateWithCheckBox()
+        Me.cmbxDepartureLocation = New ComboBoxWithCheckBox.ComboBoxWithCheckBox()
+        Me.cmbxDepartureCity = New ComboBoxWithCheckBox.ComboBoxWithCheckBox()
+        Me.cmbxDepartureFrom = New ComboBoxWithCheckBox.ComboBoxWithCheckBox()
+        Me.LinkLabel2 = New System.Windows.Forms.LinkLabel()
+        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.Label13 = New System.Windows.Forms.Label()
-        Me.DepartureDate = New System.Windows.Forms.DateTimePicker()
         Me.txbxDuration = New System.Windows.Forms.MaskedTextBox()
-        Me.DepartureTime = New System.Windows.Forms.DateTimePicker()
-        Me.Label8 = New System.Windows.Forms.Label()
-        Me.cmbxArrivingLocation = New System.Windows.Forms.ComboBox()
-        Me.cmbxArrivingTo = New System.Windows.Forms.ComboBox()
-        Me.Label25 = New System.Windows.Forms.Label()
-        Me.Label11 = New System.Windows.Forms.Label()
-        Me.cmbxAirLine = New System.Windows.Forms.ComboBox()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.Label12 = New System.Windows.Forms.Label()
-        Me.Label10 = New System.Windows.Forms.Label()
-        Me.cmbxDepartureLocation = New System.Windows.Forms.ComboBox()
-        Me.cmbxDepartureFrom = New System.Windows.Forms.ComboBox()
-        Me.Label9 = New System.Windows.Forms.Label()
         Me.TabPage9 = New System.Windows.Forms.TabPage()
         Me.MaskedTextBox1 = New System.Windows.Forms.MaskedTextBox()
         Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker()
@@ -128,38 +125,6 @@ Partial Class Form1
         Me.Including = New System.Windows.Forms.TabPage()
         Me.NotIncluding = New System.Windows.Forms.TabPage()
         Me.DayByDay = New System.Windows.Forms.TabPage()
-        Me.ListBox2 = New System.Windows.Forms.ListBox()
-        Me.tabPricingpolicy = New System.Windows.Forms.TabPage()
-        Me.Additions = New System.Windows.Forms.TabPage()
-        Me.TransferWays = New System.Windows.Forms.TabPage()
-        Me.TabControl4 = New System.Windows.Forms.TabControl()
-        Me.TabPage3 = New System.Windows.Forms.TabPage()
-        Me.TabPage4 = New System.Windows.Forms.TabPage()
-        Me.TabPage5 = New System.Windows.Forms.TabPage()
-        Me.TabPage7 = New System.Windows.Forms.TabPage()
-        Me.TabPage10 = New System.Windows.Forms.TabPage()
-        Me.TabPage11 = New System.Windows.Forms.TabPage()
-        Me.TabPage12 = New System.Windows.Forms.TabPage()
-        Me.TabPage13 = New System.Windows.Forms.TabPage()
-        Me.TabPage14 = New System.Windows.Forms.TabPage()
-        Me.TabPage15 = New System.Windows.Forms.TabPage()
-        Me.Prices = New System.Windows.Forms.TabPage()
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.ImageList2 = New System.Windows.Forms.ImageList(Me.components)
-        Me.Button6 = New System.Windows.Forms.Button()
-        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
-        Me.ListBox3 = New System.Windows.Forms.ListBox()
-        Me.Button5 = New System.Windows.Forms.Button()
-        Me.Button7 = New System.Windows.Forms.Button()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        Me.txbxTripSubTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
-        Me.txbxTripTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
-        Me.DateWithCheckBox7 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox8 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox6 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox5 = New DateWithCheckBox.DateWithCheckBox()
         Me.TextBoxWithCheckBox15 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox16 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox17 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
@@ -173,6 +138,8 @@ Partial Class Form1
         Me.TextBoxWithCheckBox25 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox26 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox27 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.ListBox2 = New System.Windows.Forms.ListBox()
+        Me.tabPricingpolicy = New System.Windows.Forms.TabPage()
         Me.PricingWithCheckBox10 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.PricingWithCheckBox9 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.PricingWithCheckBox8 = New PricingWithCheckBox.PricingWithCheckBox()
@@ -184,6 +151,7 @@ Partial Class Form1
         Me.PricingWithCheckBox2 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.PricingWithCheckBox1 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.UserControl11 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.Additions = New System.Windows.Forms.TabPage()
         Me.PricingWithCheckBox11 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.PricingWithCheckBox12 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.PricingWithCheckBox13 = New PricingWithCheckBox.PricingWithCheckBox()
@@ -195,6 +163,7 @@ Partial Class Form1
         Me.PricingWithCheckBox19 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.PricingWithCheckBox20 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.PricingWithCheckBox21 = New PricingWithCheckBox.PricingWithCheckBox()
+        Me.TransferWays = New System.Windows.Forms.TabPage()
         Me.TextBoxWithCheckBox14 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox13 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox12 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
@@ -208,41 +177,61 @@ Partial Class Form1
         Me.TextBoxWithCheckBox3 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox2 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox1 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
-        Me.TextBoxWithTypeAndCheckbox1 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox2 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox3 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox4 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox5 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox6 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox7 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox8 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox9 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox10 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.TextBoxWithTypeAndCheckbox11 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TabControl4 = New System.Windows.Forms.TabControl()
+        Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.TabPage4 = New System.Windows.Forms.TabPage()
+        Me.TabPage5 = New System.Windows.Forms.TabPage()
+        Me.TabPage7 = New System.Windows.Forms.TabPage()
+        Me.TabPage10 = New System.Windows.Forms.TabPage()
+        Me.TabPage11 = New System.Windows.Forms.TabPage()
+        Me.TabPage12 = New System.Windows.Forms.TabPage()
+        Me.TabPage13 = New System.Windows.Forms.TabPage()
+        Me.TabPage14 = New System.Windows.Forms.TabPage()
+        Me.TabPage15 = New System.Windows.Forms.TabPage()
         Me.TextBoxWithTypeAndCheckbox12 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
-        Me.ContextMenuStrip1.SuspendLayout()
-        Me.Panel1.SuspendLayout()
-        Me.ToolStrip1.SuspendLayout()
-        Me.ContextMenuStrip2.SuspendLayout()
-        Me.TabControl1.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
-        Me.TabPage6.SuspendLayout()
-        Me.TabControl5.SuspendLayout()
-        Me.TabPage16.SuspendLayout()
-        Me.TabPage17.SuspendLayout()
-        Me.TabPage2.SuspendLayout()
-        Me.TabControl3.SuspendLayout()
-        Me.TabPage8.SuspendLayout()
-        Me.TabControl2.SuspendLayout()
-        Me.TabPage9.SuspendLayout()
-        Me.DayByDay.SuspendLayout()
-        Me.tabPricingpolicy.SuspendLayout()
-        Me.Additions.SuspendLayout()
-        Me.TransferWays.SuspendLayout()
-        Me.TabControl4.SuspendLayout()
-        Me.TabPage15.SuspendLayout()
-        Me.Prices.SuspendLayout()
-        Me.SuspendLayout()
+        Me.TextBoxWithTypeAndCheckbox11 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox10 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox9 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox8 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox7 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox6 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox5 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox4 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox3 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox2 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.TextBoxWithTypeAndCheckbox1 = New TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox()
+        Me.Prices = New System.Windows.Forms.TabPage()
+        Me.Button7 = New System.Windows.Forms.Button()
+        Me.Button5 = New System.Windows.Forms.Button()
+        Me.ListBox3 = New System.Windows.Forms.ListBox()
+        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.ImageList2 = New System.Windows.Forms.ImageList(Me.components)
+        Me.Button6 = New System.Windows.Forms.Button()
+        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
+        Me.ContextMenuStrip1.SuspendLayout
+        Me.Panel1.SuspendLayout
+        Me.ToolStrip1.SuspendLayout
+        Me.ContextMenuStrip2.SuspendLayout
+        Me.TabControl1.SuspendLayout
+        Me.TabPage1.SuspendLayout
+        Me.TabPage6.SuspendLayout
+        Me.TabControl5.SuspendLayout
+        Me.TabPage16.SuspendLayout
+        Me.TabPage17.SuspendLayout
+        Me.TabPage2.SuspendLayout
+        Me.TabControl3.SuspendLayout
+        Me.TabPage8.SuspendLayout
+        Me.TabPage9.SuspendLayout
+        Me.DayByDay.SuspendLayout
+        Me.tabPricingpolicy.SuspendLayout
+        Me.Additions.SuspendLayout
+        Me.TransferWays.SuspendLayout
+        Me.TabControl4.SuspendLayout
+        Me.TabPage15.SuspendLayout
+        Me.Prices.SuspendLayout
+        Me.SuspendLayout
         '
         'TreeView1
         '
@@ -362,9 +351,18 @@ Partial Class Form1
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
+        'ToolStripButton1
+        '
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(24, 24)
+        Me.ToolStripButton1.Text = "ToolStripButton1"
+        '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(1548, 12)
+        Me.Button1.Location = New System.Drawing.Point(1372, 5)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(75, 23)
         Me.Button1.TabIndex = 2
@@ -373,10 +371,10 @@ Partial Class Form1
         '
         'TextBox1
         '
-        Me.TextBox1.Location = New System.Drawing.Point(1548, 41)
+        Me.TextBox1.Location = New System.Drawing.Point(1372, 34)
         Me.TextBox1.Multiline = True
         Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(101, 145)
+        Me.TextBox1.Size = New System.Drawing.Size(265, 145)
         Me.TextBox1.TabIndex = 3
         '
         'CheckedListBox1
@@ -422,6 +420,7 @@ Partial Class Form1
         Me.CheckedListBox2.Name = "CheckedListBox2"
         Me.CheckedListBox2.Size = New System.Drawing.Size(186, 199)
         Me.CheckedListBox2.TabIndex = 9
+        Me.CheckedListBox2.ThreeDCheckBoxes = True
         '
         'CheckedListBox3
         '
@@ -488,6 +487,7 @@ Partial Class Form1
         '
         'TabPage1
         '
+        Me.TabPage1.Controls.Add(Me.Button8)
         Me.TabPage1.Controls.Add(Me.CheckedListBox1)
         Me.TabPage1.Controls.Add(Me.CheckedListBox2)
         Me.TabPage1.Controls.Add(Me.CheckedListBox3)
@@ -504,6 +504,35 @@ Partial Class Form1
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "TabPage1"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'Button8
+        '
+        Me.Button8.Location = New System.Drawing.Point(770, 20)
+        Me.Button8.Name = "Button8"
+        Me.Button8.Size = New System.Drawing.Size(75, 23)
+        Me.Button8.TabIndex = 16
+        Me.Button8.Text = "SAVE"
+        Me.Button8.UseVisualStyleBackColor = True
+        '
+        'txbxTripSubTitle
+        '
+        Me.txbxTripSubTitle.BackColor = System.Drawing.Color.Transparent
+        Me.txbxTripSubTitle.lcTitle = "Subtitle"
+        Me.txbxTripSubTitle.length = 400
+        Me.txbxTripSubTitle.Location = New System.Drawing.Point(24, 49)
+        Me.txbxTripSubTitle.Name = "txbxTripSubTitle"
+        Me.txbxTripSubTitle.Size = New System.Drawing.Size(477, 23)
+        Me.txbxTripSubTitle.TabIndex = 1
+        '
+        'txbxTripTitle
+        '
+        Me.txbxTripTitle.BackColor = System.Drawing.Color.Transparent
+        Me.txbxTripTitle.lcTitle = "Title"
+        Me.txbxTripTitle.length = 500
+        Me.txbxTripTitle.Location = New System.Drawing.Point(24, 20)
+        Me.txbxTripTitle.Name = "txbxTripTitle"
+        Me.txbxTripTitle.Size = New System.Drawing.Size(577, 23)
+        Me.txbxTripTitle.TabIndex = 0
         '
         'TabPage6
         '
@@ -534,8 +563,8 @@ Partial Class Form1
         '
         'TabPage16
         '
-        Me.TabPage16.Controls.Add(Me.Label15)
         Me.TabPage16.Controls.Add(Me.Label3)
+        Me.TabPage16.Controls.Add(Me.Label7)
         Me.TabPage16.Controls.Add(Me.DateWithCheckBox7)
         Me.TabPage16.Controls.Add(Me.DateWithCheckBox8)
         Me.TabPage16.Controls.Add(Me.DateWithCheckBox6)
@@ -546,18 +575,8 @@ Partial Class Form1
         Me.TabPage16.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.TabPage16.Size = New System.Drawing.Size(277, 202)
         Me.TabPage16.TabIndex = 0
-        Me.TabPage16.Text = "TabPage16"
+        Me.TabPage16.Text = "Specific Dates"
         Me.TabPage16.UseVisualStyleBackColor = True
-        '
-        'Label15
-        '
-        Me.Label15.AutoSize = True
-        Me.Label15.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
-        Me.Label15.Location = New System.Drawing.Point(19, 105)
-        Me.Label15.Name = "Label15"
-        Me.Label15.Size = New System.Drawing.Size(46, 13)
-        Me.Label15.TabIndex = 5
-        Me.Label15.Text = "Travel:"
         '
         'Label3
         '
@@ -565,56 +584,109 @@ Partial Class Form1
         Me.Label3.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
         Me.Label3.Location = New System.Drawing.Point(13, 19)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(87, 13)
-        Me.Label3.TabIndex = 4
-        Me.Label3.Text = "Registeration:"
+        Me.Label3.Size = New System.Drawing.Size(124, 13)
+        Me.Label3.TabIndex = 13
+        Me.Label3.Text = "Registeration During"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
+        Me.Label7.Location = New System.Drawing.Point(13, 105)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(83, 13)
+        Me.Label7.TabIndex = 14
+        Me.Label7.Text = "Travel During"
+        '
+        'DateWithCheckBox7
+        '
+        Me.DateWithCheckBox7.BackColor = System.Drawing.SystemColors.Control
+        Me.DateWithCheckBox7.lcTitle = "To"
+        Me.DateWithCheckBox7.Location = New System.Drawing.Point(16, 150)
+        Me.DateWithCheckBox7.Name = "DateWithCheckBox7"
+        Me.DateWithCheckBox7.Size = New System.Drawing.Size(175, 23)
+        Me.DateWithCheckBox7.TabIndex = 3
+        '
+        'DateWithCheckBox8
+        '
+        Me.DateWithCheckBox8.BackColor = System.Drawing.SystemColors.Control
+        Me.DateWithCheckBox8.lcTitle = "From"
+        Me.DateWithCheckBox8.Location = New System.Drawing.Point(16, 121)
+        Me.DateWithCheckBox8.Name = "DateWithCheckBox8"
+        Me.DateWithCheckBox8.Size = New System.Drawing.Size(175, 23)
+        Me.DateWithCheckBox8.TabIndex = 2
+        '
+        'DateWithCheckBox6
+        '
+        Me.DateWithCheckBox6.BackColor = System.Drawing.SystemColors.Control
+        Me.DateWithCheckBox6.lcTitle = "To"
+        Me.DateWithCheckBox6.Location = New System.Drawing.Point(16, 64)
+        Me.DateWithCheckBox6.Name = "DateWithCheckBox6"
+        Me.DateWithCheckBox6.Size = New System.Drawing.Size(175, 23)
+        Me.DateWithCheckBox6.TabIndex = 1
+        '
+        'DateWithCheckBox5
+        '
+        Me.DateWithCheckBox5.BackColor = System.Drawing.SystemColors.Control
+        Me.DateWithCheckBox5.lcTitle = "From"
+        Me.DateWithCheckBox5.Location = New System.Drawing.Point(16, 35)
+        Me.DateWithCheckBox5.Name = "DateWithCheckBox5"
+        Me.DateWithCheckBox5.Size = New System.Drawing.Size(175, 23)
+        Me.DateWithCheckBox5.TabIndex = 0
         '
         'TabPage17
         '
-        Me.TabPage17.Controls.Add(Me.TextBox14)
-        Me.TabPage17.Controls.Add(Me.TextBox15)
+        Me.TabPage17.Controls.Add(Me.TextBoxWithCheckBox29)
+        Me.TabPage17.Controls.Add(Me.TextBoxWithCheckBox28)
         Me.TabPage17.Controls.Add(Me.Label22)
         Me.TabPage17.Controls.Add(Me.Label23)
+        Me.TabPage17.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
         Me.TabPage17.Location = New System.Drawing.Point(4, 22)
         Me.TabPage17.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.TabPage17.Name = "TabPage17"
         Me.TabPage17.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.TabPage17.Size = New System.Drawing.Size(277, 202)
         Me.TabPage17.TabIndex = 1
-        Me.TabPage17.Text = "TabPage17"
+        Me.TabPage17.Text = "Months Names"
         Me.TabPage17.UseVisualStyleBackColor = True
         '
-        'TextBox14
+        'TextBoxWithCheckBox29
         '
-        Me.TextBox14.Location = New System.Drawing.Point(15, 47)
-        Me.TextBox14.Name = "TextBox14"
-        Me.TextBox14.Size = New System.Drawing.Size(87, 20)
-        Me.TextBox14.TabIndex = 13
-        Me.TextBox14.Text = "April"
+        Me.TextBoxWithCheckBox29.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox29.lcTitle = Nothing
+        Me.TextBoxWithCheckBox29.length = 150
+        Me.TextBoxWithCheckBox29.Location = New System.Drawing.Point(16, 99)
+        Me.TextBoxWithCheckBox29.Name = "TextBoxWithCheckBox29"
+        Me.TextBoxWithCheckBox29.Size = New System.Drawing.Size(255, 23)
+        Me.TextBoxWithCheckBox29.TabIndex = 14
         '
-        'TextBox15
+        'TextBoxWithCheckBox28
         '
-        Me.TextBox15.Location = New System.Drawing.Point(15, 100)
-        Me.TextBox15.Name = "TextBox15"
-        Me.TextBox15.Size = New System.Drawing.Size(87, 20)
-        Me.TextBox15.TabIndex = 14
-        Me.TextBox15.Text = "May"
+        Me.TextBoxWithCheckBox28.BackColor = System.Drawing.Color.Transparent
+        Me.TextBoxWithCheckBox28.lcTitle = Nothing
+        Me.TextBoxWithCheckBox28.length = 150
+        Me.TextBoxWithCheckBox28.Location = New System.Drawing.Point(16, 46)
+        Me.TextBoxWithCheckBox28.Name = "TextBoxWithCheckBox28"
+        Me.TextBoxWithCheckBox28.Size = New System.Drawing.Size(255, 23)
+        Me.TextBoxWithCheckBox28.TabIndex = 13
         '
         'Label22
         '
         Me.Label22.AutoSize = True
+        Me.Label22.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
         Me.Label22.Location = New System.Drawing.Point(13, 30)
         Me.Label22.Name = "Label22"
-        Me.Label22.Size = New System.Drawing.Size(105, 13)
+        Me.Label22.Size = New System.Drawing.Size(124, 13)
         Me.Label22.TabIndex = 8
         Me.Label22.Text = "Registeration During"
         '
         'Label23
         '
         Me.Label23.AutoSize = True
+        Me.Label23.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
         Me.Label23.Location = New System.Drawing.Point(13, 83)
         Me.Label23.Name = "Label23"
-        Me.Label23.Size = New System.Drawing.Size(71, 13)
+        Me.Label23.Size = New System.Drawing.Size(83, 13)
         Me.Label23.TabIndex = 12
         Me.Label23.Text = "Travel During"
         '
@@ -680,7 +752,7 @@ Partial Class Form1
         '
         Me.Label24.AutoSize = True
         Me.Label24.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
-        Me.Label24.Location = New System.Drawing.Point(275, 40)
+        Me.Label24.Location = New System.Drawing.Point(27, 40)
         Me.Label24.Name = "Label24"
         Me.Label24.Size = New System.Drawing.Size(32, 13)
         Me.Label24.TabIndex = 56
@@ -693,195 +765,55 @@ Partial Class Form1
         Me.TabControl3.Location = New System.Drawing.Point(10, 63)
         Me.TabControl3.Name = "TabControl3"
         Me.TabControl3.SelectedIndex = 0
-        Me.TabControl3.Size = New System.Drawing.Size(703, 442)
+        Me.TabControl3.Size = New System.Drawing.Size(703, 553)
         Me.TabControl3.SizeMode = System.Windows.Forms.TabSizeMode.Fixed
         Me.TabControl3.TabIndex = 71
         '
         'TabPage8
         '
-        Me.TabPage8.Controls.Add(Me.LinkLabel2)
-        Me.TabPage8.Controls.Add(Me.cmbxDepartureCity)
-        Me.TabPage8.Controls.Add(Me.LinkLabel1)
-        Me.TabPage8.Controls.Add(Me.Label28)
-        Me.TabPage8.Controls.Add(Me.Label29)
-        Me.TabPage8.Controls.Add(Me.TabControl2)
+        Me.TabPage8.Controls.Add(Me.RadioButton8)
+        Me.TabPage8.Controls.Add(Me.cmbxArrivalTime)
+        Me.TabPage8.Controls.Add(Me.RadioButton7)
         Me.TabPage8.Controls.Add(Me.ArrivalDate)
-        Me.TabPage8.Controls.Add(Me.cmbxArrivingCity)
-        Me.TabPage8.Controls.Add(Me.ArrivalTime)
-        Me.TabPage8.Controls.Add(Me.Label13)
-        Me.TabPage8.Controls.Add(Me.DepartureDate)
-        Me.TabPage8.Controls.Add(Me.txbxDuration)
-        Me.TabPage8.Controls.Add(Me.DepartureTime)
-        Me.TabPage8.Controls.Add(Me.Label8)
+        Me.TabPage8.Controls.Add(Me.RadioButton6)
         Me.TabPage8.Controls.Add(Me.cmbxArrivingLocation)
+        Me.TabPage8.Controls.Add(Me.RadioButton5)
+        Me.TabPage8.Controls.Add(Me.cmbxArrivingCity)
+        Me.TabPage8.Controls.Add(Me.RadioButton4)
+        Me.TabPage8.Controls.Add(Me.RadioButton3)
         Me.TabPage8.Controls.Add(Me.cmbxArrivingTo)
-        Me.TabPage8.Controls.Add(Me.Label25)
-        Me.TabPage8.Controls.Add(Me.Label11)
+        Me.TabPage8.Controls.Add(Me.RadioButton2)
         Me.TabPage8.Controls.Add(Me.cmbxAirLine)
-        Me.TabPage8.Controls.Add(Me.Label7)
-        Me.TabPage8.Controls.Add(Me.Label12)
-        Me.TabPage8.Controls.Add(Me.Label10)
+        Me.TabPage8.Controls.Add(Me.RadioButton1)
+        Me.TabPage8.Controls.Add(Me.cmbxDepartureTime)
+        Me.TabPage8.Controls.Add(Me.cmbxDepartureDate)
         Me.TabPage8.Controls.Add(Me.cmbxDepartureLocation)
+        Me.TabPage8.Controls.Add(Me.cmbxDepartureCity)
         Me.TabPage8.Controls.Add(Me.cmbxDepartureFrom)
-        Me.TabPage8.Controls.Add(Me.Label9)
+        Me.TabPage8.Controls.Add(Me.LinkLabel2)
+        Me.TabPage8.Controls.Add(Me.LinkLabel1)
+        Me.TabPage8.Controls.Add(Me.Label13)
+        Me.TabPage8.Controls.Add(Me.txbxDuration)
         Me.TabPage8.Location = New System.Drawing.Point(4, 22)
         Me.TabPage8.Name = "TabPage8"
         Me.TabPage8.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage8.Size = New System.Drawing.Size(695, 416)
+        Me.TabPage8.Size = New System.Drawing.Size(695, 527)
         Me.TabPage8.TabIndex = 0
         Me.TabPage8.Text = "Move"
         Me.TabPage8.UseVisualStyleBackColor = True
         '
-        'LinkLabel2
+        'RadioButton8
         '
-        Me.LinkLabel2.AutoSize = True
-        Me.LinkLabel2.Font = New System.Drawing.Font("Tahoma", 7.0!)
-        Me.LinkLabel2.Location = New System.Drawing.Point(478, 267)
-        Me.LinkLabel2.Name = "LinkLabel2"
-        Me.LinkLabel2.Size = New System.Drawing.Size(24, 12)
-        Me.LinkLabel2.TabIndex = 70
-        Me.LinkLabel2.TabStop = True
-        Me.LinkLabel2.Text = "Add"
-        '
-        'cmbxDepartureCity
-        '
-        Me.cmbxDepartureCity.FormattingEnabled = True
-        Me.cmbxDepartureCity.Location = New System.Drawing.Point(252, 91)
-        Me.cmbxDepartureCity.Name = "cmbxDepartureCity"
-        Me.cmbxDepartureCity.Size = New System.Drawing.Size(105, 21)
-        Me.cmbxDepartureCity.TabIndex = 65
-        '
-        'LinkLabel1
-        '
-        Me.LinkLabel1.AutoSize = True
-        Me.LinkLabel1.Font = New System.Drawing.Font("Tahoma", 7.0!)
-        Me.LinkLabel1.Location = New System.Drawing.Point(478, 100)
-        Me.LinkLabel1.Name = "LinkLabel1"
-        Me.LinkLabel1.Size = New System.Drawing.Size(24, 12)
-        Me.LinkLabel1.TabIndex = 69
-        Me.LinkLabel1.TabStop = True
-        Me.LinkLabel1.Text = "Add"
-        '
-        'Label28
-        '
-        Me.Label28.AutoSize = True
-        Me.Label28.Location = New System.Drawing.Point(220, 94)
-        Me.Label28.Name = "Label28"
-        Me.Label28.Size = New System.Drawing.Size(26, 13)
-        Me.Label28.TabIndex = 64
-        Me.Label28.Text = "City"
-        '
-        'Label29
-        '
-        Me.Label29.AutoSize = True
-        Me.Label29.Location = New System.Drawing.Point(220, 261)
-        Me.Label29.Name = "Label29"
-        Me.Label29.Size = New System.Drawing.Size(26, 13)
-        Me.Label29.TabIndex = 66
-        Me.Label29.Text = "City"
-        '
-        'TabControl2
-        '
-        Me.TabControl2.Controls.Add(Me.tabAirCraft)
-        Me.TabControl2.Controls.Add(Me.tabCaravan)
-        Me.TabControl2.Controls.Add(Me.tabGMC)
-        Me.TabControl2.Controls.Add(Me.tabBus)
-        Me.TabControl2.Controls.Add(Me.tabHike)
-        Me.TabControl2.Controls.Add(Me.tabTrain)
-        Me.TabControl2.Controls.Add(Me.tabMiniBus)
-        Me.TabControl2.Controls.Add(Me.tabCruise)
-        Me.TabControl2.Controls.Add(Me.tabLayOver)
-        Me.TabControl2.ImageList = Me.ImageList1
-        Me.TabControl2.Location = New System.Drawing.Point(6, 12)
-        Me.TabControl2.Name = "TabControl2"
-        Me.TabControl2.SelectedIndex = 0
-        Me.TabControl2.Size = New System.Drawing.Size(683, 57)
-        Me.TabControl2.TabIndex = 30
-        '
-        'tabAirCraft
-        '
-        Me.tabAirCraft.ImageIndex = 0
-        Me.tabAirCraft.Location = New System.Drawing.Point(4, 57)
-        Me.tabAirCraft.Name = "tabAirCraft"
-        Me.tabAirCraft.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabAirCraft.Size = New System.Drawing.Size(675, 0)
-        Me.tabAirCraft.TabIndex = 0
-        Me.tabAirCraft.UseVisualStyleBackColor = True
-        '
-        'tabCaravan
-        '
-        Me.tabCaravan.ImageIndex = 1
-        Me.tabCaravan.Location = New System.Drawing.Point(4, 57)
-        Me.tabCaravan.Name = "tabCaravan"
-        Me.tabCaravan.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabCaravan.Size = New System.Drawing.Size(675, 0)
-        Me.tabCaravan.TabIndex = 1
-        Me.tabCaravan.UseVisualStyleBackColor = True
-        '
-        'tabGMC
-        '
-        Me.tabGMC.ImageIndex = 2
-        Me.tabGMC.Location = New System.Drawing.Point(4, 57)
-        Me.tabGMC.Name = "tabGMC"
-        Me.tabGMC.Size = New System.Drawing.Size(675, 0)
-        Me.tabGMC.TabIndex = 2
-        Me.tabGMC.UseVisualStyleBackColor = True
-        '
-        'tabBus
-        '
-        Me.tabBus.ImageIndex = 3
-        Me.tabBus.Location = New System.Drawing.Point(4, 57)
-        Me.tabBus.Name = "tabBus"
-        Me.tabBus.Size = New System.Drawing.Size(675, 0)
-        Me.tabBus.TabIndex = 3
-        Me.tabBus.UseVisualStyleBackColor = True
-        '
-        'tabHike
-        '
-        Me.tabHike.ImageIndex = 4
-        Me.tabHike.Location = New System.Drawing.Point(4, 57)
-        Me.tabHike.Name = "tabHike"
-        Me.tabHike.Size = New System.Drawing.Size(675, 0)
-        Me.tabHike.TabIndex = 4
-        Me.tabHike.UseVisualStyleBackColor = True
-        '
-        'tabTrain
-        '
-        Me.tabTrain.ImageIndex = 5
-        Me.tabTrain.Location = New System.Drawing.Point(4, 57)
-        Me.tabTrain.Name = "tabTrain"
-        Me.tabTrain.Size = New System.Drawing.Size(675, 0)
-        Me.tabTrain.TabIndex = 5
-        Me.tabTrain.UseVisualStyleBackColor = True
-        '
-        'tabMiniBus
-        '
-        Me.tabMiniBus.ImageIndex = 6
-        Me.tabMiniBus.Location = New System.Drawing.Point(4, 57)
-        Me.tabMiniBus.Name = "tabMiniBus"
-        Me.tabMiniBus.Size = New System.Drawing.Size(675, 0)
-        Me.tabMiniBus.TabIndex = 6
-        Me.tabMiniBus.UseVisualStyleBackColor = True
-        '
-        'tabCruise
-        '
-        Me.tabCruise.ImageIndex = 7
-        Me.tabCruise.Location = New System.Drawing.Point(4, 57)
-        Me.tabCruise.Name = "tabCruise"
-        Me.tabCruise.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabCruise.Size = New System.Drawing.Size(675, 0)
-        Me.tabCruise.TabIndex = 7
-        Me.tabCruise.UseVisualStyleBackColor = True
-        '
-        'tabLayOver
-        '
-        Me.tabLayOver.ImageIndex = 8
-        Me.tabLayOver.Location = New System.Drawing.Point(4, 57)
-        Me.tabLayOver.Name = "tabLayOver"
-        Me.tabLayOver.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabLayOver.Size = New System.Drawing.Size(675, 0)
-        Me.tabLayOver.TabIndex = 8
-        Me.tabLayOver.UseVisualStyleBackColor = True
+        Me.RadioButton8.Appearance = System.Windows.Forms.Appearance.Button
+        Me.RadioButton8.ImageIndex = 7
+        Me.RadioButton8.ImageList = Me.ImageList1
+        Me.RadioButton8.Location = New System.Drawing.Point(398, 12)
+        Me.RadioButton8.Name = "RadioButton8"
+        Me.RadioButton8.Size = New System.Drawing.Size(55, 55)
+        Me.RadioButton8.TabIndex = 79
+        Me.RadioButton8.TabStop = True
+        Me.RadioButton8.Tag = "Cruise"
+        Me.RadioButton8.UseVisualStyleBackColor = True
         '
         'ImageList1
         '
@@ -897,171 +829,248 @@ Partial Class Form1
         Me.ImageList1.Images.SetKeyName(7, "Cruise.png")
         Me.ImageList1.Images.SetKeyName(8, "denali (1).png")
         '
+        'cmbxArrivalTime
+        '
+        Me.cmbxArrivalTime.lcTitle = Nothing
+        Me.cmbxArrivalTime.length = 0
+        Me.cmbxArrivalTime.Location = New System.Drawing.Point(18, 424)
+        Me.cmbxArrivalTime.Name = "cmbxArrivalTime"
+        Me.cmbxArrivalTime.Size = New System.Drawing.Size(156, 24)
+        Me.cmbxArrivalTime.TabIndex = 81
+        '
+        'RadioButton7
+        '
+        Me.RadioButton7.Appearance = System.Windows.Forms.Appearance.Button
+        Me.RadioButton7.ImageIndex = 6
+        Me.RadioButton7.ImageList = Me.ImageList1
+        Me.RadioButton7.Location = New System.Drawing.Point(343, 12)
+        Me.RadioButton7.Name = "RadioButton7"
+        Me.RadioButton7.Size = New System.Drawing.Size(55, 55)
+        Me.RadioButton7.TabIndex = 78
+        Me.RadioButton7.TabStop = True
+        Me.RadioButton7.Tag = "VIP Bus"
+        Me.RadioButton7.UseVisualStyleBackColor = True
+        '
         'ArrivalDate
         '
-        Me.ArrivalDate.CustomFormat = "yyyy-MM-dd"
-        Me.ArrivalDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.ArrivalDate.Location = New System.Drawing.Point(107, 313)
+        Me.ArrivalDate.BackColor = System.Drawing.Color.Transparent
+        Me.ArrivalDate.lcTitle = "Date"
+        Me.ArrivalDate.Location = New System.Drawing.Point(18, 401)
         Me.ArrivalDate.Name = "ArrivalDate"
-        Me.ArrivalDate.Size = New System.Drawing.Size(84, 20)
-        Me.ArrivalDate.TabIndex = 62
+        Me.ArrivalDate.Size = New System.Drawing.Size(175, 23)
+        Me.ArrivalDate.TabIndex = 80
+        '
+        'RadioButton6
+        '
+        Me.RadioButton6.Appearance = System.Windows.Forms.Appearance.Button
+        Me.RadioButton6.ImageIndex = 5
+        Me.RadioButton6.ImageList = Me.ImageList1
+        Me.RadioButton6.Location = New System.Drawing.Point(288, 12)
+        Me.RadioButton6.Name = "RadioButton6"
+        Me.RadioButton6.Size = New System.Drawing.Size(55, 55)
+        Me.RadioButton6.TabIndex = 77
+        Me.RadioButton6.TabStop = True
+        Me.RadioButton6.Tag = "Train"
+        Me.RadioButton6.UseVisualStyleBackColor = True
+        '
+        'cmbxArrivingLocation
+        '
+        Me.cmbxArrivingLocation.BackColor = System.Drawing.Color.Transparent
+        Me.cmbxArrivingLocation.lcTitle = "Arrival Location"
+        Me.cmbxArrivingLocation.Length = 450
+        Me.cmbxArrivingLocation.Location = New System.Drawing.Point(25, 373)
+        Me.cmbxArrivingLocation.Name = "cmbxArrivingLocation"
+        Me.cmbxArrivingLocation.Order = ComboBoxWithCheckBox.ControlOrder.Horizontal
+        Me.cmbxArrivingLocation.Size = New System.Drawing.Size(453, 27)
+        Me.cmbxArrivingLocation.TabIndex = 79
+        '
+        'RadioButton5
+        '
+        Me.RadioButton5.Appearance = System.Windows.Forms.Appearance.Button
+        Me.RadioButton5.ImageIndex = 4
+        Me.RadioButton5.ImageList = Me.ImageList1
+        Me.RadioButton5.Location = New System.Drawing.Point(233, 12)
+        Me.RadioButton5.Name = "RadioButton5"
+        Me.RadioButton5.Size = New System.Drawing.Size(55, 55)
+        Me.RadioButton5.TabIndex = 76
+        Me.RadioButton5.TabStop = True
+        Me.RadioButton5.Tag = "Hike"
+        Me.RadioButton5.UseVisualStyleBackColor = True
         '
         'cmbxArrivingCity
         '
-        Me.cmbxArrivingCity.FormattingEnabled = True
-        Me.cmbxArrivingCity.Location = New System.Drawing.Point(252, 258)
+        Me.cmbxArrivingCity.BackColor = System.Drawing.Color.Transparent
+        Me.cmbxArrivingCity.lcTitle = "City"
+        Me.cmbxArrivingCity.Length = 0
+        Me.cmbxArrivingCity.Location = New System.Drawing.Point(169, 316)
         Me.cmbxArrivingCity.Name = "cmbxArrivingCity"
-        Me.cmbxArrivingCity.Size = New System.Drawing.Size(105, 21)
-        Me.cmbxArrivingCity.TabIndex = 67
+        Me.cmbxArrivingCity.Order = ComboBoxWithCheckBox.ControlOrder.Vertical
+        Me.cmbxArrivingCity.Size = New System.Drawing.Size(124, 49)
+        Me.cmbxArrivingCity.TabIndex = 78
         '
-        'ArrivalTime
+        'RadioButton4
         '
-        Me.ArrivalTime.CustomFormat = "HH:mm"
-        Me.ArrivalTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.ArrivalTime.Location = New System.Drawing.Point(197, 313)
-        Me.ArrivalTime.Name = "ArrivalTime"
-        Me.ArrivalTime.ShowUpDown = True
-        Me.ArrivalTime.Size = New System.Drawing.Size(54, 20)
-        Me.ArrivalTime.TabIndex = 61
+        Me.RadioButton4.Appearance = System.Windows.Forms.Appearance.Button
+        Me.RadioButton4.ImageIndex = 3
+        Me.RadioButton4.ImageList = Me.ImageList1
+        Me.RadioButton4.Location = New System.Drawing.Point(178, 12)
+        Me.RadioButton4.Name = "RadioButton4"
+        Me.RadioButton4.Size = New System.Drawing.Size(55, 55)
+        Me.RadioButton4.TabIndex = 75
+        Me.RadioButton4.TabStop = True
+        Me.RadioButton4.Tag = "Bus"
+        Me.RadioButton4.UseVisualStyleBackColor = True
+        '
+        'RadioButton3
+        '
+        Me.RadioButton3.Appearance = System.Windows.Forms.Appearance.Button
+        Me.RadioButton3.ImageIndex = 2
+        Me.RadioButton3.ImageList = Me.ImageList1
+        Me.RadioButton3.Location = New System.Drawing.Point(123, 12)
+        Me.RadioButton3.Name = "RadioButton3"
+        Me.RadioButton3.Size = New System.Drawing.Size(55, 55)
+        Me.RadioButton3.TabIndex = 74
+        Me.RadioButton3.TabStop = True
+        Me.RadioButton3.Tag = "GMC"
+        Me.RadioButton3.UseVisualStyleBackColor = True
+        '
+        'cmbxArrivingTo
+        '
+        Me.cmbxArrivingTo.BackColor = System.Drawing.Color.Transparent
+        Me.cmbxArrivingTo.lcTitle = "Arriving To"
+        Me.cmbxArrivingTo.Length = 0
+        Me.cmbxArrivingTo.Location = New System.Drawing.Point(25, 316)
+        Me.cmbxArrivingTo.Name = "cmbxArrivingTo"
+        Me.cmbxArrivingTo.Order = ComboBoxWithCheckBox.ControlOrder.Vertical
+        Me.cmbxArrivingTo.Size = New System.Drawing.Size(124, 49)
+        Me.cmbxArrivingTo.TabIndex = 77
+        '
+        'RadioButton2
+        '
+        Me.RadioButton2.Appearance = System.Windows.Forms.Appearance.Button
+        Me.RadioButton2.ImageIndex = 1
+        Me.RadioButton2.ImageList = Me.ImageList1
+        Me.RadioButton2.Location = New System.Drawing.Point(68, 12)
+        Me.RadioButton2.Name = "RadioButton2"
+        Me.RadioButton2.Size = New System.Drawing.Size(55, 55)
+        Me.RadioButton2.TabIndex = 73
+        Me.RadioButton2.TabStop = True
+        Me.RadioButton2.Tag = "Caravan"
+        Me.RadioButton2.UseVisualStyleBackColor = True
+        '
+        'cmbxAirLine
+        '
+        Me.cmbxAirLine.BackColor = System.Drawing.Color.Transparent
+        Me.cmbxAirLine.lcTitle = "Operator"
+        Me.cmbxAirLine.Length = 450
+        Me.cmbxAirLine.Location = New System.Drawing.Point(25, 234)
+        Me.cmbxAirLine.Name = "cmbxAirLine"
+        Me.cmbxAirLine.Order = ComboBoxWithCheckBox.ControlOrder.Vertical
+        Me.cmbxAirLine.Size = New System.Drawing.Size(453, 49)
+        Me.cmbxAirLine.TabIndex = 76
+        '
+        'RadioButton1
+        '
+        Me.RadioButton1.Appearance = System.Windows.Forms.Appearance.Button
+        Me.RadioButton1.ImageIndex = 0
+        Me.RadioButton1.ImageList = Me.ImageList1
+        Me.RadioButton1.Location = New System.Drawing.Point(13, 12)
+        Me.RadioButton1.Name = "RadioButton1"
+        Me.RadioButton1.Size = New System.Drawing.Size(55, 55)
+        Me.RadioButton1.TabIndex = 72
+        Me.RadioButton1.TabStop = True
+        Me.RadioButton1.Tag = "Airplane"
+        Me.RadioButton1.UseVisualStyleBackColor = True
+        '
+        'cmbxDepartureTime
+        '
+        Me.cmbxDepartureTime.lcTitle = Nothing
+        Me.cmbxDepartureTime.length = 0
+        Me.cmbxDepartureTime.Location = New System.Drawing.Point(18, 187)
+        Me.cmbxDepartureTime.Name = "cmbxDepartureTime"
+        Me.cmbxDepartureTime.Size = New System.Drawing.Size(156, 24)
+        Me.cmbxDepartureTime.TabIndex = 75
+        '
+        'cmbxDepartureDate
+        '
+        Me.cmbxDepartureDate.BackColor = System.Drawing.Color.Transparent
+        Me.cmbxDepartureDate.lcTitle = "Date"
+        Me.cmbxDepartureDate.Location = New System.Drawing.Point(18, 166)
+        Me.cmbxDepartureDate.Name = "cmbxDepartureDate"
+        Me.cmbxDepartureDate.Size = New System.Drawing.Size(175, 23)
+        Me.cmbxDepartureDate.TabIndex = 74
+        '
+        'cmbxDepartureLocation
+        '
+        Me.cmbxDepartureLocation.BackColor = System.Drawing.Color.Transparent
+        Me.cmbxDepartureLocation.lcTitle = "Departure From"
+        Me.cmbxDepartureLocation.Length = 450
+        Me.cmbxDepartureLocation.Location = New System.Drawing.Point(25, 143)
+        Me.cmbxDepartureLocation.Name = "cmbxDepartureLocation"
+        Me.cmbxDepartureLocation.Order = ComboBoxWithCheckBox.ControlOrder.Horizontal
+        Me.cmbxDepartureLocation.Size = New System.Drawing.Size(453, 27)
+        Me.cmbxDepartureLocation.TabIndex = 73
+        '
+        'cmbxDepartureCity
+        '
+        Me.cmbxDepartureCity.BackColor = System.Drawing.Color.Transparent
+        Me.cmbxDepartureCity.lcTitle = "City"
+        Me.cmbxDepartureCity.Length = 0
+        Me.cmbxDepartureCity.Location = New System.Drawing.Point(155, 88)
+        Me.cmbxDepartureCity.Name = "cmbxDepartureCity"
+        Me.cmbxDepartureCity.Order = ComboBoxWithCheckBox.ControlOrder.Vertical
+        Me.cmbxDepartureCity.Size = New System.Drawing.Size(124, 49)
+        Me.cmbxDepartureCity.TabIndex = 72
+        '
+        'cmbxDepartureFrom
+        '
+        Me.cmbxDepartureFrom.BackColor = System.Drawing.Color.Transparent
+        Me.cmbxDepartureFrom.lcTitle = "Departure From"
+        Me.cmbxDepartureFrom.Length = 0
+        Me.cmbxDepartureFrom.Location = New System.Drawing.Point(25, 88)
+        Me.cmbxDepartureFrom.Name = "cmbxDepartureFrom"
+        Me.cmbxDepartureFrom.Order = ComboBoxWithCheckBox.ControlOrder.Vertical
+        Me.cmbxDepartureFrom.Size = New System.Drawing.Size(124, 49)
+        Me.cmbxDepartureFrom.TabIndex = 71
+        '
+        'LinkLabel2
+        '
+        Me.LinkLabel2.AutoSize = True
+        Me.LinkLabel2.Font = New System.Drawing.Font("Tahoma", 7.0!)
+        Me.LinkLabel2.Location = New System.Drawing.Point(447, 356)
+        Me.LinkLabel2.Name = "LinkLabel2"
+        Me.LinkLabel2.Size = New System.Drawing.Size(24, 12)
+        Me.LinkLabel2.TabIndex = 70
+        Me.LinkLabel2.TabStop = True
+        Me.LinkLabel2.Text = "Add"
+        '
+        'LinkLabel1
+        '
+        Me.LinkLabel1.AutoSize = True
+        Me.LinkLabel1.Font = New System.Drawing.Font("Tahoma", 7.0!)
+        Me.LinkLabel1.Location = New System.Drawing.Point(453, 130)
+        Me.LinkLabel1.Name = "LinkLabel1"
+        Me.LinkLabel1.Size = New System.Drawing.Size(24, 12)
+        Me.LinkLabel1.TabIndex = 69
+        Me.LinkLabel1.TabStop = True
+        Me.LinkLabel1.Text = "Add"
         '
         'Label13
         '
         Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(53, 362)
+        Me.Label13.Location = New System.Drawing.Point(53, 501)
         Me.Label13.Name = "Label13"
         Me.Label13.Size = New System.Drawing.Size(48, 13)
         Me.Label13.TabIndex = 51
         Me.Label13.Text = "Duration"
         '
-        'DepartureDate
-        '
-        Me.DepartureDate.CustomFormat = "yyyy-MM-dd"
-        Me.DepartureDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DepartureDate.Location = New System.Drawing.Point(109, 145)
-        Me.DepartureDate.Name = "DepartureDate"
-        Me.DepartureDate.Size = New System.Drawing.Size(84, 20)
-        Me.DepartureDate.TabIndex = 60
-        '
         'txbxDuration
         '
-        Me.txbxDuration.Location = New System.Drawing.Point(107, 359)
+        Me.txbxDuration.Location = New System.Drawing.Point(107, 498)
         Me.txbxDuration.Mask = "0d 0h 0m"
         Me.txbxDuration.Name = "txbxDuration"
         Me.txbxDuration.Size = New System.Drawing.Size(258, 20)
         Me.txbxDuration.TabIndex = 63
-        '
-        'DepartureTime
-        '
-        Me.DepartureTime.CustomFormat = "HH:mm"
-        Me.DepartureTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DepartureTime.Location = New System.Drawing.Point(199, 145)
-        Me.DepartureTime.Name = "DepartureTime"
-        Me.DepartureTime.ShowUpDown = True
-        Me.DepartureTime.Size = New System.Drawing.Size(54, 20)
-        Me.DepartureTime.TabIndex = 59
-        '
-        'Label8
-        '
-        Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(6, 121)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(99, 13)
-        Me.Label8.TabIndex = 42
-        Me.Label8.Text = "Departure Location"
-        '
-        'cmbxArrivingLocation
-        '
-        Me.cmbxArrivingLocation.FormattingEnabled = True
-        Me.cmbxArrivingLocation.Location = New System.Drawing.Point(107, 285)
-        Me.cmbxArrivingLocation.Name = "cmbxArrivingLocation"
-        Me.cmbxArrivingLocation.Size = New System.Drawing.Size(393, 21)
-        Me.cmbxArrivingLocation.TabIndex = 58
-        '
-        'cmbxArrivingTo
-        '
-        Me.cmbxArrivingTo.FormattingEnabled = True
-        Me.cmbxArrivingTo.Location = New System.Drawing.Point(108, 258)
-        Me.cmbxArrivingTo.Name = "cmbxArrivingTo"
-        Me.cmbxArrivingTo.Size = New System.Drawing.Size(106, 21)
-        Me.cmbxArrivingTo.TabIndex = 47
-        '
-        'Label25
-        '
-        Me.Label25.AutoSize = True
-        Me.Label25.Location = New System.Drawing.Point(22, 288)
-        Me.Label25.Name = "Label25"
-        Me.Label25.Size = New System.Drawing.Size(81, 13)
-        Me.Label25.TabIndex = 57
-        Me.Label25.Text = "Arrival Location"
-        '
-        'Label11
-        '
-        Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(39, 148)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(62, 13)
-        Me.Label11.TabIndex = 48
-        Me.Label11.Text = "Date / Time"
-        '
-        'cmbxAirLine
-        '
-        Me.cmbxAirLine.FormattingEnabled = True
-        Me.cmbxAirLine.Location = New System.Drawing.Point(108, 191)
-        Me.cmbxAirLine.Name = "cmbxAirLine"
-        Me.cmbxAirLine.Size = New System.Drawing.Size(393, 21)
-        Me.cmbxAirLine.TabIndex = 43
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(20, 94)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(83, 13)
-        Me.Label7.TabIndex = 40
-        Me.Label7.Text = "Departure From"
-        '
-        'Label12
-        '
-        Me.Label12.AutoSize = True
-        Me.Label12.Location = New System.Drawing.Point(40, 319)
-        Me.Label12.Name = "Label12"
-        Me.Label12.Size = New System.Drawing.Size(62, 13)
-        Me.Label12.TabIndex = 49
-        Me.Label12.Text = "Date / Time"
-        '
-        'Label10
-        '
-        Me.Label10.AutoSize = True
-        Me.Label10.Location = New System.Drawing.Point(41, 261)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(59, 13)
-        Me.Label10.TabIndex = 46
-        Me.Label10.Text = "Arriving To"
-        '
-        'cmbxDepartureLocation
-        '
-        Me.cmbxDepartureLocation.FormattingEnabled = True
-        Me.cmbxDepartureLocation.Location = New System.Drawing.Point(109, 118)
-        Me.cmbxDepartureLocation.Name = "cmbxDepartureLocation"
-        Me.cmbxDepartureLocation.Size = New System.Drawing.Size(393, 21)
-        Me.cmbxDepartureLocation.TabIndex = 45
-        '
-        'cmbxDepartureFrom
-        '
-        Me.cmbxDepartureFrom.FormattingEnabled = True
-        Me.cmbxDepartureFrom.Location = New System.Drawing.Point(109, 91)
-        Me.cmbxDepartureFrom.Name = "cmbxDepartureFrom"
-        Me.cmbxDepartureFrom.Size = New System.Drawing.Size(105, 21)
-        Me.cmbxDepartureFrom.TabIndex = 41
-        '
-        'Label9
-        '
-        Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(49, 194)
-        Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(51, 13)
-        Me.Label9.TabIndex = 44
-        Me.Label9.Text = "Oeprator"
         '
         'TabPage9
         '
@@ -1076,7 +1085,7 @@ Partial Class Form1
         Me.TabPage9.Location = New System.Drawing.Point(4, 22)
         Me.TabPage9.Name = "TabPage9"
         Me.TabPage9.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage9.Size = New System.Drawing.Size(695, 416)
+        Me.TabPage9.Size = New System.Drawing.Size(695, 527)
         Me.TabPage9.TabIndex = 1
         Me.TabPage9.Text = "LayOver"
         Me.TabPage9.UseVisualStyleBackColor = True
@@ -1191,9 +1200,9 @@ Partial Class Form1
         '
         'txtTitle
         '
-        Me.txtTitle.Location = New System.Drawing.Point(308, 37)
+        Me.txtTitle.Location = New System.Drawing.Point(65, 37)
         Me.txtTitle.Name = "txtTitle"
-        Me.txtTitle.Size = New System.Drawing.Size(395, 20)
+        Me.txtTitle.Size = New System.Drawing.Size(644, 20)
         Me.txtTitle.TabIndex = 55
         '
         'Including
@@ -1237,376 +1246,6 @@ Partial Class Form1
         Me.DayByDay.TabIndex = 5
         Me.DayByDay.Text = "Day By Day"
         Me.DayByDay.UseVisualStyleBackColor = True
-        '
-        'ListBox2
-        '
-        Me.ListBox2.FormattingEnabled = True
-        Me.ListBox2.Location = New System.Drawing.Point(6, 48)
-        Me.ListBox2.Name = "ListBox2"
-        Me.ListBox2.Size = New System.Drawing.Size(326, 589)
-        Me.ListBox2.TabIndex = 0
-        '
-        'tabPricingpolicy
-        '
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox10)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox9)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox8)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox7)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox6)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox5)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox4)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox3)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox2)
-        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox1)
-        Me.tabPricingpolicy.Controls.Add(Me.UserControl11)
-        Me.tabPricingpolicy.Location = New System.Drawing.Point(4, 22)
-        Me.tabPricingpolicy.Name = "tabPricingpolicy"
-        Me.tabPricingpolicy.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabPricingpolicy.Size = New System.Drawing.Size(953, 645)
-        Me.tabPricingpolicy.TabIndex = 6
-        Me.tabPricingpolicy.Text = "Pricing Policy"
-        Me.tabPricingpolicy.UseVisualStyleBackColor = True
-        '
-        'Additions
-        '
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox11)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox12)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox13)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox14)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox15)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox16)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox17)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox18)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox19)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox20)
-        Me.Additions.Controls.Add(Me.PricingWithCheckBox21)
-        Me.Additions.Location = New System.Drawing.Point(4, 22)
-        Me.Additions.Name = "Additions"
-        Me.Additions.Size = New System.Drawing.Size(953, 645)
-        Me.Additions.TabIndex = 7
-        Me.Additions.Text = "Additions"
-        Me.Additions.UseVisualStyleBackColor = True
-        '
-        'TransferWays
-        '
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox14)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox13)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox12)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox11)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox10)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox9)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox8)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox7)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox6)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox4)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox3)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox2)
-        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox1)
-        Me.TransferWays.Controls.Add(Me.TabControl4)
-        Me.TransferWays.Location = New System.Drawing.Point(4, 22)
-        Me.TransferWays.Name = "TransferWays"
-        Me.TransferWays.Size = New System.Drawing.Size(953, 645)
-        Me.TransferWays.TabIndex = 8
-        Me.TransferWays.Text = "TransferWays"
-        Me.TransferWays.UseVisualStyleBackColor = True
-        '
-        'TabControl4
-        '
-        Me.TabControl4.Controls.Add(Me.TabPage3)
-        Me.TabControl4.Controls.Add(Me.TabPage4)
-        Me.TabControl4.Controls.Add(Me.TabPage5)
-        Me.TabControl4.Controls.Add(Me.TabPage7)
-        Me.TabControl4.Controls.Add(Me.TabPage10)
-        Me.TabControl4.Controls.Add(Me.TabPage11)
-        Me.TabControl4.Controls.Add(Me.TabPage12)
-        Me.TabControl4.Controls.Add(Me.TabPage13)
-        Me.TabControl4.Controls.Add(Me.TabPage14)
-        Me.TabControl4.ImageList = Me.ImageList1
-        Me.TabControl4.Location = New System.Drawing.Point(10, 11)
-        Me.TabControl4.Name = "TabControl4"
-        Me.TabControl4.SelectedIndex = 0
-        Me.TabControl4.Size = New System.Drawing.Size(729, 66)
-        Me.TabControl4.TabIndex = 31
-        '
-        'TabPage3
-        '
-        Me.TabPage3.ImageIndex = 0
-        Me.TabPage3.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage3.TabIndex = 0
-        Me.TabPage3.UseVisualStyleBackColor = True
-        '
-        'TabPage4
-        '
-        Me.TabPage4.ImageIndex = 1
-        Me.TabPage4.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage4.TabIndex = 1
-        Me.TabPage4.UseVisualStyleBackColor = True
-        '
-        'TabPage5
-        '
-        Me.TabPage5.ImageIndex = 2
-        Me.TabPage5.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage5.TabIndex = 2
-        Me.TabPage5.UseVisualStyleBackColor = True
-        '
-        'TabPage7
-        '
-        Me.TabPage7.ImageIndex = 3
-        Me.TabPage7.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage7.TabIndex = 3
-        Me.TabPage7.UseVisualStyleBackColor = True
-        '
-        'TabPage10
-        '
-        Me.TabPage10.ImageIndex = 4
-        Me.TabPage10.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage10.Name = "TabPage10"
-        Me.TabPage10.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage10.TabIndex = 4
-        Me.TabPage10.UseVisualStyleBackColor = True
-        '
-        'TabPage11
-        '
-        Me.TabPage11.ImageIndex = 5
-        Me.TabPage11.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage11.Name = "TabPage11"
-        Me.TabPage11.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage11.TabIndex = 5
-        Me.TabPage11.UseVisualStyleBackColor = True
-        '
-        'TabPage12
-        '
-        Me.TabPage12.ImageIndex = 6
-        Me.TabPage12.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage12.Name = "TabPage12"
-        Me.TabPage12.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage12.TabIndex = 6
-        Me.TabPage12.UseVisualStyleBackColor = True
-        '
-        'TabPage13
-        '
-        Me.TabPage13.ImageIndex = 7
-        Me.TabPage13.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage13.Name = "TabPage13"
-        Me.TabPage13.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage13.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage13.TabIndex = 7
-        Me.TabPage13.UseVisualStyleBackColor = True
-        '
-        'TabPage14
-        '
-        Me.TabPage14.ImageIndex = 8
-        Me.TabPage14.Location = New System.Drawing.Point(4, 57)
-        Me.TabPage14.Name = "TabPage14"
-        Me.TabPage14.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage14.Size = New System.Drawing.Size(721, 5)
-        Me.TabPage14.TabIndex = 8
-        Me.TabPage14.UseVisualStyleBackColor = True
-        '
-        'TabPage15
-        '
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox12)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox11)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox10)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox9)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox8)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox7)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox6)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox5)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox4)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox3)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox2)
-        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox1)
-        Me.TabPage15.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage15.Name = "TabPage15"
-        Me.TabPage15.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage15.Size = New System.Drawing.Size(953, 645)
-        Me.TabPage15.TabIndex = 9
-        Me.TabPage15.Text = "Laces, Stamps, and Comments"
-        Me.TabPage15.UseVisualStyleBackColor = True
-        '
-        'Prices
-        '
-        Me.Prices.Controls.Add(Me.Button7)
-        Me.Prices.Controls.Add(Me.Button5)
-        Me.Prices.Controls.Add(Me.ListBox3)
-        Me.Prices.Location = New System.Drawing.Point(4, 22)
-        Me.Prices.Name = "Prices"
-        Me.Prices.Padding = New System.Windows.Forms.Padding(3)
-        Me.Prices.Size = New System.Drawing.Size(953, 645)
-        Me.Prices.TabIndex = 10
-        Me.Prices.Text = "Prices"
-        Me.Prices.UseVisualStyleBackColor = True
-        '
-        'ComboBox1
-        '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Items.AddRange(New Object() {"Solo", "Tour"})
-        Me.ComboBox1.Location = New System.Drawing.Point(91, 64)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(121, 21)
-        Me.ComboBox1.TabIndex = 23
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
-        Me.Label2.Location = New System.Drawing.Point(8, 110)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(43, 13)
-        Me.Label2.TabIndex = 5
-        Me.Label2.Text = "Travel"
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
-        Me.Label1.Location = New System.Drawing.Point(8, 27)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(77, 13)
-        Me.Label1.TabIndex = 4
-        Me.Label1.Text = "Registration"
-        '
-        'ImageList2
-        '
-        Me.ImageList2.ImageStream = CType(resources.GetObject("ImageList2.ImageStream"), System.Windows.Forms.ImageListStreamer)
-        Me.ImageList2.TransparentColor = System.Drawing.Color.Transparent
-        Me.ImageList2.Images.SetKeyName(0, "Admin.png")
-        Me.ImageList2.Images.SetKeyName(1, "aircraft.png")
-        Me.ImageList2.Images.SetKeyName(2, "backpack.png")
-        Me.ImageList2.Images.SetKeyName(3, "Breakfast.png")
-        Me.ImageList2.Images.SetKeyName(4, "CoffeeTeaX24.png")
-        Me.ImageList2.Images.SetKeyName(5, "cruise.png")
-        Me.ImageList2.Images.SetKeyName(6, "Dinner.png")
-        Me.ImageList2.Images.SetKeyName(7, "KG30.png")
-        Me.ImageList2.Images.SetKeyName(8, "Lunch and Dinner.png")
-        Me.ImageList2.Images.SetKeyName(9, "Lunch.png")
-        '
-        'Button6
-        '
-        Me.Button6.Location = New System.Drawing.Point(1548, 191)
-        Me.Button6.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.Button6.Name = "Button6"
-        Me.Button6.Size = New System.Drawing.Size(64, 19)
-        Me.Button6.TabIndex = 17
-        Me.Button6.Text = "Button6"
-        Me.Button6.UseVisualStyleBackColor = True
-        '
-        'CheckBox1
-        '
-        Me.CheckBox1.AutoSize = True
-        Me.CheckBox1.Location = New System.Drawing.Point(1444, 435)
-        Me.CheckBox1.Name = "CheckBox1"
-        Me.CheckBox1.Size = New System.Drawing.Size(79, 17)
-        Me.CheckBox1.TabIndex = 71
-        Me.CheckBox1.Text = "CheckBox1"
-        Me.CheckBox1.ThreeState = True
-        Me.CheckBox1.UseVisualStyleBackColor = True
-        '
-        'ListBox3
-        '
-        Me.ListBox3.Font = New System.Drawing.Font("Courier New", 8.0!)
-        Me.ListBox3.FormattingEnabled = True
-        Me.ListBox3.ItemHeight = 14
-        Me.ListBox3.Location = New System.Drawing.Point(17, 34)
-        Me.ListBox3.Name = "ListBox3"
-        Me.ListBox3.Size = New System.Drawing.Size(252, 550)
-        Me.ListBox3.TabIndex = 0
-        '
-        'Button5
-        '
-        Me.Button5.Location = New System.Drawing.Point(17, 7)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(75, 23)
-        Me.Button5.TabIndex = 1
-        Me.Button5.Tag = ""
-        Me.Button5.Text = "Add"
-        Me.Button5.UseVisualStyleBackColor = True
-        '
-        'Button7
-        '
-        Me.Button7.Location = New System.Drawing.Point(98, 7)
-        Me.Button7.Name = "Button7"
-        Me.Button7.Size = New System.Drawing.Size(75, 23)
-        Me.Button7.TabIndex = 2
-        Me.Button7.Tag = ""
-        Me.Button7.Text = "Remove"
-        Me.Button7.UseVisualStyleBackColor = True
-        '
-        'ToolStripButton1
-        '
-        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(24, 24)
-        Me.ToolStripButton1.Text = "ToolStripButton1"
-        '
-        'txbxTripSubTitle
-        '
-        Me.txbxTripSubTitle.BackColor = System.Drawing.Color.Transparent
-        Me.txbxTripSubTitle.lcTitle = "Subtitle"
-        Me.txbxTripSubTitle.length = 400
-        Me.txbxTripSubTitle.Location = New System.Drawing.Point(24, 49)
-        Me.txbxTripSubTitle.Name = "txbxTripSubTitle"
-        Me.txbxTripSubTitle.Size = New System.Drawing.Size(477, 23)
-        Me.txbxTripSubTitle.TabIndex = 1
-        '
-        'txbxTripTitle
-        '
-        Me.txbxTripTitle.BackColor = System.Drawing.Color.Transparent
-        Me.txbxTripTitle.lcTitle = "Title"
-        Me.txbxTripTitle.length = 500
-        Me.txbxTripTitle.Location = New System.Drawing.Point(24, 20)
-        Me.txbxTripTitle.Name = "txbxTripTitle"
-        Me.txbxTripTitle.Size = New System.Drawing.Size(577, 23)
-        Me.txbxTripTitle.TabIndex = 0
-        '
-        'DateWithCheckBox7
-        '
-        Me.DateWithCheckBox7.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox7.lcTitle = "To"
-        Me.DateWithCheckBox7.Location = New System.Drawing.Point(16, 150)
-        Me.DateWithCheckBox7.Name = "DateWithCheckBox7"
-        Me.DateWithCheckBox7.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox7.TabIndex = 3
-        '
-        'DateWithCheckBox8
-        '
-        Me.DateWithCheckBox8.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox8.lcTitle = "From"
-        Me.DateWithCheckBox8.Location = New System.Drawing.Point(16, 121)
-        Me.DateWithCheckBox8.Name = "DateWithCheckBox8"
-        Me.DateWithCheckBox8.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox8.TabIndex = 2
-        '
-        'DateWithCheckBox6
-        '
-        Me.DateWithCheckBox6.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox6.lcTitle = "To"
-        Me.DateWithCheckBox6.Location = New System.Drawing.Point(16, 64)
-        Me.DateWithCheckBox6.Name = "DateWithCheckBox6"
-        Me.DateWithCheckBox6.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox6.TabIndex = 1
-        '
-        'DateWithCheckBox5
-        '
-        Me.DateWithCheckBox5.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox5.lcTitle = "From"
-        Me.DateWithCheckBox5.Location = New System.Drawing.Point(16, 35)
-        Me.DateWithCheckBox5.Name = "DateWithCheckBox5"
-        Me.DateWithCheckBox5.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox5.TabIndex = 0
         '
         'TextBoxWithCheckBox15
         '
@@ -1738,6 +1377,35 @@ Partial Class Form1
         Me.TextBoxWithCheckBox27.Size = New System.Drawing.Size(477, 23)
         Me.TextBoxWithCheckBox27.TabIndex = 45
         '
+        'ListBox2
+        '
+        Me.ListBox2.FormattingEnabled = True
+        Me.ListBox2.Location = New System.Drawing.Point(6, 48)
+        Me.ListBox2.Name = "ListBox2"
+        Me.ListBox2.Size = New System.Drawing.Size(326, 589)
+        Me.ListBox2.TabIndex = 0
+        '
+        'tabPricingpolicy
+        '
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox10)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox9)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox8)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox7)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox6)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox5)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox4)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox3)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox2)
+        Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox1)
+        Me.tabPricingpolicy.Controls.Add(Me.UserControl11)
+        Me.tabPricingpolicy.Location = New System.Drawing.Point(4, 22)
+        Me.tabPricingpolicy.Name = "tabPricingpolicy"
+        Me.tabPricingpolicy.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabPricingpolicy.Size = New System.Drawing.Size(953, 645)
+        Me.tabPricingpolicy.TabIndex = 6
+        Me.tabPricingpolicy.Text = "Pricing Policy"
+        Me.tabPricingpolicy.UseVisualStyleBackColor = True
+        '
         'PricingWithCheckBox10
         '
         Me.PricingWithCheckBox10.BackColor = System.Drawing.Color.Transparent
@@ -1859,6 +1527,26 @@ Partial Class Form1
         Me.UserControl11.SubTitle = ""
         Me.UserControl11.TabIndex = 0
         '
+        'Additions
+        '
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox11)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox12)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox13)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox14)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox15)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox16)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox17)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox18)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox19)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox20)
+        Me.Additions.Controls.Add(Me.PricingWithCheckBox21)
+        Me.Additions.Location = New System.Drawing.Point(4, 22)
+        Me.Additions.Name = "Additions"
+        Me.Additions.Size = New System.Drawing.Size(953, 645)
+        Me.Additions.TabIndex = 7
+        Me.Additions.Text = "Additions"
+        Me.Additions.UseVisualStyleBackColor = True
+        '
         'PricingWithCheckBox11
         '
         Me.PricingWithCheckBox11.BackColor = System.Drawing.Color.Transparent
@@ -1979,6 +1667,29 @@ Partial Class Form1
         Me.PricingWithCheckBox21.Size = New System.Drawing.Size(415, 49)
         Me.PricingWithCheckBox21.SubTitle = ""
         Me.PricingWithCheckBox21.TabIndex = 11
+        '
+        'TransferWays
+        '
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox14)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox13)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox12)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox11)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox10)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox9)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox8)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox7)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox6)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox4)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox3)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox2)
+        Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox1)
+        Me.TransferWays.Controls.Add(Me.TabControl4)
+        Me.TransferWays.Location = New System.Drawing.Point(4, 22)
+        Me.TransferWays.Name = "TransferWays"
+        Me.TransferWays.Size = New System.Drawing.Size(953, 645)
+        Me.TransferWays.TabIndex = 8
+        Me.TransferWays.Text = "TransferWays"
+        Me.TransferWays.UseVisualStyleBackColor = True
         '
         'TextBoxWithCheckBox14
         '
@@ -2110,85 +1821,138 @@ Partial Class Form1
         Me.TextBoxWithCheckBox1.Size = New System.Drawing.Size(527, 23)
         Me.TextBoxWithCheckBox1.TabIndex = 32
         '
-        'TextBoxWithTypeAndCheckbox1
+        'TabControl4
         '
-        Me.TextBoxWithTypeAndCheckbox1.length = 400
-        Me.TextBoxWithTypeAndCheckbox1.Location = New System.Drawing.Point(24, 26)
-        Me.TextBoxWithTypeAndCheckbox1.Name = "TextBoxWithTypeAndCheckbox1"
-        Me.TextBoxWithTypeAndCheckbox1.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox1.TabIndex = 0
+        Me.TabControl4.Controls.Add(Me.TabPage3)
+        Me.TabControl4.Controls.Add(Me.TabPage4)
+        Me.TabControl4.Controls.Add(Me.TabPage5)
+        Me.TabControl4.Controls.Add(Me.TabPage7)
+        Me.TabControl4.Controls.Add(Me.TabPage10)
+        Me.TabControl4.Controls.Add(Me.TabPage11)
+        Me.TabControl4.Controls.Add(Me.TabPage12)
+        Me.TabControl4.Controls.Add(Me.TabPage13)
+        Me.TabControl4.Controls.Add(Me.TabPage14)
+        Me.TabControl4.ImageList = Me.ImageList1
+        Me.TabControl4.Location = New System.Drawing.Point(10, 11)
+        Me.TabControl4.Name = "TabControl4"
+        Me.TabControl4.SelectedIndex = 0
+        Me.TabControl4.Size = New System.Drawing.Size(729, 66)
+        Me.TabControl4.TabIndex = 31
         '
-        'TextBoxWithTypeAndCheckbox2
+        'TabPage3
         '
-        Me.TextBoxWithTypeAndCheckbox2.length = 400
-        Me.TextBoxWithTypeAndCheckbox2.Location = New System.Drawing.Point(24, 58)
-        Me.TextBoxWithTypeAndCheckbox2.Name = "TextBoxWithTypeAndCheckbox2"
-        Me.TextBoxWithTypeAndCheckbox2.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox2.TabIndex = 1
+        Me.TabPage3.ImageIndex = 0
+        Me.TabPage3.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage3.Name = "TabPage3"
+        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage3.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage3.TabIndex = 0
+        Me.TabPage3.UseVisualStyleBackColor = True
         '
-        'TextBoxWithTypeAndCheckbox3
+        'TabPage4
         '
-        Me.TextBoxWithTypeAndCheckbox3.length = 400
-        Me.TextBoxWithTypeAndCheckbox3.Location = New System.Drawing.Point(24, 90)
-        Me.TextBoxWithTypeAndCheckbox3.Name = "TextBoxWithTypeAndCheckbox3"
-        Me.TextBoxWithTypeAndCheckbox3.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox3.TabIndex = 2
+        Me.TabPage4.ImageIndex = 1
+        Me.TabPage4.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage4.Name = "TabPage4"
+        Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage4.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage4.TabIndex = 1
+        Me.TabPage4.UseVisualStyleBackColor = True
         '
-        'TextBoxWithTypeAndCheckbox4
+        'TabPage5
         '
-        Me.TextBoxWithTypeAndCheckbox4.length = 400
-        Me.TextBoxWithTypeAndCheckbox4.Location = New System.Drawing.Point(24, 122)
-        Me.TextBoxWithTypeAndCheckbox4.Name = "TextBoxWithTypeAndCheckbox4"
-        Me.TextBoxWithTypeAndCheckbox4.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox4.TabIndex = 3
+        Me.TabPage5.ImageIndex = 2
+        Me.TabPage5.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage5.Name = "TabPage5"
+        Me.TabPage5.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage5.TabIndex = 2
+        Me.TabPage5.UseVisualStyleBackColor = True
         '
-        'TextBoxWithTypeAndCheckbox5
+        'TabPage7
         '
-        Me.TextBoxWithTypeAndCheckbox5.length = 400
-        Me.TextBoxWithTypeAndCheckbox5.Location = New System.Drawing.Point(24, 150)
-        Me.TextBoxWithTypeAndCheckbox5.Name = "TextBoxWithTypeAndCheckbox5"
-        Me.TextBoxWithTypeAndCheckbox5.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox5.TabIndex = 4
+        Me.TabPage7.ImageIndex = 3
+        Me.TabPage7.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage7.Name = "TabPage7"
+        Me.TabPage7.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage7.TabIndex = 3
+        Me.TabPage7.UseVisualStyleBackColor = True
         '
-        'TextBoxWithTypeAndCheckbox6
+        'TabPage10
         '
-        Me.TextBoxWithTypeAndCheckbox6.length = 400
-        Me.TextBoxWithTypeAndCheckbox6.Location = New System.Drawing.Point(24, 182)
-        Me.TextBoxWithTypeAndCheckbox6.Name = "TextBoxWithTypeAndCheckbox6"
-        Me.TextBoxWithTypeAndCheckbox6.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox6.TabIndex = 5
+        Me.TabPage10.ImageIndex = 4
+        Me.TabPage10.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage10.Name = "TabPage10"
+        Me.TabPage10.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage10.TabIndex = 4
+        Me.TabPage10.UseVisualStyleBackColor = True
         '
-        'TextBoxWithTypeAndCheckbox7
+        'TabPage11
         '
-        Me.TextBoxWithTypeAndCheckbox7.length = 400
-        Me.TextBoxWithTypeAndCheckbox7.Location = New System.Drawing.Point(24, 214)
-        Me.TextBoxWithTypeAndCheckbox7.Name = "TextBoxWithTypeAndCheckbox7"
-        Me.TextBoxWithTypeAndCheckbox7.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox7.TabIndex = 6
+        Me.TabPage11.ImageIndex = 5
+        Me.TabPage11.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage11.Name = "TabPage11"
+        Me.TabPage11.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage11.TabIndex = 5
+        Me.TabPage11.UseVisualStyleBackColor = True
         '
-        'TextBoxWithTypeAndCheckbox8
+        'TabPage12
         '
-        Me.TextBoxWithTypeAndCheckbox8.length = 400
-        Me.TextBoxWithTypeAndCheckbox8.Location = New System.Drawing.Point(24, 246)
-        Me.TextBoxWithTypeAndCheckbox8.Name = "TextBoxWithTypeAndCheckbox8"
-        Me.TextBoxWithTypeAndCheckbox8.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox8.TabIndex = 7
+        Me.TabPage12.ImageIndex = 6
+        Me.TabPage12.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage12.Name = "TabPage12"
+        Me.TabPage12.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage12.TabIndex = 6
+        Me.TabPage12.UseVisualStyleBackColor = True
         '
-        'TextBoxWithTypeAndCheckbox9
+        'TabPage13
         '
-        Me.TextBoxWithTypeAndCheckbox9.length = 400
-        Me.TextBoxWithTypeAndCheckbox9.Location = New System.Drawing.Point(24, 278)
-        Me.TextBoxWithTypeAndCheckbox9.Name = "TextBoxWithTypeAndCheckbox9"
-        Me.TextBoxWithTypeAndCheckbox9.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox9.TabIndex = 8
+        Me.TabPage13.ImageIndex = 7
+        Me.TabPage13.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage13.Name = "TabPage13"
+        Me.TabPage13.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage13.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage13.TabIndex = 7
+        Me.TabPage13.UseVisualStyleBackColor = True
         '
-        'TextBoxWithTypeAndCheckbox10
+        'TabPage14
         '
-        Me.TextBoxWithTypeAndCheckbox10.length = 400
-        Me.TextBoxWithTypeAndCheckbox10.Location = New System.Drawing.Point(24, 310)
-        Me.TextBoxWithTypeAndCheckbox10.Name = "TextBoxWithTypeAndCheckbox10"
-        Me.TextBoxWithTypeAndCheckbox10.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox10.TabIndex = 9
+        Me.TabPage14.ImageIndex = 8
+        Me.TabPage14.Location = New System.Drawing.Point(4, 57)
+        Me.TabPage14.Name = "TabPage14"
+        Me.TabPage14.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage14.Size = New System.Drawing.Size(721, 5)
+        Me.TabPage14.TabIndex = 8
+        Me.TabPage14.UseVisualStyleBackColor = True
+        '
+        'TabPage15
+        '
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox12)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox11)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox10)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox9)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox8)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox7)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox6)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox5)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox4)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox3)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox2)
+        Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox1)
+        Me.TabPage15.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage15.Name = "TabPage15"
+        Me.TabPage15.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage15.Size = New System.Drawing.Size(953, 645)
+        Me.TabPage15.TabIndex = 9
+        Me.TabPage15.Text = "Laces, Stamps, and Comments"
+        Me.TabPage15.UseVisualStyleBackColor = True
+        '
+        'TextBoxWithTypeAndCheckbox12
+        '
+        Me.TextBoxWithTypeAndCheckbox12.length = 400
+        Me.TextBoxWithTypeAndCheckbox12.Location = New System.Drawing.Point(24, 374)
+        Me.TextBoxWithTypeAndCheckbox12.Name = "TextBoxWithTypeAndCheckbox12"
+        Me.TextBoxWithTypeAndCheckbox12.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox12.TabIndex = 11
         '
         'TextBoxWithTypeAndCheckbox11
         '
@@ -2198,13 +1962,193 @@ Partial Class Form1
         Me.TextBoxWithTypeAndCheckbox11.Size = New System.Drawing.Size(501, 26)
         Me.TextBoxWithTypeAndCheckbox11.TabIndex = 10
         '
-        'TextBoxWithTypeAndCheckbox12
+        'TextBoxWithTypeAndCheckbox10
         '
-        Me.TextBoxWithTypeAndCheckbox12.length = 400
-        Me.TextBoxWithTypeAndCheckbox12.Location = New System.Drawing.Point(24, 374)
-        Me.TextBoxWithTypeAndCheckbox12.Name = "TextBoxWithTypeAndCheckbox12"
-        Me.TextBoxWithTypeAndCheckbox12.Size = New System.Drawing.Size(501, 26)
-        Me.TextBoxWithTypeAndCheckbox12.TabIndex = 11
+        Me.TextBoxWithTypeAndCheckbox10.length = 400
+        Me.TextBoxWithTypeAndCheckbox10.Location = New System.Drawing.Point(24, 310)
+        Me.TextBoxWithTypeAndCheckbox10.Name = "TextBoxWithTypeAndCheckbox10"
+        Me.TextBoxWithTypeAndCheckbox10.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox10.TabIndex = 9
+        '
+        'TextBoxWithTypeAndCheckbox9
+        '
+        Me.TextBoxWithTypeAndCheckbox9.length = 400
+        Me.TextBoxWithTypeAndCheckbox9.Location = New System.Drawing.Point(24, 278)
+        Me.TextBoxWithTypeAndCheckbox9.Name = "TextBoxWithTypeAndCheckbox9"
+        Me.TextBoxWithTypeAndCheckbox9.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox9.TabIndex = 8
+        '
+        'TextBoxWithTypeAndCheckbox8
+        '
+        Me.TextBoxWithTypeAndCheckbox8.length = 400
+        Me.TextBoxWithTypeAndCheckbox8.Location = New System.Drawing.Point(24, 246)
+        Me.TextBoxWithTypeAndCheckbox8.Name = "TextBoxWithTypeAndCheckbox8"
+        Me.TextBoxWithTypeAndCheckbox8.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox8.TabIndex = 7
+        '
+        'TextBoxWithTypeAndCheckbox7
+        '
+        Me.TextBoxWithTypeAndCheckbox7.length = 400
+        Me.TextBoxWithTypeAndCheckbox7.Location = New System.Drawing.Point(24, 214)
+        Me.TextBoxWithTypeAndCheckbox7.Name = "TextBoxWithTypeAndCheckbox7"
+        Me.TextBoxWithTypeAndCheckbox7.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox7.TabIndex = 6
+        '
+        'TextBoxWithTypeAndCheckbox6
+        '
+        Me.TextBoxWithTypeAndCheckbox6.length = 400
+        Me.TextBoxWithTypeAndCheckbox6.Location = New System.Drawing.Point(24, 182)
+        Me.TextBoxWithTypeAndCheckbox6.Name = "TextBoxWithTypeAndCheckbox6"
+        Me.TextBoxWithTypeAndCheckbox6.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox6.TabIndex = 5
+        '
+        'TextBoxWithTypeAndCheckbox5
+        '
+        Me.TextBoxWithTypeAndCheckbox5.length = 400
+        Me.TextBoxWithTypeAndCheckbox5.Location = New System.Drawing.Point(24, 150)
+        Me.TextBoxWithTypeAndCheckbox5.Name = "TextBoxWithTypeAndCheckbox5"
+        Me.TextBoxWithTypeAndCheckbox5.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox5.TabIndex = 4
+        '
+        'TextBoxWithTypeAndCheckbox4
+        '
+        Me.TextBoxWithTypeAndCheckbox4.length = 400
+        Me.TextBoxWithTypeAndCheckbox4.Location = New System.Drawing.Point(24, 122)
+        Me.TextBoxWithTypeAndCheckbox4.Name = "TextBoxWithTypeAndCheckbox4"
+        Me.TextBoxWithTypeAndCheckbox4.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox4.TabIndex = 3
+        '
+        'TextBoxWithTypeAndCheckbox3
+        '
+        Me.TextBoxWithTypeAndCheckbox3.length = 400
+        Me.TextBoxWithTypeAndCheckbox3.Location = New System.Drawing.Point(24, 90)
+        Me.TextBoxWithTypeAndCheckbox3.Name = "TextBoxWithTypeAndCheckbox3"
+        Me.TextBoxWithTypeAndCheckbox3.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox3.TabIndex = 2
+        '
+        'TextBoxWithTypeAndCheckbox2
+        '
+        Me.TextBoxWithTypeAndCheckbox2.length = 400
+        Me.TextBoxWithTypeAndCheckbox2.Location = New System.Drawing.Point(24, 58)
+        Me.TextBoxWithTypeAndCheckbox2.Name = "TextBoxWithTypeAndCheckbox2"
+        Me.TextBoxWithTypeAndCheckbox2.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox2.TabIndex = 1
+        '
+        'TextBoxWithTypeAndCheckbox1
+        '
+        Me.TextBoxWithTypeAndCheckbox1.length = 400
+        Me.TextBoxWithTypeAndCheckbox1.Location = New System.Drawing.Point(24, 26)
+        Me.TextBoxWithTypeAndCheckbox1.Name = "TextBoxWithTypeAndCheckbox1"
+        Me.TextBoxWithTypeAndCheckbox1.Size = New System.Drawing.Size(501, 26)
+        Me.TextBoxWithTypeAndCheckbox1.TabIndex = 0
+        '
+        'Prices
+        '
+        Me.Prices.Controls.Add(Me.Button7)
+        Me.Prices.Controls.Add(Me.Button5)
+        Me.Prices.Controls.Add(Me.ListBox3)
+        Me.Prices.Location = New System.Drawing.Point(4, 22)
+        Me.Prices.Name = "Prices"
+        Me.Prices.Padding = New System.Windows.Forms.Padding(3)
+        Me.Prices.Size = New System.Drawing.Size(953, 645)
+        Me.Prices.TabIndex = 10
+        Me.Prices.Text = "Prices"
+        Me.Prices.UseVisualStyleBackColor = True
+        '
+        'Button7
+        '
+        Me.Button7.Location = New System.Drawing.Point(98, 7)
+        Me.Button7.Name = "Button7"
+        Me.Button7.Size = New System.Drawing.Size(75, 23)
+        Me.Button7.TabIndex = 2
+        Me.Button7.Tag = ""
+        Me.Button7.Text = "Remove"
+        Me.Button7.UseVisualStyleBackColor = True
+        '
+        'Button5
+        '
+        Me.Button5.Location = New System.Drawing.Point(17, 7)
+        Me.Button5.Name = "Button5"
+        Me.Button5.Size = New System.Drawing.Size(75, 23)
+        Me.Button5.TabIndex = 1
+        Me.Button5.Tag = ""
+        Me.Button5.Text = "Add"
+        Me.Button5.UseVisualStyleBackColor = True
+        '
+        'ListBox3
+        '
+        Me.ListBox3.Font = New System.Drawing.Font("Courier New", 8.0!)
+        Me.ListBox3.FormattingEnabled = True
+        Me.ListBox3.ItemHeight = 14
+        Me.ListBox3.Location = New System.Drawing.Point(17, 34)
+        Me.ListBox3.Name = "ListBox3"
+        Me.ListBox3.Size = New System.Drawing.Size(252, 550)
+        Me.ListBox3.TabIndex = 0
+        '
+        'ComboBox1
+        '
+        Me.ComboBox1.FormattingEnabled = True
+        Me.ComboBox1.Items.AddRange(New Object() {"Solo", "Tour"})
+        Me.ComboBox1.Location = New System.Drawing.Point(91, 64)
+        Me.ComboBox1.Name = "ComboBox1"
+        Me.ComboBox1.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBox1.TabIndex = 23
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
+        Me.Label2.Location = New System.Drawing.Point(8, 110)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(43, 13)
+        Me.Label2.TabIndex = 5
+        Me.Label2.Text = "Travel"
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
+        Me.Label1.Location = New System.Drawing.Point(8, 27)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(77, 13)
+        Me.Label1.TabIndex = 4
+        Me.Label1.Text = "Registration"
+        '
+        'ImageList2
+        '
+        Me.ImageList2.ImageStream = CType(resources.GetObject("ImageList2.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList2.TransparentColor = System.Drawing.Color.Transparent
+        Me.ImageList2.Images.SetKeyName(0, "Admin.png")
+        Me.ImageList2.Images.SetKeyName(1, "aircraft.png")
+        Me.ImageList2.Images.SetKeyName(2, "backpack.png")
+        Me.ImageList2.Images.SetKeyName(3, "Breakfast.png")
+        Me.ImageList2.Images.SetKeyName(4, "CoffeeTeaX24.png")
+        Me.ImageList2.Images.SetKeyName(5, "cruise.png")
+        Me.ImageList2.Images.SetKeyName(6, "Dinner.png")
+        Me.ImageList2.Images.SetKeyName(7, "KG30.png")
+        Me.ImageList2.Images.SetKeyName(8, "Lunch and Dinner.png")
+        Me.ImageList2.Images.SetKeyName(9, "Lunch.png")
+        '
+        'Button6
+        '
+        Me.Button6.Location = New System.Drawing.Point(1372, 184)
+        Me.Button6.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.Button6.Name = "Button6"
+        Me.Button6.Size = New System.Drawing.Size(64, 19)
+        Me.Button6.TabIndex = 17
+        Me.Button6.Text = "Button6"
+        Me.Button6.UseVisualStyleBackColor = True
+        '
+        'CheckBox1
+        '
+        Me.CheckBox1.AutoSize = True
+        Me.CheckBox1.Location = New System.Drawing.Point(1372, 208)
+        Me.CheckBox1.Name = "CheckBox1"
+        Me.CheckBox1.Size = New System.Drawing.Size(79, 17)
+        Me.CheckBox1.TabIndex = 71
+        Me.CheckBox1.Text = "CheckBox1"
+        Me.CheckBox1.ThreeState = True
+        Me.CheckBox1.UseVisualStyleBackColor = True
         '
         'Form1
         '
@@ -2240,7 +2184,6 @@ Partial Class Form1
         Me.TabControl3.ResumeLayout(False)
         Me.TabPage8.ResumeLayout(False)
         Me.TabPage8.PerformLayout()
-        Me.TabControl2.ResumeLayout(False)
         Me.TabPage9.ResumeLayout(False)
         Me.TabPage9.PerformLayout()
         Me.DayByDay.ResumeLayout(False)
@@ -2287,13 +2230,7 @@ Partial Class Form1
     Friend WithEvents TabPage1 As TabPage
     Friend WithEvents TabPage2 As TabPage
     Friend WithEvents ListBox1 As ListBox
-    Friend WithEvents TabControl2 As TabControl
-    Friend WithEvents tabAirCraft As TabPage
-    Friend WithEvents tabCaravan As TabPage
-    Friend WithEvents tabGMC As TabPage
     Friend WithEvents TabPage6 As TabPage
-    Friend WithEvents TextBox14 As TextBox
-    Friend WithEvents TextBox15 As TextBox
     Friend WithEvents Label23 As Label
     Friend WithEvents Label22 As Label
     Friend WithEvents Label21 As Label
@@ -2303,31 +2240,9 @@ Partial Class Form1
     Friend WithEvents Label20 As Label
     Friend WithEvents Including As TabPage
     Friend WithEvents ImageList1 As ImageList
-    Friend WithEvents tabBus As TabPage
-    Friend WithEvents tabHike As TabPage
-    Friend WithEvents tabTrain As TabPage
-    Friend WithEvents tabMiniBus As TabPage
-    Friend WithEvents tabCruise As TabPage
-    Friend WithEvents ArrivalDate As DateTimePicker
-    Friend WithEvents ArrivalTime As DateTimePicker
-    Friend WithEvents DepartureDate As DateTimePicker
-    Friend WithEvents DepartureTime As DateTimePicker
-    Friend WithEvents cmbxArrivingLocation As ComboBox
-    Friend WithEvents Label25 As Label
     Friend WithEvents txtTitle As TextBox
     Friend WithEvents Label24 As Label
-    Friend WithEvents Label12 As Label
-    Friend WithEvents cmbxDepartureLocation As ComboBox
-    Friend WithEvents Label9 As Label
-    Friend WithEvents cmbxDepartureFrom As ComboBox
     Friend WithEvents Button2 As Button
-    Friend WithEvents Label10 As Label
-    Friend WithEvents Label7 As Label
-    Friend WithEvents cmbxAirLine As ComboBox
-    Friend WithEvents Label11 As Label
-    Friend WithEvents cmbxArrivingTo As ComboBox
-    Friend WithEvents Label8 As Label
-    Friend WithEvents tabLayOver As TabPage
     Friend WithEvents MaskedTextBox1 As MaskedTextBox
     Friend WithEvents Label27 As Label
     Friend WithEvents DateTimePicker3 As DateTimePicker
@@ -2341,10 +2256,6 @@ Partial Class Form1
     Friend WithEvents NotIncluding As TabPage
     Friend WithEvents DayByDay As TabPage
     Friend WithEvents ImageList2 As ImageList
-    Friend WithEvents cmbxArrivingCity As ComboBox
-    Friend WithEvents Label29 As Label
-    Friend WithEvents cmbxDepartureCity As ComboBox
-    Friend WithEvents Label28 As Label
     Friend WithEvents Button4 As Button
     Friend WithEvents Button3 As Button
     Friend WithEvents ListBox2 As ListBox
@@ -2388,8 +2299,6 @@ Partial Class Form1
     Friend WithEvents txbxTripTitle As TextBoxWithCheckBox.TextBoxWithCheckBox
     Friend WithEvents DateWithCheckBox6 As DateWithCheckBox.DateWithCheckBox
     Friend WithEvents DateWithCheckBox5 As DateWithCheckBox.DateWithCheckBox
-    Friend WithEvents Label15 As Label
-    Friend WithEvents Label3 As Label
     Friend WithEvents DateWithCheckBox7 As DateWithCheckBox.DateWithCheckBox
     Friend WithEvents DateWithCheckBox8 As DateWithCheckBox.DateWithCheckBox
     Friend WithEvents TabControl3 As TabControl
@@ -2458,4 +2367,28 @@ Partial Class Form1
     Friend WithEvents TextBoxWithTypeAndCheckbox3 As TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox
     Friend WithEvents TextBoxWithTypeAndCheckbox2 As TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox
     Friend WithEvents TextBoxWithTypeAndCheckbox1 As TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox
+    Friend WithEvents cmbxDepartureFrom As ComboBoxWithCheckBox.ComboBoxWithCheckBox
+    Friend WithEvents cmbxDepartureCity As ComboBoxWithCheckBox.ComboBoxWithCheckBox
+    Friend WithEvents cmbxDepartureLocation As ComboBoxWithCheckBox.ComboBoxWithCheckBox
+    Friend WithEvents cmbxAirLine As ComboBoxWithCheckBox.ComboBoxWithCheckBox
+    Friend WithEvents cmbxDepartureTime As TimeWithCheckBox.TimeWithCheckBox
+    Friend WithEvents cmbxDepartureDate As DateWithCheckBox.DateWithCheckBox
+    Friend WithEvents cmbxArrivingTo As ComboBoxWithCheckBox.ComboBoxWithCheckBox
+    Friend WithEvents cmbxArrivingCity As ComboBoxWithCheckBox.ComboBoxWithCheckBox
+    Friend WithEvents cmbxArrivingLocation As ComboBoxWithCheckBox.ComboBoxWithCheckBox
+    Friend WithEvents ArrivalDate As DateWithCheckBox.DateWithCheckBox
+    Friend WithEvents cmbxArrivalTime As TimeWithCheckBox.TimeWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox29 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents TextBoxWithCheckBox28 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents RadioButton3 As RadioButton
+    Friend WithEvents RadioButton2 As RadioButton
+    Friend WithEvents RadioButton1 As RadioButton
+    Friend WithEvents RadioButton8 As RadioButton
+    Friend WithEvents RadioButton7 As RadioButton
+    Friend WithEvents RadioButton6 As RadioButton
+    Friend WithEvents RadioButton5 As RadioButton
+    Friend WithEvents RadioButton4 As RadioButton
+    Friend WithEvents Label3 As Label
+    Friend WithEvents Label7 As Label
+    Friend WithEvents Button8 As Button
 End Class
