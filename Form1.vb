@@ -465,10 +465,124 @@ Public Class Form1
 
             data.Attractions.Add(New CheckListItem(name:=tvp.Text, isChecked:=True))
         Next
-
+        data.Text = data.Title.Text
         Return data
 
     End Function
+
+    Private Sub ResetCitiesStayAttraction()
+
+        ' Empty out Cities / Stay / Attraction completely
+        CheckedListBox2.Items.Clear()
+        CheckedListBox3.Items.Clear()
+        CheckedListBox4.Items.Clear()
+
+        ' Uncheck every country, but keep the countries themselves listed
+        For idx As Integer = 0 To CheckedListBox1.Items.Count - 1
+            CheckedListBox1.SetItemChecked(idx, False)
+        Next
+
+        CheckedListBox1.ClearSelected()
+        CheckedListBox2.ClearSelected()
+        CheckedListBox3.ClearSelected()
+        CheckedListBox4.ClearSelected()
+
+    End Sub
+
+    ''' <summary>
+    ''' Fills TabPage1 (Title, Sub Title, CheckedListBox1-4) from a previously
+    ''' saved TravelFormData instance — the reverse of SaveTabPage1Data().
+    ''' </summary>
+    ''' <remarks>
+    ''' Countries (CheckedListBox1) is assumed to already hold the full master
+    ''' list of countries (as loaded in Form1_Load) — this only flips the
+    ''' checkmarks to match the saved data, it doesn't add/remove rows.
+    ''' Cities/Stay/Attraction have no such pre-loaded master list, so their
+    ''' rows are rebuilt from scratch using the saved Name/state.
+    ''' TravelFormData's CheckListItem/CityListItem only expose Name and
+    ''' IsChecked/State (TravelBasicInfo.vb) — there is no ID, ParentID or
+    ''' IsHeader on those models, so matching/rebuilding below is done by
+    ''' Name only, and the rebuilt TextValueParent rows get an empty ID.
+    ''' SaveTabPage1Data only stores checked rows, so there's nothing to
+    ''' restore for unchecked/header rows.
+    ''' </remarks>
+    Public Sub LoadTabPage1Data(data As TravelFormData)
+
+        If data Is Nothing Then Exit Sub
+
+        ' ---- Title / Sub Title ---------------------------------------------
+        txbxTripTitle.CheckBox1.Checked = data.Title.IsEnabled
+        txbxTripTitle.TextBox1.Text = data.Title.Text
+
+        txbxTripSubTitle.CheckBox1.Checked = data.SubTitle.IsEnabled
+        txbxTripSubTitle.TextBox1.Text = data.SubTitle.Text
+
+        ' ---- Countries (CheckedListBox1) — flip checkmarks only -------------
+        Dim checkedCountryNames As New HashSet(Of String)(
+            data.Countries.Where(Function(c) c.IsChecked).Select(Function(c) c.Name))
+
+        For idx As Integer = 0 To CheckedListBox1.Items.Count - 1
+            Dim tvp As TextValueParent = CType(CheckedListBox1.Items(idx), TextValueParent)
+            CheckedListBox1.SetItemChecked(idx, checkedCountryNames.Contains(tvp.Text))
+            CheckedListBox1.SelectedIndex = idx
+            CheckedListBox1_SelectedIndexChanged(CheckedListBox1.Items(idx), EventArgs.Empty)
+        Next
+
+        ' ---- Cities (CheckedListBox2) — rebuilt, tri-state -------------------
+        'CheckedListBox2.Items.Clear()
+
+        For Each city In data.Cities
+            For idx As Integer = 0 To CheckedListBox2.Items.Count - 1
+                Dim tvp As TextValueParent = CType(CheckedListBox2.Items(idx), TextValueParent)
+                If city.Name = CheckedListBox2.Items(idx).ToString Then
+                    CheckedListBox2.SetItemChecked(idx, True)
+                    CheckedListBox2.SelectedIndex = idx
+                End If
+            Next
+        Next
+
+        ' ---- Stay (CheckedListBox3) — rebuilt --------------------------------
+        'CheckedListBox3.Items.Clear()
+        'For Each stay In data.Stays
+        '    Dim tvp As New TextValueParent(Text:=stay.Name, ID:="")
+        '    Dim newIndex As Integer = CheckedListBox3.Items.Add(tvp)
+        '    CheckedListBox3.SetItemChecked(newIndex, stay.IsChecked)
+        'Next
+        For Each stay In data.Stays
+            For idx As Integer = 0 To CheckedListBox3.Items.Count - 1
+                Dim tvp As TextValueParent = CType(CheckedListBox3.Items(idx), TextValueParent)
+                If stay.Name = CheckedListBox3.Items(idx).ToString Then
+                    CheckedListBox3.SetItemChecked(idx, True)
+                    CheckedListBox3.SelectedIndex = idx
+                End If
+            Next
+        Next
+
+
+        ' ---- Attraction (CheckedListBox4) — rebuilt ---------------------------
+        'CheckedListBox4.Items.Clear()
+        'For Each attraction In data.Attractions
+        '    Dim tvp As New TextValueParent(Text:=attraction.Name, ID:="")
+        '    'Dim newIndex As Integer = CheckedListBox4.Items.Add(tvp)
+        '    CheckedListBox4.SetItemChecked(newIndex, attraction.IsChecked)
+        'Next
+        For Each attraction In data.Attractions
+            For idx As Integer = 0 To CheckedListBox4.Items.Count - 1
+                Dim tvp As TextValueParent = CType(CheckedListBox4.Items(idx), TextValueParent)
+                If attraction.Name = CheckedListBox4.Items(idx).ToString Then
+                    CheckedListBox4.SetItemChecked(idx, True)
+                    CheckedListBox4.SelectedIndex = idx
+                End If
+            Next
+        Next
+
+
+        CheckedListBox1.ClearSelected()
+        CheckedListBox2.ClearSelected()
+        CheckedListBox3.ClearSelected()
+        CheckedListBox4.ClearSelected()
+
+    End Sub
 
     Private Sub ResetAllFields()
         ' Reset all fields
@@ -993,6 +1107,36 @@ Public Class Form1
         Dim A As New TravelFormData
         A = SaveTabPage1Data()
 
+
+        TreeView1.Nodes.Add(A)
+
+        ResetCitiesStayAttraction()
+
+
+    End Sub
+
+    ''' <summary>
+    ''' Loads a previously saved trip back into TabPage1 — the reverse of
+    ''' Button8_Click_1, which calls SaveTabPage1Data() and adds the result
+    ''' to TreeView1 as a TravelFormData node.
+    ''' </summary>
+    ''' <param name="node">
+    ''' A TreeView1 node, e.g. TreeView1.SelectedNode. TreeView1 also holds
+    ''' TravelOffers nodes (added by ToolStripButton1_Click and the
+    ''' CitiesToolStripMenuItem/StayToolStripMenuItem/TransferToolStripMenuItem
+    ''' handlers), which are a different node type — those are simply
+    ''' ignored here since they hold no TabPage1 data to load.
+    ''' </param>
+    Private Sub LoadTabPage1DataFromTreeNode(node As TreeNode)
+        Dim data As TravelFormData = TryCast(node, TravelFormData)
+        If data Is Nothing Then Exit Sub ' not a saved-trip node (e.g. a TravelOffers node) — nothing to load
+
+        LoadTabPage1Data(data)
+    End Sub
+
+    Private Sub TreeView1_NodeMouseDoubleClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseDoubleClick
+        TreeView1.SelectedNode = e.Node
+        LoadTabPage1DataFromTreeNode(e.Node)
     End Sub
 End Class
 
@@ -1158,8 +1302,6 @@ Public Enum Categories
     Stay
     TravelWays
 End Enum
-
-
 
 Public Class DatesAndDuration
     Public Property StartDate As Date

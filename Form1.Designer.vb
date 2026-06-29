@@ -451,6 +451,7 @@ Partial Class Form1
         '
         'CheckedListBox4
         '
+        Me.CheckedListBox4.CheckOnClick = True
         Me.CheckedListBox4.FormattingEnabled = True
         Me.CheckedListBox4.Location = New System.Drawing.Point(478, 264)
         Me.CheckedListBox4.Name = "CheckedListBox4"
