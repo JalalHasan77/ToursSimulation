@@ -62,23 +62,24 @@ Partial Class Form1
         Me.txbxTripSubTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.txbxTripTitle = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
+        Me.btnSaveDepartureAndArrival = New System.Windows.Forms.Button()
         Me.TabControl5 = New System.Windows.Forms.TabControl()
-        Me.TabPage16 = New System.Windows.Forms.TabPage()
+        Me.tabSpecificDates = New System.Windows.Forms.TabPage()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.Label7 = New System.Windows.Forms.Label()
-        Me.DateWithCheckBox7 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox8 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox6 = New DateWithCheckBox.DateWithCheckBox()
-        Me.DateWithCheckBox5 = New DateWithCheckBox.DateWithCheckBox()
+        Me.chkTravTo = New DateWithCheckBox.DateWithCheckBox()
+        Me.chkTravFrom = New DateWithCheckBox.DateWithCheckBox()
+        Me.chkRegTo = New DateWithCheckBox.DateWithCheckBox()
+        Me.chkRegFrom = New DateWithCheckBox.DateWithCheckBox()
         Me.TabPage17 = New System.Windows.Forms.TabPage()
-        Me.TextBoxWithCheckBox29 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
-        Me.TextBoxWithCheckBox28 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.chkTravMonths = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.chkRegMonths = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.Label22 = New System.Windows.Forms.Label()
         Me.Label23 = New System.Windows.Forms.Label()
         Me.Label21 = New System.Windows.Forms.Label()
         Me.Label19 = New System.Windows.Forms.Label()
-        Me.TextBox12 = New System.Windows.Forms.TextBox()
-        Me.TextBox13 = New System.Windows.Forms.TextBox()
+        Me.txtDays = New System.Windows.Forms.TextBox()
+        Me.txtNights = New System.Windows.Forms.TextBox()
         Me.Label20 = New System.Windows.Forms.Label()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.Label24 = New System.Windows.Forms.Label()
@@ -210,28 +211,30 @@ Partial Class Form1
         Me.ImageList2 = New System.Windows.Forms.ImageList(Me.components)
         Me.Button6 = New System.Windows.Forms.Button()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
-        Me.ContextMenuStrip1.SuspendLayout
-        Me.Panel1.SuspendLayout
-        Me.ToolStrip1.SuspendLayout
-        Me.ContextMenuStrip2.SuspendLayout
-        Me.TabControl1.SuspendLayout
-        Me.TabPage1.SuspendLayout
-        Me.TabPage6.SuspendLayout
-        Me.TabControl5.SuspendLayout
-        Me.TabPage16.SuspendLayout
-        Me.TabPage17.SuspendLayout
-        Me.TabPage2.SuspendLayout
-        Me.TabControl3.SuspendLayout
-        Me.TabPage8.SuspendLayout
-        Me.TabPage9.SuspendLayout
-        Me.DayByDay.SuspendLayout
-        Me.tabPricingpolicy.SuspendLayout
-        Me.Additions.SuspendLayout
-        Me.TransferWays.SuspendLayout
-        Me.TabControl4.SuspendLayout
-        Me.TabPage15.SuspendLayout
-        Me.Prices.SuspendLayout
-        Me.SuspendLayout
+        Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.ContextMenuStrip1.SuspendLayout()
+        Me.Panel1.SuspendLayout()
+        Me.ToolStrip1.SuspendLayout()
+        Me.ContextMenuStrip2.SuspendLayout()
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
+        Me.TabPage6.SuspendLayout()
+        Me.TabControl5.SuspendLayout()
+        Me.tabSpecificDates.SuspendLayout()
+        Me.TabPage17.SuspendLayout()
+        Me.TabPage2.SuspendLayout()
+        Me.TabControl3.SuspendLayout()
+        Me.TabPage8.SuspendLayout()
+        Me.TabPage9.SuspendLayout()
+        Me.Including.SuspendLayout()
+        Me.DayByDay.SuspendLayout()
+        Me.tabPricingpolicy.SuspendLayout()
+        Me.Additions.SuspendLayout()
+        Me.TransferWays.SuspendLayout()
+        Me.TabControl4.SuspendLayout()
+        Me.TabPage15.SuspendLayout()
+        Me.Prices.SuspendLayout()
+        Me.SuspendLayout()
         '
         'TreeView1
         '
@@ -537,11 +540,12 @@ Partial Class Form1
         '
         'TabPage6
         '
+        Me.TabPage6.Controls.Add(Me.btnSaveDepartureAndArrival)
         Me.TabPage6.Controls.Add(Me.TabControl5)
         Me.TabPage6.Controls.Add(Me.Label21)
         Me.TabPage6.Controls.Add(Me.Label19)
-        Me.TabPage6.Controls.Add(Me.TextBox12)
-        Me.TabPage6.Controls.Add(Me.TextBox13)
+        Me.TabPage6.Controls.Add(Me.txtDays)
+        Me.TabPage6.Controls.Add(Me.txtNights)
         Me.TabPage6.Controls.Add(Me.Label20)
         Me.TabPage6.Location = New System.Drawing.Point(4, 22)
         Me.TabPage6.Name = "TabPage6"
@@ -551,9 +555,18 @@ Partial Class Form1
         Me.TabPage6.Text = "Departure & Arrival"
         Me.TabPage6.UseVisualStyleBackColor = True
         '
+        'btnSaveDepartureAndArrival
+        '
+        Me.btnSaveDepartureAndArrival.Location = New System.Drawing.Point(24, 319)
+        Me.btnSaveDepartureAndArrival.Name = "btnSaveDepartureAndArrival"
+        Me.btnSaveDepartureAndArrival.Size = New System.Drawing.Size(278, 23)
+        Me.btnSaveDepartureAndArrival.TabIndex = 72
+        Me.btnSaveDepartureAndArrival.Text = "SAVE"
+        Me.btnSaveDepartureAndArrival.UseVisualStyleBackColor = True
+        '
         'TabControl5
         '
-        Me.TabControl5.Controls.Add(Me.TabPage16)
+        Me.TabControl5.Controls.Add(Me.tabSpecificDates)
         Me.TabControl5.Controls.Add(Me.TabPage17)
         Me.TabControl5.Location = New System.Drawing.Point(17, 9)
         Me.TabControl5.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
@@ -562,22 +575,22 @@ Partial Class Form1
         Me.TabControl5.Size = New System.Drawing.Size(285, 228)
         Me.TabControl5.TabIndex = 20
         '
-        'TabPage16
+        'tabSpecificDates
         '
-        Me.TabPage16.Controls.Add(Me.Label3)
-        Me.TabPage16.Controls.Add(Me.Label7)
-        Me.TabPage16.Controls.Add(Me.DateWithCheckBox7)
-        Me.TabPage16.Controls.Add(Me.DateWithCheckBox8)
-        Me.TabPage16.Controls.Add(Me.DateWithCheckBox6)
-        Me.TabPage16.Controls.Add(Me.DateWithCheckBox5)
-        Me.TabPage16.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage16.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.TabPage16.Name = "TabPage16"
-        Me.TabPage16.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.TabPage16.Size = New System.Drawing.Size(277, 202)
-        Me.TabPage16.TabIndex = 0
-        Me.TabPage16.Text = "Specific Dates"
-        Me.TabPage16.UseVisualStyleBackColor = True
+        Me.tabSpecificDates.Controls.Add(Me.Label3)
+        Me.tabSpecificDates.Controls.Add(Me.Label7)
+        Me.tabSpecificDates.Controls.Add(Me.chkTravTo)
+        Me.tabSpecificDates.Controls.Add(Me.chkTravFrom)
+        Me.tabSpecificDates.Controls.Add(Me.chkRegTo)
+        Me.tabSpecificDates.Controls.Add(Me.chkRegFrom)
+        Me.tabSpecificDates.Location = New System.Drawing.Point(4, 22)
+        Me.tabSpecificDates.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.tabSpecificDates.Name = "tabSpecificDates"
+        Me.tabSpecificDates.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.tabSpecificDates.Size = New System.Drawing.Size(277, 202)
+        Me.tabSpecificDates.TabIndex = 0
+        Me.tabSpecificDates.Text = "Specific Dates"
+        Me.tabSpecificDates.UseVisualStyleBackColor = True
         '
         'Label3
         '
@@ -599,46 +612,46 @@ Partial Class Form1
         Me.Label7.TabIndex = 14
         Me.Label7.Text = "Travel During"
         '
-        'DateWithCheckBox7
+        'chkTravTo
         '
-        Me.DateWithCheckBox7.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox7.lcTitle = "To"
-        Me.DateWithCheckBox7.Location = New System.Drawing.Point(16, 150)
-        Me.DateWithCheckBox7.Name = "DateWithCheckBox7"
-        Me.DateWithCheckBox7.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox7.TabIndex = 3
+        Me.chkTravTo.BackColor = System.Drawing.SystemColors.Control
+        Me.chkTravTo.lcTitle = "To"
+        Me.chkTravTo.Location = New System.Drawing.Point(16, 150)
+        Me.chkTravTo.Name = "chkTravTo"
+        Me.chkTravTo.Size = New System.Drawing.Size(175, 23)
+        Me.chkTravTo.TabIndex = 3
         '
-        'DateWithCheckBox8
+        'chkTravFrom
         '
-        Me.DateWithCheckBox8.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox8.lcTitle = "From"
-        Me.DateWithCheckBox8.Location = New System.Drawing.Point(16, 121)
-        Me.DateWithCheckBox8.Name = "DateWithCheckBox8"
-        Me.DateWithCheckBox8.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox8.TabIndex = 2
+        Me.chkTravFrom.BackColor = System.Drawing.SystemColors.Control
+        Me.chkTravFrom.lcTitle = "From"
+        Me.chkTravFrom.Location = New System.Drawing.Point(16, 121)
+        Me.chkTravFrom.Name = "chkTravFrom"
+        Me.chkTravFrom.Size = New System.Drawing.Size(175, 23)
+        Me.chkTravFrom.TabIndex = 2
         '
-        'DateWithCheckBox6
+        'chkRegTo
         '
-        Me.DateWithCheckBox6.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox6.lcTitle = "To"
-        Me.DateWithCheckBox6.Location = New System.Drawing.Point(16, 64)
-        Me.DateWithCheckBox6.Name = "DateWithCheckBox6"
-        Me.DateWithCheckBox6.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox6.TabIndex = 1
+        Me.chkRegTo.BackColor = System.Drawing.SystemColors.Control
+        Me.chkRegTo.lcTitle = "To"
+        Me.chkRegTo.Location = New System.Drawing.Point(16, 64)
+        Me.chkRegTo.Name = "chkRegTo"
+        Me.chkRegTo.Size = New System.Drawing.Size(175, 23)
+        Me.chkRegTo.TabIndex = 1
         '
-        'DateWithCheckBox5
+        'chkRegFrom
         '
-        Me.DateWithCheckBox5.BackColor = System.Drawing.SystemColors.Control
-        Me.DateWithCheckBox5.lcTitle = "From"
-        Me.DateWithCheckBox5.Location = New System.Drawing.Point(16, 35)
-        Me.DateWithCheckBox5.Name = "DateWithCheckBox5"
-        Me.DateWithCheckBox5.Size = New System.Drawing.Size(175, 23)
-        Me.DateWithCheckBox5.TabIndex = 0
+        Me.chkRegFrom.BackColor = System.Drawing.SystemColors.Control
+        Me.chkRegFrom.lcTitle = "From"
+        Me.chkRegFrom.Location = New System.Drawing.Point(16, 35)
+        Me.chkRegFrom.Name = "chkRegFrom"
+        Me.chkRegFrom.Size = New System.Drawing.Size(175, 23)
+        Me.chkRegFrom.TabIndex = 0
         '
         'TabPage17
         '
-        Me.TabPage17.Controls.Add(Me.TextBoxWithCheckBox29)
-        Me.TabPage17.Controls.Add(Me.TextBoxWithCheckBox28)
+        Me.TabPage17.Controls.Add(Me.chkTravMonths)
+        Me.TabPage17.Controls.Add(Me.chkRegMonths)
         Me.TabPage17.Controls.Add(Me.Label22)
         Me.TabPage17.Controls.Add(Me.Label23)
         Me.TabPage17.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Bold)
@@ -651,25 +664,25 @@ Partial Class Form1
         Me.TabPage17.Text = "Months Names"
         Me.TabPage17.UseVisualStyleBackColor = True
         '
-        'TextBoxWithCheckBox29
+        'chkTravMonths
         '
-        Me.TextBoxWithCheckBox29.BackColor = System.Drawing.Color.Transparent
-        Me.TextBoxWithCheckBox29.lcTitle = Nothing
-        Me.TextBoxWithCheckBox29.length = 150
-        Me.TextBoxWithCheckBox29.Location = New System.Drawing.Point(16, 99)
-        Me.TextBoxWithCheckBox29.Name = "TextBoxWithCheckBox29"
-        Me.TextBoxWithCheckBox29.Size = New System.Drawing.Size(255, 23)
-        Me.TextBoxWithCheckBox29.TabIndex = 14
+        Me.chkTravMonths.BackColor = System.Drawing.Color.Transparent
+        Me.chkTravMonths.lcTitle = Nothing
+        Me.chkTravMonths.length = 150
+        Me.chkTravMonths.Location = New System.Drawing.Point(16, 99)
+        Me.chkTravMonths.Name = "chkTravMonths"
+        Me.chkTravMonths.Size = New System.Drawing.Size(255, 23)
+        Me.chkTravMonths.TabIndex = 14
         '
-        'TextBoxWithCheckBox28
+        'chkRegMonths
         '
-        Me.TextBoxWithCheckBox28.BackColor = System.Drawing.Color.Transparent
-        Me.TextBoxWithCheckBox28.lcTitle = Nothing
-        Me.TextBoxWithCheckBox28.length = 150
-        Me.TextBoxWithCheckBox28.Location = New System.Drawing.Point(16, 46)
-        Me.TextBoxWithCheckBox28.Name = "TextBoxWithCheckBox28"
-        Me.TextBoxWithCheckBox28.Size = New System.Drawing.Size(255, 23)
-        Me.TextBoxWithCheckBox28.TabIndex = 13
+        Me.chkRegMonths.BackColor = System.Drawing.Color.Transparent
+        Me.chkRegMonths.lcTitle = Nothing
+        Me.chkRegMonths.length = 150
+        Me.chkRegMonths.Location = New System.Drawing.Point(16, 46)
+        Me.chkRegMonths.Name = "chkRegMonths"
+        Me.chkRegMonths.Size = New System.Drawing.Size(255, 23)
+        Me.chkRegMonths.TabIndex = 13
         '
         'Label22
         '
@@ -709,19 +722,19 @@ Partial Class Form1
         Me.Label19.TabIndex = 17
         Me.Label19.Text = "Nights"
         '
-        'TextBox12
+        'txtDays
         '
-        Me.TextBox12.Location = New System.Drawing.Point(93, 278)
-        Me.TextBox12.Name = "TextBox12"
-        Me.TextBox12.Size = New System.Drawing.Size(41, 20)
-        Me.TextBox12.TabIndex = 16
+        Me.txtDays.Location = New System.Drawing.Point(93, 278)
+        Me.txtDays.Name = "txtDays"
+        Me.txtDays.Size = New System.Drawing.Size(41, 20)
+        Me.txtDays.TabIndex = 16
         '
-        'TextBox13
+        'txtNights
         '
-        Me.TextBox13.Location = New System.Drawing.Point(93, 252)
-        Me.TextBox13.Name = "TextBox13"
-        Me.TextBox13.Size = New System.Drawing.Size(41, 20)
-        Me.TextBox13.TabIndex = 14
+        Me.txtNights.Location = New System.Drawing.Point(93, 252)
+        Me.txtNights.Name = "txtNights"
+        Me.txtNights.Size = New System.Drawing.Size(41, 20)
+        Me.txtNights.TabIndex = 14
         '
         'Label20
         '
@@ -1208,6 +1221,7 @@ Partial Class Form1
         '
         'Including
         '
+        Me.Including.Controls.Add(Me.Panel2)
         Me.Including.Location = New System.Drawing.Point(4, 22)
         Me.Including.Name = "Including"
         Me.Including.Size = New System.Drawing.Size(953, 645)
@@ -2151,6 +2165,13 @@ Partial Class Form1
         Me.CheckBox1.ThreeState = True
         Me.CheckBox1.UseVisualStyleBackColor = True
         '
+        'Panel2
+        '
+        Me.Panel2.Location = New System.Drawing.Point(0, 0)
+        Me.Panel2.Name = "Panel2"
+        Me.Panel2.Size = New System.Drawing.Size(586, 645)
+        Me.Panel2.TabIndex = 0
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2176,8 +2197,8 @@ Partial Class Form1
         Me.TabPage6.ResumeLayout(False)
         Me.TabPage6.PerformLayout()
         Me.TabControl5.ResumeLayout(False)
-        Me.TabPage16.ResumeLayout(False)
-        Me.TabPage16.PerformLayout()
+        Me.tabSpecificDates.ResumeLayout(False)
+        Me.tabSpecificDates.PerformLayout()
         Me.TabPage17.ResumeLayout(False)
         Me.TabPage17.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
@@ -2187,6 +2208,7 @@ Partial Class Form1
         Me.TabPage8.PerformLayout()
         Me.TabPage9.ResumeLayout(False)
         Me.TabPage9.PerformLayout()
+        Me.Including.ResumeLayout(False)
         Me.DayByDay.ResumeLayout(False)
         Me.tabPricingpolicy.ResumeLayout(False)
         Me.Additions.ResumeLayout(False)
@@ -2236,8 +2258,8 @@ Partial Class Form1
     Friend WithEvents Label22 As Label
     Friend WithEvents Label21 As Label
     Friend WithEvents Label19 As Label
-    Friend WithEvents TextBox12 As TextBox
-    Friend WithEvents TextBox13 As TextBox
+    Friend WithEvents txtDays As TextBox
+    Friend WithEvents txtNights As TextBox
     Friend WithEvents Label20 As Label
     Friend WithEvents Including As TabPage
     Friend WithEvents ImageList1 As ImageList
@@ -2288,7 +2310,7 @@ Partial Class Form1
     Friend WithEvents txbxSubTitle As TextBoxWithCheckBox.TextBoxWithCheckBox
     Friend WithEvents txbxTitle As TextBoxWithCheckBox.TextBoxWithCheckBox
     Friend WithEvents TabControl5 As TabControl
-    Friend WithEvents TabPage16 As TabPage
+    Friend WithEvents tabSpecificDates As TabPage
     Friend WithEvents Label2 As Label
     Friend WithEvents Label1 As Label
     Friend WithEvents DateWithCheckBox3 As DateWithCheckBox.DateWithCheckBox
@@ -2298,10 +2320,10 @@ Partial Class Form1
     Friend WithEvents TabPage17 As TabPage
     Friend WithEvents txbxTripSubTitle As TextBoxWithCheckBox.TextBoxWithCheckBox
     Friend WithEvents txbxTripTitle As TextBoxWithCheckBox.TextBoxWithCheckBox
-    Friend WithEvents DateWithCheckBox6 As DateWithCheckBox.DateWithCheckBox
-    Friend WithEvents DateWithCheckBox5 As DateWithCheckBox.DateWithCheckBox
-    Friend WithEvents DateWithCheckBox7 As DateWithCheckBox.DateWithCheckBox
-    Friend WithEvents DateWithCheckBox8 As DateWithCheckBox.DateWithCheckBox
+    Friend WithEvents chkRegTo As DateWithCheckBox.DateWithCheckBox
+    Friend WithEvents chkRegFrom As DateWithCheckBox.DateWithCheckBox
+    Friend WithEvents chkTravTo As DateWithCheckBox.DateWithCheckBox
+    Friend WithEvents chkTravFrom As DateWithCheckBox.DateWithCheckBox
     Friend WithEvents TabControl3 As TabControl
     Friend WithEvents TabPage8 As TabPage
     Friend WithEvents TabPage9 As TabPage
@@ -2379,8 +2401,8 @@ Partial Class Form1
     Friend WithEvents cmbxArrivingLocation As ComboBoxWithCheckBox.ComboBoxWithCheckBox
     Friend WithEvents ArrivalDate As DateWithCheckBox.DateWithCheckBox
     Friend WithEvents cmbxArrivalTime As TimeWithCheckBox.TimeWithCheckBox
-    Friend WithEvents TextBoxWithCheckBox29 As TextBoxWithCheckBox.TextBoxWithCheckBox
-    Friend WithEvents TextBoxWithCheckBox28 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents chkTravMonths As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents chkRegMonths As TextBoxWithCheckBox.TextBoxWithCheckBox
     Friend WithEvents RadioButton3 As RadioButton
     Friend WithEvents RadioButton2 As RadioButton
     Friend WithEvents RadioButton1 As RadioButton
@@ -2392,4 +2414,6 @@ Partial Class Form1
     Friend WithEvents Label3 As Label
     Friend WithEvents Label7 As Label
     Friend WithEvents Button8 As Button
+    Friend WithEvents btnSaveDepartureAndArrival As Button
+    Friend WithEvents Panel2 As Panel
 End Class

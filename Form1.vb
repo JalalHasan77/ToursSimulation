@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports ToursSimulatorNestedClass.BookingFilters
 Imports ToursSimulatorNestedClass.TravelForm.Models
 
 Public Class Form1
@@ -46,12 +47,48 @@ Public Class Form1
     "AirlineID", "AirLineName")
 
 
-        LoadServicesIntoTab("Including")
+        'LoadServicesIntoTab("Including")
+        LoadExtendedServicesIntoTab("Including")
         LoadServicesIntoTab("NotIncluding")
         '____________________________________________________________
     End Sub
 
+    Private Sub LoadExtendedServicesIntoTab(tabName As String)
+        Dim count As Integer = 0
+        Dim iconBasePath As String = "D:\VB Projects\ToursSimulatorNestedClass\ToursSimulatorNestedClass\Icon\"
+        Dim ServicesDT As DataTable = GetDataTable("Select * from Services")
 
+        Dim tabPage As TabPage = TabControl1.TabPages(tabName) ' or TabControl1.TabPages("TabPage1")
+        Dim found As Control() = tabPage.Controls.Find("Panel2", True) ' True = search nested controls too
+        Dim pnl As Panel = CType(found(0), Panel)
+
+        pnl.AutoScroll = True
+
+        For Each row As DataRow In ServicesDT.Rows
+            Dim uc As New PricingWithCheckBox.PricingWithCheckBox
+
+            Dim imagePath As String = iconBasePath & row("Icon").ToString().Trim()
+
+            If File.Exists(imagePath) Then
+                uc.Button1.BackgroundImage = Image.FromFile(imagePath)
+                uc.Button1.BackgroundImageLayout = ImageLayout.Zoom
+            End If
+
+            uc.TextBox1.Text = row("Service").ToString().Trim()
+            uc.Location = New Point(10, 0 + uc.Height * count)
+
+            pnl.Controls.Add(uc)
+            count += 1
+        Next
+
+        For I As Integer = 0 To 5
+            Dim uc As New PricingWithCheckBox.PricingWithCheckBox
+            uc.Location = New Point(10, 0 + uc.Height * count)
+            pnl.Controls.Add(uc)
+            count += 1
+        Next
+
+    End Sub
 
     Private Sub LoadServicesIntoTab(tabName As String)
         Dim count As Integer = 0
@@ -303,45 +340,68 @@ Public Class Form1
         Dim CurrentSelectedItem As TextValueParent =
             CType(SourceList.SelectedItem, TextValueParent)
 
-        If SourceList.GetItemChecked(SourceList.SelectedIndex) Then
+        CascadeCheckedItem(
+            SourceList,
+            CurrentSelectedItem,
+            SourceList.GetItemChecked(SourceList.SelectedIndex),
+            TargetList,
+            SqlTemplate,
+            IDField,
+            TextField)
 
-            ' BUGFIX: SelectedIndexChanged can fire more than once for the
-            ' same already-checked item (e.g. CheckOnClick selecting AND
-            ' checking the row in the same click, or simply re-selecting a
-            ' city that is already checked). Without this guard, the title
-            ' + rows below get appended again on every extra firing, which
-            ' is exactly what produced the duplicated Stay / Attraction
-            ' entries. Clearing out anything already loaded for this parent
-            ' first makes the load idempotent no matter how many times this
-            ' runs for the same checked item.
-            RemoveItemsByParentID(TargetList, CurrentSelectedItem.ID)
+    End Sub
+
+    ''' <summary>
+    ''' Core Country→City / City→Stay/Attraction cascade: if Item is
+    ''' checked, (re)loads its children from the DB into TargetList; if
+    ''' unchecked, removes its existing children. Takes the item and its
+    ''' checked state explicitly rather than reading SourceList.SelectedItem
+    ''' /.SelectedIndex, so it can be driven either by a real row click
+    ''' (via HandleCheckedListBox, below) or programmatically — e.g. by
+    ''' LoadTabPage1Data — without needing to fake a UI selection change.
+    ''' </summary>
+    Private Sub CascadeCheckedItem(
+    SourceList As CheckedListBox,
+    Item As TextValueParent,
+    isChecked As Boolean,
+    TargetList As CheckedListBox,
+    SqlTemplate As String,
+    IDField As String,
+    TextField As String)
+
+        If isChecked Then
+
+            ' BUGFIX: this can run more than once for the same already-
+            ' checked item (e.g. CheckOnClick selecting AND checking the
+            ' row in the same click, or re-selecting a city that is already
+            ' checked). Without this guard, the title + rows below get
+            ' appended again on every extra firing, which is exactly what
+            ' produced the duplicated Stay / Attraction entries. Clearing
+            ' out anything already loaded for this parent first makes the
+            ' load idempotent no matter how many times this runs for the
+            ' same checked item.
+            RemoveItemsByParentID(TargetList, Item.ID)
 
             ' Add fake title
-            Dim i As New TextValueParent(
-                Text:="----" & CurrentSelectedItem.Text & "----",
+            TargetList.Items.Add(New TextValueParent(
+                Text:="----" & Item.Text & "----",
                 ID:="",
-                ParentID:=CurrentSelectedItem.ID)
+                ParentID:=Item.ID))
 
-            TargetList.Items.Add(i)
-
-            Dim SQL As String =
-                String.Format(SqlTemplate, CurrentSelectedItem.ID)
-
+            Dim SQL As String = String.Format(SqlTemplate, Item.ID)
             Dim DT As DataTable = GetDataTable(SQL)
 
             For Each DR As DataRow In DT.Rows
-                i = New TextValueParent(
+                TargetList.Items.Add(New TextValueParent(
                     Text:=DR(TextField).ToString(),
                     ID:=DR(IDField).ToString(),
-                    ParentID:=CurrentSelectedItem.ID)
-
-                TargetList.Items.Add(i)
+                    ParentID:=Item.ID))
             Next
         Else
             If SourceList Is CheckedListBox1 Then
-                RemoveCountryChildren(CurrentSelectedItem.ID)
+                RemoveCountryChildren(Item.ID)
             Else
-                RemoveItemsByParentID(TargetList, CurrentSelectedItem.ID)
+                RemoveItemsByParentID(TargetList, Item.ID)
             End If
         End If
 
@@ -497,14 +557,16 @@ Public Class Form1
     ''' Countries (CheckedListBox1) is assumed to already hold the full master
     ''' list of countries (as loaded in Form1_Load) — this only flips the
     ''' checkmarks to match the saved data, it doesn't add/remove rows.
-    ''' Cities/Stay/Attraction have no such pre-loaded master list, so their
-    ''' rows are rebuilt from scratch using the saved Name/state.
-    ''' TravelFormData's CheckListItem/CityListItem only expose Name and
-    ''' IsChecked/State (TravelBasicInfo.vb) — there is no ID, ParentID or
-    ''' IsHeader on those models, so matching/rebuilding below is done by
-    ''' Name only, and the rebuilt TextValueParent rows get an empty ID.
-    ''' SaveTabPage1Data only stores checked rows, so there's nothing to
-    ''' restore for unchecked/header rows.
+    ''' Cities/Stay/Attraction have no such pre-loaded master list: Cities is
+    ''' (re)populated by CascadeCheckedItem from the DB, exactly as a real
+    ''' click on a checked country would do via CheckedListBox1_SelectedIndexChanged,
+    ''' so each city keeps its real DB ID/ParentID. Stay/Attraction are
+    ''' populated the same way once a city is checked. TravelFormData's
+    ''' CheckListItem/CityListItem only expose Name and IsChecked/State
+    ''' (TravelBasicInfo.vb) — there is no ID/ParentID on those models — so
+    ''' matching a saved row back to a freshly-loaded list row is done by
+    ''' Name. SaveTabPage1Data only stores checked rows, so there's nothing
+    ''' to restore for unchecked/header rows.
     ''' </remarks>
     Public Sub LoadTabPage1Data(data As TravelFormData)
 
@@ -517,71 +579,93 @@ Public Class Form1
         txbxTripSubTitle.CheckBox1.Checked = data.SubTitle.IsEnabled
         txbxTripSubTitle.TextBox1.Text = data.SubTitle.Text
 
-        ' ---- Countries (CheckedListBox1) — flip checkmarks only -------------
+        ' ---- Countries (CheckedListBox1) -------------------------------------
+        ' Flip every row's checkmark to match the saved data, and replay the
+        ' same Country -> City cascade HandleCheckedListBox runs on a real
+        ' click: newly-checked countries get their cities (re)loaded from
+        ' the DB, newly-unchecked ones get their cities/stay/attraction
+        ' cleaned up. Driving CascadeCheckedItem directly (instead of
+        ' bouncing SelectedIndex to fake a click) means this never double-
+        ' fires and never needs a UI selection at all.
         Dim checkedCountryNames As New HashSet(Of String)(
             data.Countries.Where(Function(c) c.IsChecked).Select(Function(c) c.Name))
 
         For idx As Integer = 0 To CheckedListBox1.Items.Count - 1
-            Dim tvp As TextValueParent = CType(CheckedListBox1.Items(idx), TextValueParent)
-            CheckedListBox1.SetItemChecked(idx, checkedCountryNames.Contains(tvp.Text))
-            CheckedListBox1.SelectedIndex = idx
-            CheckedListBox1_SelectedIndexChanged(CheckedListBox1.Items(idx), EventArgs.Empty)
+            Dim country As TextValueParent = CType(CheckedListBox1.Items(idx), TextValueParent)
+            Dim isChecked As Boolean = checkedCountryNames.Contains(country.Text)
+
+            CheckedListBox1.SetItemChecked(idx, isChecked)
+            CascadeCheckedItem(
+                CheckedListBox1, country, isChecked, CheckedListBox2,
+                "SELECT CityID, CityNameEn FROM DesCities WHERE CountryID = {0}",
+                "CityID", "CityNameEn")
         Next
 
-        ' ---- Cities (CheckedListBox2) — rebuilt, tri-state -------------------
-        'CheckedListBox2.Items.Clear()
-
-        For Each city In data.Cities
-            For idx As Integer = 0 To CheckedListBox2.Items.Count - 1
-                Dim tvp As TextValueParent = CType(CheckedListBox2.Items(idx), TextValueParent)
-                If city.Name = CheckedListBox2.Items(idx).ToString Then
-                    CheckedListBox2.SetItemChecked(idx, True)
-                    CheckedListBox2.SelectedIndex = idx
-                End If
-            Next
+        ' ---- Cities (CheckedListBox2) -----------------------------------------
+        ' CheckedListBox2 now holds exactly the cities for the countries just
+        ' checked above. Check the ones that were saved, and cascade each
+        ' into Stay/Attraction exactly like CheckedListBox2_SelectedIndexChanged does.
+        Dim savedCityStates As New Dictionary(Of String, TriState)()
+        For Each c In data.Cities
+            savedCityStates(c.Name) = c.State
         Next
 
-        ' ---- Stay (CheckedListBox3) — rebuilt --------------------------------
-        'CheckedListBox3.Items.Clear()
-        'For Each stay In data.Stays
-        '    Dim tvp As New TextValueParent(Text:=stay.Name, ID:="")
-        '    Dim newIndex As Integer = CheckedListBox3.Items.Add(tvp)
-        '    CheckedListBox3.SetItemChecked(newIndex, stay.IsChecked)
-        'Next
-        For Each stay In data.Stays
-            For idx As Integer = 0 To CheckedListBox3.Items.Count - 1
-                Dim tvp As TextValueParent = CType(CheckedListBox3.Items(idx), TextValueParent)
-                If stay.Name = CheckedListBox3.Items(idx).ToString Then
-                    CheckedListBox3.SetItemChecked(idx, True)
-                    CheckedListBox3.SelectedIndex = idx
-                End If
-            Next
+        For idx As Integer = 0 To CheckedListBox2.Items.Count - 1
+            Dim city As TextValueParent = CType(CheckedListBox2.Items(idx), TextValueParent)
+            If city.ID = "" Then Continue For ' skip "----Country----" header rows
+
+            Dim state As TriState
+            If Not savedCityStates.TryGetValue(city.Text, state) Then Continue For
+
+            ' CheckedListBox2_ItemCheck always cycles Unchecked -> Checked ->
+            ' Indeterminate -> Unchecked, regardless of what value is asked
+            ' for. Every row here is freshly added (Unchecked), so one call
+            ' lands on Checked; Indeterminate needs the check toggled twice.
+            CheckedListBox2.SetItemChecked(idx, True) ' Unchecked -> Checked
+            If state = TriState.Indeterminate Then
+                CheckedListBox2.SetItemChecked(idx, True) ' Checked -> Indeterminate
+            End If
+
+            ' Both Checked and Indeterminate count as "checked" for cascading
+            ' purposes — GetItemChecked returns True for either, same as it
+            ' would for a real click, so Stay/Attraction load either way.
+            CascadeCheckedItem(
+                CheckedListBox2, city, True, CheckedListBox3,
+                "SELECT StayID, StayName FROM Stay WHERE CityID = {0}",
+                "StayID", "StayName")
+            CascadeCheckedItem(
+                CheckedListBox2, city, True, CheckedListBox4,
+                "SELECT AttractionID, AttractionNameEn FROM DesAttractions WHERE CityID = {0}",
+                "AttractionID", "AttractionNameEn")
         Next
 
-
-        ' ---- Attraction (CheckedListBox4) — rebuilt ---------------------------
-        'CheckedListBox4.Items.Clear()
-        'For Each attraction In data.Attractions
-        '    Dim tvp As New TextValueParent(Text:=attraction.Name, ID:="")
-        '    'Dim newIndex As Integer = CheckedListBox4.Items.Add(tvp)
-        '    CheckedListBox4.SetItemChecked(newIndex, attraction.IsChecked)
-        'Next
-        For Each attraction In data.Attractions
-            For idx As Integer = 0 To CheckedListBox4.Items.Count - 1
-                Dim tvp As TextValueParent = CType(CheckedListBox4.Items(idx), TextValueParent)
-                If attraction.Name = CheckedListBox4.Items(idx).ToString Then
-                    CheckedListBox4.SetItemChecked(idx, True)
-                    CheckedListBox4.SelectedIndex = idx
-                End If
-            Next
-        Next
-
+        ' ---- Stay / Attraction (CheckedListBox3 / 4) ---------------------------
+        ' Leaf lists — nothing further to cascade into, just check the saved rows.
+        CheckByName(CheckedListBox3, data.Stays.Select(Function(s) s.Name))
+        CheckByName(CheckedListBox4, data.Attractions.Select(Function(a) a.Name))
 
         CheckedListBox1.ClearSelected()
         CheckedListBox2.ClearSelected()
         CheckedListBox3.ClearSelected()
         CheckedListBox4.ClearSelected()
 
+    End Sub
+
+    ''' <summary>
+    ''' Checks every row in list whose Text matches one of names. Used for
+    ''' the leaf-level lists (Stay, Attraction) that have nothing further to
+    ''' cascade into. Assumes list was just freshly (re)populated by
+    ''' CascadeCheckedItem — i.e. every row starts Unchecked — so there's no
+    ''' need to also uncheck non-matches.
+    ''' </summary>
+    Private Sub CheckByName(list As CheckedListBox, names As IEnumerable(Of String))
+        Dim nameSet As New HashSet(Of String)(names)
+        For idx As Integer = 0 To list.Items.Count - 1
+            Dim tvp As TextValueParent = CType(list.Items(idx), TextValueParent)
+            If nameSet.Contains(tvp.Text) Then
+                list.SetItemChecked(idx, True)
+            End If
+        Next
     End Sub
 
     Private Sub ResetAllFields()
@@ -818,11 +902,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
 
-
-
-    End Sub
 
     Private Sub DateTimePicker6_Leave(sender As Object, e As EventArgs)
     End Sub
@@ -994,33 +1074,33 @@ Public Class Form1
 
     End Sub
 
-    Private Sub DateWithCheckBox8_ControlLeft(sender As Object, e As EventArgs) Handles DateWithCheckBox8.ControlLeft, DateWithCheckBox7.ControlLeft
+    Private Sub DateWithCheckBox8_ControlLeft(sender As Object, e As EventArgs) Handles chkTravFrom.ControlLeft, chkTravTo.ControlLeft
         Try
             ' ── Calculate Duration ────────────────────────────────
-            Dim EndDateTime As DateTime = DateWithCheckBox7.lcDateTimePicker.Value
-            Dim StartDateTime As DateTime = DateWithCheckBox8.lcDateTimePicker.Value
+            Dim EndDateTime As DateTime = chkTravTo.lcDateTimePicker.Value
+            Dim StartDateTime As DateTime = chkTravFrom.lcDateTimePicker.Value
             Dim FlightDuration As TimeSpan = EndDateTime - StartDateTime
 
-            TextBox12.Text = EndDateTime.Subtract(StartDateTime).Days + 1
-            TextBox13.Text = EndDateTime.Subtract(StartDateTime).Days
+            txtDays.Text = EndDateTime.Subtract(StartDateTime).Days + 1
+            txtNights.Text = EndDateTime.Subtract(StartDateTime).Days
             ' ──────────────────────────────────────────────────────
-            TextBox12_TextChanged(TextBox12, EventArgs.Empty)
+            TextBox12_TextChanged(txtDays, EventArgs.Empty)
         Catch ex As Exception
 
         End Try
     End Sub
 
-    Private Sub TextBox13_TextChanged(sender As Object, e As EventArgs) Handles TextBox13.TextChanged
+    Private Sub TextBox13_TextChanged(sender As Object, e As EventArgs) Handles txtNights.TextChanged
 
     End Sub
 
-    Private Sub TextBox12_TextChanged(sender As Object, e As EventArgs) Handles TextBox12.TextChanged
+    Private Sub TextBox12_TextChanged(sender As Object, e As EventArgs) Handles txtDays.TextChanged
         Try
 
 
-            Dim S As Date = DateWithCheckBox8.lcDateTimePicker.Value
+            Dim S As Date = chkTravFrom.lcDateTimePicker.Value
 
-            For I As Integer = 1 To CInt(TextBox13.Text)
+            For I As Integer = 1 To CInt(txtNights.Text)
                 Dim day As String = String.Format("Day {0}", I)
                 If TabControl5.SelectedTab.Name = "TabPage16" Then
                     day = day & String.Format(" (" & S.ToString("yyyy-MM-dd") & ")")
@@ -1137,6 +1217,27 @@ Public Class Form1
     Private Sub TreeView1_NodeMouseDoubleClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseDoubleClick
         TreeView1.SelectedNode = e.Node
         LoadTabPage1DataFromTreeNode(e.Node)
+    End Sub
+
+    Private Sub BtnSaveDepartureAndArrival_Click(sender As Object, e As EventArgs) Handles btnSaveDepartureAndArrival.Click
+        Dim mode As DuringFilterMode = If(TabControl5.SelectedTab Is tabSpecificDates,
+                                           DuringFilterMode.SpecificDates,
+                                           DuringFilterMode.MonthsNames)
+
+        Dim filter = BookingSearchFilter.FromForm(
+            mode,
+            chkRegFrom.CheckBox1.Checked, chkRegFrom.lcDateTimePicker.Value,
+            chkRegTo.CheckBox1.Checked, chkRegTo.lcDateTimePicker.Value,
+            chkTravFrom.CheckBox1.Checked, chkTravFrom.lcDateTimePicker.Value,
+            chkTravTo.CheckBox1.Checked, chkTravTo.lcDateTimePicker.Value,
+            chkRegMonths.CheckBox1.Checked, chkRegMonths.TextBox1.Text,
+            chkTravMonths.CheckBox1.Checked, chkTravMonths.TextBox1.Text,
+            CInt(txtNights.Text), CInt(txtDays.Text))
+
+        Dim errMsg As String = ""
+        If Not filter.IsValid(errMsg) Then
+            MessageBox.Show(errMsg)
+        End If
     End Sub
 End Class
 
@@ -1302,6 +1403,8 @@ Public Enum Categories
     Stay
     TravelWays
 End Enum
+
+
 
 Public Class DatesAndDuration
     Public Property StartDate As Date
