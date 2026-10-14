@@ -136,6 +136,8 @@ Partial Class Form1
         Me.Button10 = New System.Windows.Forms.Button()
         Me.Button9 = New System.Windows.Forms.Button()
         Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.pnlNotIncluding = New System.Windows.Forms.Panel()
+        Me.btnSaveNotIncludingToNode = New System.Windows.Forms.Button()
         Me.NotIncluding = New System.Windows.Forms.TabPage()
         Me.DayByDay = New System.Windows.Forms.TabPage()
         Me.TextBoxWithCheckBox15 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
@@ -152,6 +154,8 @@ Partial Class Form1
         Me.TextBoxWithCheckBox26 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.TextBoxWithCheckBox27 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.ListBox2 = New System.Windows.Forms.ListBox()
+        Me.btnSaveDay = New System.Windows.Forms.Button()
+        Me.btnSaveDaysToNode = New System.Windows.Forms.Button()
         Me.tabPricingpolicy = New System.Windows.Forms.TabPage()
         Me.Additions = New System.Windows.Forms.TabPage()
         Me.TransferWays = New System.Windows.Forms.TabPage()
@@ -203,6 +207,12 @@ Partial Class Form1
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.Button11 = New System.Windows.Forms.Button()
         Me.Button12 = New System.Windows.Forms.Button()
+        Me.btnSavePricesToNode = New System.Windows.Forms.Button()
+        Me.btnSaveLacesToNode = New System.Windows.Forms.Button()
+        Me.btnSaveTransferWaysToNode = New System.Windows.Forms.Button()
+        Me.btnSaveTransferWay = New System.Windows.Forms.Button()
+        Me.btnSaveAdditionsToNode = New System.Windows.Forms.Button()
+        Me.btnSavePricingPolicyToNode = New System.Windows.Forms.Button()
         Me.btnSaveIncludingToNode = New System.Windows.Forms.Button()
         Me.PricingWithCheckBox10 = New PricingWithCheckBox.PricingWithCheckBox()
         Me.PricingWithCheckBox9 = New PricingWithCheckBox.PricingWithCheckBox()
@@ -1363,12 +1373,32 @@ Partial Class Form1
         '
         'NotIncluding
         '
+        Me.NotIncluding.Controls.Add(Me.pnlNotIncluding)
+        Me.NotIncluding.Controls.Add(Me.btnSaveNotIncludingToNode)
         Me.NotIncluding.Location = New System.Drawing.Point(4, 22)
         Me.NotIncluding.Name = "NotIncluding"
         Me.NotIncluding.Size = New System.Drawing.Size(953, 645)
         Me.NotIncluding.TabIndex = 4
         Me.NotIncluding.Text = "Not Including"
         Me.NotIncluding.UseVisualStyleBackColor = True
+        '
+        'pnlNotIncluding
+        '
+        Me.pnlNotIncluding.AutoScroll = True
+        Me.pnlNotIncluding.Location = New System.Drawing.Point(0, 0)
+        Me.pnlNotIncluding.Name = "pnlNotIncluding"
+        Me.pnlNotIncluding.Size = New System.Drawing.Size(586, 645)
+        Me.pnlNotIncluding.TabIndex = 0
+        '
+        'btnSaveNotIncludingToNode
+        '
+        Me.btnSaveNotIncludingToNode.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnSaveNotIncludingToNode.Location = New System.Drawing.Point(777, 10)
+        Me.btnSaveNotIncludingToNode.Name = "btnSaveNotIncludingToNode"
+        Me.btnSaveNotIncludingToNode.Size = New System.Drawing.Size(166, 23)
+        Me.btnSaveNotIncludingToNode.TabIndex = 1
+        Me.btnSaveNotIncludingToNode.Text = "Save to Selected Version"
+        Me.btnSaveNotIncludingToNode.UseVisualStyleBackColor = True
         '
         'DayByDay
         '
@@ -1386,6 +1416,8 @@ Partial Class Form1
         Me.DayByDay.Controls.Add(Me.TextBoxWithCheckBox26)
         Me.DayByDay.Controls.Add(Me.TextBoxWithCheckBox27)
         Me.DayByDay.Controls.Add(Me.ListBox2)
+        Me.DayByDay.Controls.Add(Me.btnSaveDay)
+        Me.DayByDay.Controls.Add(Me.btnSaveDaysToNode)
         Me.DayByDay.Location = New System.Drawing.Point(4, 22)
         Me.DayByDay.Name = "DayByDay"
         Me.DayByDay.Padding = New System.Windows.Forms.Padding(3)
@@ -1532,6 +1564,25 @@ Partial Class Form1
         Me.ListBox2.Size = New System.Drawing.Size(326, 589)
         Me.ListBox2.TabIndex = 0
         '
+        'btnSaveDay
+        '
+        Me.btnSaveDay.Enabled = False
+        Me.btnSaveDay.Location = New System.Drawing.Point(351, 430)
+        Me.btnSaveDay.Name = "btnSaveDay"
+        Me.btnSaveDay.Size = New System.Drawing.Size(100, 23)
+        Me.btnSaveDay.TabIndex = 58
+        Me.btnSaveDay.Text = "SAVE"
+        Me.btnSaveDay.UseVisualStyleBackColor = True
+        '
+        'btnSaveDaysToNode
+        '
+        Me.btnSaveDaysToNode.Location = New System.Drawing.Point(457, 430)
+        Me.btnSaveDaysToNode.Name = "btnSaveDaysToNode"
+        Me.btnSaveDaysToNode.Size = New System.Drawing.Size(166, 23)
+        Me.btnSaveDaysToNode.TabIndex = 59
+        Me.btnSaveDaysToNode.Text = "Save to Selected Version"
+        Me.btnSaveDaysToNode.UseVisualStyleBackColor = True
+        '
         'tabPricingpolicy
         '
         Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox10)
@@ -1545,6 +1596,7 @@ Partial Class Form1
         Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox2)
         Me.tabPricingpolicy.Controls.Add(Me.PricingWithCheckBox1)
         Me.tabPricingpolicy.Controls.Add(Me.UserControl11)
+        Me.tabPricingpolicy.Controls.Add(Me.btnSavePricingPolicyToNode)
         Me.tabPricingpolicy.Location = New System.Drawing.Point(4, 22)
         Me.tabPricingpolicy.Name = "tabPricingpolicy"
         Me.tabPricingpolicy.Padding = New System.Windows.Forms.Padding(3)
@@ -1552,6 +1604,15 @@ Partial Class Form1
         Me.tabPricingpolicy.TabIndex = 6
         Me.tabPricingpolicy.Text = "Pricing Policy"
         Me.tabPricingpolicy.UseVisualStyleBackColor = True
+        '
+        'btnSavePricingPolicyToNode
+        '
+        Me.btnSavePricingPolicyToNode.Location = New System.Drawing.Point(431, 7)
+        Me.btnSavePricingPolicyToNode.Name = "btnSavePricingPolicyToNode"
+        Me.btnSavePricingPolicyToNode.Size = New System.Drawing.Size(166, 23)
+        Me.btnSavePricingPolicyToNode.TabIndex = 11
+        Me.btnSavePricingPolicyToNode.Text = "Save to Selected Version"
+        Me.btnSavePricingPolicyToNode.UseVisualStyleBackColor = True
         '
         'Additions
         '
@@ -1566,12 +1627,22 @@ Partial Class Form1
         Me.Additions.Controls.Add(Me.PricingWithCheckBox19)
         Me.Additions.Controls.Add(Me.PricingWithCheckBox20)
         Me.Additions.Controls.Add(Me.PricingWithCheckBox21)
+        Me.Additions.Controls.Add(Me.btnSaveAdditionsToNode)
         Me.Additions.Location = New System.Drawing.Point(4, 22)
         Me.Additions.Name = "Additions"
         Me.Additions.Size = New System.Drawing.Size(953, 645)
         Me.Additions.TabIndex = 7
         Me.Additions.Text = "Additions"
         Me.Additions.UseVisualStyleBackColor = True
+        '
+        'btnSaveAdditionsToNode
+        '
+        Me.btnSaveAdditionsToNode.Location = New System.Drawing.Point(431, 7)
+        Me.btnSaveAdditionsToNode.Name = "btnSaveAdditionsToNode"
+        Me.btnSaveAdditionsToNode.Size = New System.Drawing.Size(166, 23)
+        Me.btnSaveAdditionsToNode.TabIndex = 22
+        Me.btnSaveAdditionsToNode.Text = "Save to Selected Version"
+        Me.btnSaveAdditionsToNode.UseVisualStyleBackColor = True
         '
         'TransferWays
         '
@@ -1589,12 +1660,32 @@ Partial Class Form1
         Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox2)
         Me.TransferWays.Controls.Add(Me.TextBoxWithCheckBox1)
         Me.TransferWays.Controls.Add(Me.TabControl4)
+        Me.TransferWays.Controls.Add(Me.btnSaveTransferWaysToNode)
+        Me.TransferWays.Controls.Add(Me.btnSaveTransferWay)
         Me.TransferWays.Location = New System.Drawing.Point(4, 22)
         Me.TransferWays.Name = "TransferWays"
         Me.TransferWays.Size = New System.Drawing.Size(953, 645)
         Me.TransferWays.TabIndex = 8
         Me.TransferWays.Text = "TransferWays"
         Me.TransferWays.UseVisualStyleBackColor = True
+        '
+        'btnSaveTransferWaysToNode
+        '
+        Me.btnSaveTransferWaysToNode.Location = New System.Drawing.Point(120, 480)
+        Me.btnSaveTransferWaysToNode.Name = "btnSaveTransferWaysToNode"
+        Me.btnSaveTransferWaysToNode.Size = New System.Drawing.Size(166, 23)
+        Me.btnSaveTransferWaysToNode.TabIndex = 21
+        Me.btnSaveTransferWaysToNode.Text = "Save to Selected Version"
+        Me.btnSaveTransferWaysToNode.UseVisualStyleBackColor = True
+        '
+        'btnSaveTransferWay
+        '
+        Me.btnSaveTransferWay.Location = New System.Drawing.Point(14, 480)
+        Me.btnSaveTransferWay.Name = "btnSaveTransferWay"
+        Me.btnSaveTransferWay.Size = New System.Drawing.Size(100, 23)
+        Me.btnSaveTransferWay.TabIndex = 20
+        Me.btnSaveTransferWay.Text = "SAVE"
+        Me.btnSaveTransferWay.UseVisualStyleBackColor = True
         '
         'TextBoxWithCheckBox14
         '
@@ -1843,6 +1934,7 @@ Partial Class Form1
         Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox3)
         Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox2)
         Me.TabPage15.Controls.Add(Me.TextBoxWithTypeAndCheckbox1)
+        Me.TabPage15.Controls.Add(Me.btnSaveLacesToNode)
         Me.TabPage15.Location = New System.Drawing.Point(4, 22)
         Me.TabPage15.Name = "TabPage15"
         Me.TabPage15.Padding = New System.Windows.Forms.Padding(3)
@@ -1850,6 +1942,15 @@ Partial Class Form1
         Me.TabPage15.TabIndex = 9
         Me.TabPage15.Text = "Laces, Stamps, and Comments"
         Me.TabPage15.UseVisualStyleBackColor = True
+        '
+        'btnSaveLacesToNode
+        '
+        Me.btnSaveLacesToNode.Location = New System.Drawing.Point(24, 412)
+        Me.btnSaveLacesToNode.Name = "btnSaveLacesToNode"
+        Me.btnSaveLacesToNode.Size = New System.Drawing.Size(166, 23)
+        Me.btnSaveLacesToNode.TabIndex = 12
+        Me.btnSaveLacesToNode.Text = "Save to Selected Version"
+        Me.btnSaveLacesToNode.UseVisualStyleBackColor = True
         '
         'TextBoxWithTypeAndCheckbox12
         '
@@ -1952,6 +2053,7 @@ Partial Class Form1
         Me.Prices.Controls.Add(Me.Button7)
         Me.Prices.Controls.Add(Me.Button5)
         Me.Prices.Controls.Add(Me.ListBox3)
+        Me.Prices.Controls.Add(Me.btnSavePricesToNode)
         Me.Prices.Location = New System.Drawing.Point(4, 22)
         Me.Prices.Name = "Prices"
         Me.Prices.Padding = New System.Windows.Forms.Padding(3)
@@ -1959,6 +2061,15 @@ Partial Class Form1
         Me.Prices.TabIndex = 10
         Me.Prices.Text = "Prices"
         Me.Prices.UseVisualStyleBackColor = True
+        '
+        'btnSavePricesToNode
+        '
+        Me.btnSavePricesToNode.Location = New System.Drawing.Point(179, 7)
+        Me.btnSavePricesToNode.Name = "btnSavePricesToNode"
+        Me.btnSavePricesToNode.Size = New System.Drawing.Size(166, 23)
+        Me.btnSavePricesToNode.TabIndex = 3
+        Me.btnSavePricesToNode.Text = "Save to Selected Version"
+        Me.btnSavePricesToNode.UseVisualStyleBackColor = True
         '
         'Button7
         '
@@ -2462,6 +2573,8 @@ Partial Class Form1
     Friend WithEvents Button4 As Button
     Friend WithEvents Button3 As Button
     Friend WithEvents ListBox2 As ListBox
+    Friend WithEvents btnSaveDay As Button
+    Friend WithEvents btnSaveDaysToNode As Button
     Friend WithEvents LinkLabel2 As LinkLabel
     Friend WithEvents LinkLabel1 As LinkLabel
     Friend WithEvents tabPricingpolicy As TabPage
@@ -2600,9 +2713,17 @@ Partial Class Form1
     Friend WithEvents btnSaveDepartureAndArrival As Button
     Friend WithEvents btnSaveDatesToNode As Button
     Friend WithEvents Panel2 As Panel
+    Friend WithEvents pnlNotIncluding As Panel
+    Friend WithEvents btnSaveNotIncludingToNode As Button
     Friend WithEvents Button9 As Button
     Friend WithEvents Button10 As Button
     Friend WithEvents Button11 As Button
     Friend WithEvents Button12 As Button
+    Friend WithEvents btnSavePricesToNode As Button
+    Friend WithEvents btnSaveLacesToNode As Button
+    Friend WithEvents btnSaveTransferWaysToNode As Button
+    Friend WithEvents btnSaveTransferWay As Button
+    Friend WithEvents btnSaveAdditionsToNode As Button
+    Friend WithEvents btnSavePricingPolicyToNode As Button
     Friend WithEvents btnSaveIncludingToNode As Button
 End Class

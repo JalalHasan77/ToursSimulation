@@ -51,17 +51,23 @@ Public Class Form1
 
         'LoadServicesIntoTab("Including")
         LoadExtendedServicesIntoTab("Including")
-        LoadServicesIntoTab("NotIncluding")
+        LoadExtendedServicesIntoTab("NotIncluding", "pnlNotIncluding") ' editable rows, left
+        LoadServicesIntoTab("NotIncluding")                           ' old rows, right, disabled
         '____________________________________________________________
     End Sub
 
-    Private Sub LoadExtendedServicesIntoTab(tabName As String)
+    ''' <summary>
+    ''' Fills a panel on the given tab with one PricingWithCheckBox row per
+    ''' service (+ 6 blank rows). Including uses Panel2, Not Including uses
+    ''' pnlNotIncluding.
+    ''' </summary>
+    Private Sub LoadExtendedServicesIntoTab(tabName As String, Optional panelName As String = "Panel2")
         Dim count As Integer = 0
         Dim iconBasePath As String = "D:\VB Projects\ToursSimulatorNestedClass\ToursSimulatorNestedClass\Icon\"
         Dim ServicesDT As DataTable = GetDataTable("Select * from Services")
 
         Dim tabPage As TabPage = TabControl1.TabPages(tabName) ' or TabControl1.TabPages("TabPage1")
-        Dim found As Control() = tabPage.Controls.Find("Panel2", True) ' True = search nested controls too
+        Dim found As Control() = tabPage.Controls.Find(panelName, True) ' True = search nested controls too
         Dim pnl As Panel = CType(found(0), Panel)
 
         pnl.AutoScroll = True
@@ -106,9 +112,15 @@ Public Class Form1
             End If
 
             uc.Title = row("Service").ToString().Trim()
-            uc.Location = New Point(10, 10 + 26 * count)
 
-            TabControl1.TabPages(tabName).Controls.Add(uc)
+            ' Right-aligned and read-only: the editable rows are the
+            ' PricingWithCheckBox list on the left of the tab.
+            Dim page As TabPage = TabControl1.TabPages(tabName)
+            uc.Location = New Point(page.ClientSize.Width - uc.Width - 10, 45 + 26 * count) ' below the Save button
+            uc.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+            uc.Enabled = False
+
+            page.Controls.Add(uc)
             count += 1
         Next
     End Sub
@@ -1166,38 +1178,116 @@ Public Class Form1
     End Sub
 
     Private Sub TextBox12_TextChanged(sender As Object, e As EventArgs) Handles txtDays.TextChanged
-        Try
+        BuildDayByDayList()
+    End Sub
 
+    ''' <summary>
+    ''' (Re)builds ListBox2 with one DayPlan per day of the trip. Clears the
+    ''' list first (it used to keep appending), and keeps the lines already
+    ''' typed for Day 1, Day 2, ... so changing the dates only renames days.
+    ''' </summary>
+    Private Sub BuildDayByDayList()
+        Dim days As Integer
+        If Not Integer.TryParse(txtDays.Text, days) OrElse days < 0 Then Exit Sub
 
-            Dim S As Date = chkTravFrom.lcDateTimePicker.Value
+        Dim old As List(Of DayPlan) = ListBox2.Items.OfType(Of DayPlan)().ToList()
+        Dim showDates As Boolean = (TabControl5.SelectedTab Is tabSpecificDates)
+        Dim d As Date = chkTravFrom.lcDateTimePicker.Value.Date
 
-            For I As Integer = 1 To CInt(txtNights.Text)
-                Dim day As String = String.Format("Day {0}", I)
-                If TabControl5.SelectedTab.Name = "tabSpecificDates" Then
-                    day = day & String.Format(" (" & S.ToString("yyyy-MM-dd") & ")")
-                End If
-                ListBox2.Items.Add(day)
-                S = S.AddDays(1)
-            Next
+        ListBox2.BeginUpdate()
+        ListBox2.Items.Clear()
+        For i As Integer = 1 To days
+            Dim title As String = "Day " & i
+            If showDates Then title &= " (" & d.ToString("yyyy-MM-dd") & ")"
 
+            Dim plan As DayPlan = If(i <= old.Count, old(i - 1), New DayPlan())
+            plan.Title = title
+            ListBox2.Items.Add(plan)
+            d = d.AddDays(1)
+        Next
+        ListBox2.EndUpdate()
+    End Sub
 
-        Catch ex As Exception
+    ''' <summary>The 13 line boxes on the Day By Day tab, top to bottom.</summary>
+    Private Function DayLineBoxes() As TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Return {TextBoxWithCheckBox27, TextBoxWithCheckBox26, TextBoxWithCheckBox25,
+                TextBoxWithCheckBox24, TextBoxWithCheckBox23, TextBoxWithCheckBox22,
+                TextBoxWithCheckBox21, TextBoxWithCheckBox20, TextBoxWithCheckBox19,
+                TextBoxWithCheckBox18, TextBoxWithCheckBox17, TextBoxWithCheckBox16,
+                TextBoxWithCheckBox15}
+    End Function
 
-        End Try
+    ''' <summary>Clicking a day shows its lines and ticks in the 13 boxes.</summary>
+    Private Sub ListBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox2.SelectedIndexChanged
+        Dim plan As DayPlan = TryCast(ListBox2.SelectedItem, DayPlan)
+        btnSaveDay.Enabled = (plan IsNot Nothing)
+        If plan Is Nothing Then Exit Sub
+
+        Dim boxes = DayLineBoxes()
+        For i As Integer = 0 To boxes.Length - 1
+            If i < plan.Lines.Count Then
+                boxes(i).CheckBox1.Checked = plan.Lines(i).Enabled
+                boxes(i).TextBox1.Text = plan.Lines(i).Text
+            Else
+                boxes(i).CheckBox1.Checked = False
+                boxes(i).TextBox1.Text = ""
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' SAVE on the Day By Day tab: writes the 13 boxes (text + tick) into
+    ''' the day selected in ListBox2, replacing what it had.
+    ''' </summary>
+    Private Sub btnSaveDay_Click(sender As Object, e As EventArgs) Handles btnSaveDay.Click
+        Dim plan As DayPlan = TryCast(ListBox2.SelectedItem, DayPlan)
+        If plan Is Nothing Then
+            MessageBox.Show("Select a day in the list first.")
+            Exit Sub
+        End If
+
+        plan.Lines.Clear()
+        For Each box In DayLineBoxes()
+            plan.Lines.Add(New DayLine With {.Enabled = box.CheckBox1.Checked, .Text = box.TextBox1.Text})
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' "Save to Selected Version" on the Day By Day tab: stores a copy of
+    ''' every day in ListBox2 (title, 13 lines, ticks) on the selected version.
+    ''' </summary>
+    Private Sub btnSaveDaysToNode_Click(sender As Object, e As EventArgs) Handles btnSaveDaysToNode.Click
+        Dim node As TravelFormData = GetSelectedVersionNode()
+        If node Is Nothing Then Exit Sub
+
+        Dim days As List(Of DayPlan) = ListBox2.Items.OfType(Of DayPlan)().Select(Function(p) p.Clone()).ToList()
+        GetExtras(node).Days = days
+        MessageBox.Show(days.Count & " day(s) saved to """ & node.Text & """.")
+    End Sub
+
+    ''' <summary>
+    ''' Puts saved days back into ListBox2 (copies, so editing doesn't change
+    ''' the version until it is saved again). Nothing = never saved: leave as is.
+    ''' </summary>
+    Private Sub LoadDays(days As List(Of DayPlan))
+        If days Is Nothing Then Exit Sub
+        ListBox2.Items.Clear()
+        For Each p As DayPlan In days
+            ListBox2.Items.Add(p.Clone())
+        Next
+        btnSaveDay.Enabled = False
     End Sub
 
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+        PriceDialog.TextBox1.Text = ""   ' start empty, not with the last edited price
         If PriceDialog.ShowDialog = DialogResult.OK Then
-
-            Dim Amount As String = CDbl(PriceDialog.TextBox1.Text).ToString("#,##0") & "                               "
-            Amount = Amount.Substring(0, 32)
-
-
-            ListBox3.Items.Add(Amount & PriceDialog.ComboBox1.SelectedItem.ToString)
+            Dim entry As PriceEntry = PriceEntryFromDialog()
+            If entry IsNot Nothing Then ListBox3.Items.Add(entry)
         End If
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
+        If ListBox3.SelectedIndex < 0 Then Exit Sub
         ListBox3.Items.RemoveAt(ListBox3.SelectedIndex)
     End Sub
 
@@ -1435,7 +1525,14 @@ Public Class Form1
         If extras IsNot Nothing Then
             LoadDepartureArrival(extras.DepartureArrival)
             LoadTravelLegs(extras.Legs)
-            LoadIncluding(extras.Including)
+            LoadPricingRows(Panel2, extras.Including)
+            LoadPricingRows(pnlNotIncluding, extras.NotIncluding)
+            LoadDays(extras.Days)   ' after LoadDepartureArrival, which rebuilds the day list
+            LoadPricingRows(tabPricingpolicy, extras.PricingPolicy)
+            LoadPricingRows(Additions, extras.Additions)
+            LoadTransferWays(extras.TransferWays)
+            LoadLaces(extras.Laces)
+            LoadPrices(extras.Prices)
         End If
         SetCurrentVersion(data)   ' Save Changes now writes back into this node
         TabControl1.SelectedTab = TabPage1
@@ -1542,39 +1639,266 @@ Public Class Form1
     ''' "Save to Selected Version" on the Including tab: stores every
     ''' PricingWithCheckBox row in Panel2 (text, prices, icon and its
     ''' ticked / active state) on the version sub-node selected in TreeView1.
-    ''' Uses the same ToPricingItem() as "SAVE V1".
     ''' </summary>
     Private Sub btnSaveIncludingToNode_Click(sender As Object, e As EventArgs) Handles btnSaveIncludingToNode.Click
-        Dim node As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
-        If node Is Nothing OrElse node.Parent Is Nothing Then
-            MessageBox.Show("Select a version (a sub-node under a trip) in the tree first.")
-            Exit Sub
-        End If
+        Dim node As TravelFormData = GetSelectedVersionNode()
+        If node Is Nothing Then Exit Sub
 
-        Dim rows As New PricingItem.PricingCollection()
-        For Each ctl As Control In Panel2.Controls
-            Dim row As PricingWithCheckBox.PricingWithCheckBox = TryCast(ctl, PricingWithCheckBox.PricingWithCheckBox)
-            If row IsNot Nothing Then rows.Add(row.ToPricingItem())
-        Next
-
+        Dim rows = CollectPricingRows(Panel2)
         GetExtras(node).Including = rows
         MessageBox.Show(rows.Count & " Including row(s) saved to """ & node.Text & """.")
     End Sub
 
     ''' <summary>
-    ''' Puts saved Including rows back into Panel2, row by row in order
-    ''' (same matching as "Load V1"). Does nothing if rows is Nothing.
+    ''' "Save to Selected Version" on the Not Including tab: same as the
+    ''' Including one, for the rows in pnlNotIncluding.
     ''' </summary>
-    Private Sub LoadIncluding(rows As PricingItem.PricingCollection)
+    Private Sub btnSaveNotIncludingToNode_Click(sender As Object, e As EventArgs) Handles btnSaveNotIncludingToNode.Click
+        Dim node As TravelFormData = GetSelectedVersionNode()
+        If node Is Nothing Then Exit Sub
+
+        Dim rows = CollectPricingRows(pnlNotIncluding)
+        GetExtras(node).NotIncluding = rows
+        MessageBox.Show(rows.Count & " Not Including row(s) saved to """ & node.Text & """.")
+    End Sub
+
+    ''' <summary>
+    ''' "Save to Selected Version" on the Pricing Policy tab: same as the
+    ''' Including one, for the PricingWithCheckBox rows on that tab.
+    ''' </summary>
+    Private Sub btnSavePricingPolicyToNode_Click(sender As Object, e As EventArgs) Handles btnSavePricingPolicyToNode.Click
+        Dim node As TravelFormData = GetSelectedVersionNode()
+        If node Is Nothing Then Exit Sub
+
+        Dim rows = CollectPricingRows(tabPricingpolicy)
+        GetExtras(node).PricingPolicy = rows
+        MessageBox.Show(rows.Count & " Pricing Policy row(s) saved to """ & node.Text & """.")
+    End Sub
+
+    ''' <summary>
+    ''' "Save to Selected Version" on the Additions tab: same as the
+    ''' Including one, for the PricingWithCheckBox rows on that tab.
+    ''' </summary>
+    Private Sub btnSaveAdditionsToNode_Click(sender As Object, e As EventArgs) Handles btnSaveAdditionsToNode.Click
+        Dim node As TravelFormData = GetSelectedVersionNode()
+        If node Is Nothing Then Exit Sub
+
+        Dim rows = CollectPricingRows(Additions)
+        GetExtras(node).Additions = rows
+        MessageBox.Show(rows.Count & " Additions row(s) saved to """ & node.Text & """.")
+    End Sub
+
+    ''' <summary>The version sub-node selected in TreeView1, or Nothing (with a message).</summary>
+    Private Function GetSelectedVersionNode() As TravelFormData
+        Dim node As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
+        If node Is Nothing OrElse node.Parent Is Nothing Then
+            MessageBox.Show("Select a version (a sub-node under a trip) in the tree first.")
+            Return Nothing
+        End If
+        Return node
+    End Function
+
+    ''' <summary>
+    ''' The PricingWithCheckBox rows directly inside a container (a panel or
+    ''' a tab page), top to bottom, so save and load always match the same
+    ''' row to the same position on screen.
+    ''' </summary>
+    Private Function PricingRowsOf(container As Control) As List(Of PricingWithCheckBox.PricingWithCheckBox)
+        Return container.Controls.OfType(Of PricingWithCheckBox.PricingWithCheckBox)().
+            OrderBy(Function(r) r.Top).ToList()
+    End Function
+
+    ''' <summary>
+    ''' Reads every PricingWithCheckBox row in a container, top to bottom,
+    ''' using the same ToPricingItem() as "SAVE V1".
+    ''' </summary>
+    Private Function CollectPricingRows(container As Control) As PricingItem.PricingCollection
+        Dim rows As New PricingItem.PricingCollection()
+        For Each row In PricingRowsOf(container)
+            rows.Add(row.ToPricingItem())
+        Next
+        Return rows
+    End Function
+
+    ''' <summary>
+    ''' Puts saved rows back into a container, top to bottom (same matching
+    ''' as "Load V1"). Does nothing if rows is Nothing.
+    ''' </summary>
+    Private Sub LoadPricingRows(container As Control, rows As PricingItem.PricingCollection)
         If rows Is Nothing Then Exit Sub
 
-        Dim index As Integer = 0
-        For Each ctl As Control In Panel2.Controls
-            Dim row As PricingWithCheckBox.PricingWithCheckBox = TryCast(ctl, PricingWithCheckBox.PricingWithCheckBox)
-            If row Is Nothing Then Continue For
-            If index >= rows.Count Then Exit For
-            row.FromPricingItem(rows(index))
-            index += 1
+        Dim target = PricingRowsOf(container)
+        For i As Integer = 0 To Math.Min(rows.Count, target.Count) - 1
+            target(i).FromPricingItem(rows(i))
+        Next
+    End Sub
+
+    ' =========================================================================
+    '  TransferWays tab: 12 lines per transfer type (TabControl4 icon tab)
+    ' =========================================================================
+
+    ''' <summary>Lines saved per TabControl4 page name (e.g. "TabPage3").</summary>
+    Private _transferWayLines As New Dictionary(Of String, List(Of DayLine))
+
+    ''' <summary>The line boxes on the TransferWays tab, top to bottom.</summary>
+    Private Function TransferWayBoxes() As List(Of TextBoxWithCheckBox.TextBoxWithCheckBox)
+        Return TransferWays.Controls.OfType(Of TextBoxWithCheckBox.TextBoxWithCheckBox)().
+            OrderBy(Function(b) b.Top).ToList()
+    End Function
+
+    ''' <summary>
+    ''' SAVE on the TransferWays tab: writes the line boxes (text + tick)
+    ''' into the transfer type selected in TabControl4, replacing what it had.
+    ''' </summary>
+    Private Sub btnSaveTransferWay_Click(sender As Object, e As EventArgs) Handles btnSaveTransferWay.Click
+        If TabControl4.SelectedTab Is Nothing Then Exit Sub
+
+        _transferWayLines(TabControl4.SelectedTab.Name) =
+            TransferWayBoxes().Select(Function(b) New DayLine With {.Enabled = b.CheckBox1.Checked, .Text = b.TextBox1.Text}).ToList()
+    End Sub
+
+    ''' <summary>Switching transfer type shows that type's saved lines.</summary>
+    Private Sub TabControl4_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl4.SelectedIndexChanged
+        ShowTransferWayLines()
+    End Sub
+
+    Private Sub ShowTransferWayLines()
+        Dim lines As List(Of DayLine) = Nothing
+        If TabControl4.SelectedTab IsNot Nothing Then
+            _transferWayLines.TryGetValue(TabControl4.SelectedTab.Name, lines)
+        End If
+
+        Dim boxes = TransferWayBoxes()
+        For i As Integer = 0 To boxes.Count - 1
+            If lines IsNot Nothing AndAlso i < lines.Count Then
+                boxes(i).CheckBox1.Checked = lines(i).Enabled
+                boxes(i).TextBox1.Text = lines(i).Text
+            Else
+                boxes(i).CheckBox1.Checked = False
+                boxes(i).TextBox1.Text = ""
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' "Save to Selected Version" on the TransferWays tab: stores the lines
+    ''' of every transfer type saved with SAVE on the selected version.
+    ''' </summary>
+    Private Sub btnSaveTransferWaysToNode_Click(sender As Object, e As EventArgs) Handles btnSaveTransferWaysToNode.Click
+        Dim node As TravelFormData = GetSelectedVersionNode()
+        If node Is Nothing Then Exit Sub
+
+        GetExtras(node).TransferWays = CopyTransferWays(_transferWayLines)
+        MessageBox.Show(_transferWayLines.Count & " transfer type(s) saved to """ & node.Text & """.")
+    End Sub
+
+    ''' <summary>Puts saved transfer lines back. Nothing = never saved: leave as is.</summary>
+    Private Sub LoadTransferWays(data As Dictionary(Of String, List(Of DayLine)))
+        If data Is Nothing Then Exit Sub
+        _transferWayLines = CopyTransferWays(data)
+        ShowTransferWayLines()
+    End Sub
+
+    Friend Shared Function CopyTransferWays(src As Dictionary(Of String, List(Of DayLine))) As Dictionary(Of String, List(Of DayLine))
+        If src Is Nothing Then Return Nothing
+        Dim copy As New Dictionary(Of String, List(Of DayLine))
+        For Each kv In src
+            copy(kv.Key) = kv.Value.Select(Function(l) New DayLine With {.Enabled = l.Enabled, .Text = l.Text}).ToList()
+        Next
+        Return copy
+    End Function
+
+    ' =========================================================================
+    '  Laces, Stamps, and Comments tab (TabPage15)
+    ' =========================================================================
+
+    ''' <summary>The TextBoxWithTypeAndCheckbox rows on TabPage15, top to bottom.</summary>
+    Private Function TypedLineControls() As List(Of TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox)
+        Return TabPage15.Controls.OfType(Of TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox)().
+            OrderBy(Function(c) c.Top).ToList()
+    End Function
+
+    ''' <summary>
+    ''' "Save to Selected Version" on the Laces, Stamps, and Comments tab:
+    ''' stores every row (tick, text and type) on the selected version.
+    ''' </summary>
+    Private Sub btnSaveLacesToNode_Click(sender As Object, e As EventArgs) Handles btnSaveLacesToNode.Click
+        Dim node As TravelFormData = GetSelectedVersionNode()
+        If node Is Nothing Then Exit Sub
+
+        Dim rows = TypedLineControls().Select(Function(c) TypedLine.FromControl(c)).ToList()
+        GetExtras(node).Laces = rows
+        MessageBox.Show(rows.Count & " row(s) saved to """ & node.Text & """.")
+    End Sub
+
+    Private Sub LoadLaces(rows As List(Of TypedLine))
+        If rows Is Nothing Then Exit Sub
+        Dim target = TypedLineControls()
+        For i As Integer = 0 To Math.Min(rows.Count, target.Count) - 1
+            rows(i).ApplyTo(target(i))
+        Next
+    End Sub
+
+    ' =========================================================================
+    '  Prices tab (ListBox3)
+    ' =========================================================================
+
+    ''' <summary>Double-click a price: edit it in PriceDialog.</summary>
+    Private Sub ListBox3_DoubleClick(sender As Object, e As EventArgs) Handles ListBox3.DoubleClick
+        Dim index As Integer = ListBox3.SelectedIndex
+        Dim entry As PriceEntry = TryCast(ListBox3.SelectedItem, PriceEntry)
+        If entry Is Nothing Then Exit Sub
+
+        PriceDialog.TextBox1.Text = entry.Amount.ToString()
+        SelectComboByText(PriceDialog.ComboBox1, entry.Currency)
+
+        If PriceDialog.ShowDialog() <> DialogResult.OK Then Exit Sub
+
+        Dim updated As PriceEntry = PriceEntryFromDialog()
+        If updated Is Nothing Then Exit Sub
+        ListBox3.Items(index) = updated
+        ListBox3.SelectedIndex = index
+    End Sub
+
+    ''' <summary>Reads PriceDialog into a PriceEntry; Nothing (with a message) if invalid.</summary>
+    Private Function PriceEntryFromDialog() As PriceEntry
+        Dim amount As Double
+        If Not Double.TryParse(PriceDialog.TextBox1.Text, amount) Then
+            MessageBox.Show("The amount must be a number.")
+            Return Nothing
+        End If
+        If PriceDialog.ComboBox1.SelectedItem Is Nothing Then
+            MessageBox.Show("Choose a currency / type.")
+            Return Nothing
+        End If
+        Return New PriceEntry With {.Amount = amount, .Currency = PriceDialog.ComboBox1.SelectedItem.ToString()}
+    End Function
+
+    Private Sub SelectComboByText(cmb As ComboBox, text As String)
+        For i As Integer = 0 To cmb.Items.Count - 1
+            If cmb.Items(i).ToString() = text Then
+                cmb.SelectedIndex = i
+                Exit Sub
+            End If
+        Next
+        cmb.SelectedIndex = -1
+    End Sub
+
+    ''' <summary>"Save to Selected Version" on the Prices tab: stores all of ListBox3.</summary>
+    Private Sub btnSavePricesToNode_Click(sender As Object, e As EventArgs) Handles btnSavePricesToNode.Click
+        Dim node As TravelFormData = GetSelectedVersionNode()
+        If node Is Nothing Then Exit Sub
+
+        Dim prices = ListBox3.Items.OfType(Of PriceEntry)().Select(Function(p) p.Clone()).ToList()
+        GetExtras(node).Prices = prices
+        MessageBox.Show(prices.Count & " price(s) saved to """ & node.Text & """.")
+    End Sub
+
+    Private Sub LoadPrices(prices As List(Of PriceEntry))
+        If prices Is Nothing Then Exit Sub
+        ListBox3.Items.Clear()
+        For Each p As PriceEntry In prices
+            ListBox3.Items.Add(p.Clone())
         Next
     End Sub
 
@@ -1740,6 +2064,16 @@ Public Class Form1
                 Next
             End If
             d.Including = extras.Including
+            d.NotIncluding = extras.NotIncluding
+            d.Days = extras.Days
+            d.PricingPolicy = extras.PricingPolicy
+            d.Additions = extras.Additions
+            If extras.TransferWays IsNot Nothing Then
+                d.TransferWays = extras.TransferWays.Select(Function(kv) New TransferWayDto With {
+                    .TabName = kv.Key, .Lines = kv.Value}).ToList()
+            End If
+            d.Laces = extras.Laces
+            d.Prices = extras.Prices
         End If
         Return d
     End Function
@@ -1762,11 +2096,22 @@ Public Class Form1
             v.Attractions.Add(New CheckListItem(name:=name, isChecked:=True))
         Next
 
-        If d.DepartureArrival IsNot Nothing OrElse d.LegsSaved OrElse d.Including IsNot Nothing Then
+        If d.DepartureArrival IsNot Nothing OrElse d.LegsSaved OrElse d.Including IsNot Nothing OrElse d.NotIncluding IsNot Nothing OrElse d.Days IsNot Nothing _
+           OrElse d.PricingPolicy IsNot Nothing OrElse d.Additions IsNot Nothing _
+           OrElse d.TransferWays IsNot Nothing OrElse d.Laces IsNot Nothing OrElse d.Prices IsNot Nothing Then
             Dim extras As New VersionExtras()
             If d.DepartureArrival IsNot Nothing Then extras.DepartureArrival = d.DepartureArrival.ToInfo()
             If d.LegsSaved Then extras.Legs = d.Legs.Select(Function(l) l.ToLeg()).ToList()
             extras.Including = d.Including
+            extras.NotIncluding = d.NotIncluding
+            extras.Days = d.Days
+            extras.PricingPolicy = d.PricingPolicy
+            extras.Additions = d.Additions
+            If d.TransferWays IsNot Nothing Then
+                extras.TransferWays = d.TransferWays.ToDictionary(Function(t) t.TabName, Function(t) t.Lines)
+            End If
+            extras.Laces = d.Laces
+            extras.Prices = d.Prices
             v.Tag = extras
         End If
         v.Text = d.Text
@@ -2071,6 +2416,13 @@ Public Class VersionDto
     Public Property Legs As New List(Of LegDto)
     ' Including tab rows, same XML format as Pricing.txt (Nothing = not saved)
     Public Property Including As PricingItem.PricingCollection
+    Public Property NotIncluding As PricingItem.PricingCollection
+    Public Property Days As List(Of DayPlan)   ' Nothing = not saved
+    Public Property PricingPolicy As PricingItem.PricingCollection
+    Public Property Additions As PricingItem.PricingCollection
+    Public Property TransferWays As List(Of TransferWayDto)   ' Nothing = not saved
+    Public Property Laces As List(Of TypedLine)
+    Public Property Prices As List(Of PriceEntry)
 End Class
 
 ''' <summary>One Flight or LayOver from ListBox1 (Kind tells which).</summary>
@@ -2230,6 +2582,99 @@ Public Class DepartureArrivalDto
     End Function
 End Class
 
+''' <summary>One row of the Prices tab (ListBox3).</summary>
+Public Class PriceEntry
+    Public Property Amount As Double
+    Public Property Currency As String = ""
+
+    Public Function Clone() As PriceEntry
+        Return New PriceEntry With {.Amount = Amount, .Currency = Currency}
+    End Function
+
+    ''' <summary>Same layout ListBox3 always used: amount padded to 32, then currency.</summary>
+    Public Overrides Function ToString() As String
+        Return Amount.ToString("#,##0").PadRight(32).Substring(0, 32) & Currency
+    End Function
+End Class
+
+''' <summary>
+''' One TextBoxWithTypeAndCheckbox row (Laces, Stamps, and Comments tab).
+''' Read through the control's own CheckBox / TextBox / ComboBox children,
+''' so it doesn't depend on their names inside the control.
+''' </summary>
+Public Class TypedLine
+    Public Property Enabled As Boolean
+    Public Property Text As String = ""
+    Public Property TypeText As String = ""
+    Public Property TypeIndex As Integer = -1
+
+    Friend Shared Function FromControl(c As Control) As TypedLine
+        Dim t As New TypedLine()
+        Dim chk = FindChild(Of CheckBox)(c)
+        Dim txt = FindChild(Of TextBox)(c)
+        Dim cmb = FindChild(Of ComboBox)(c)
+        If chk IsNot Nothing Then t.Enabled = chk.Checked
+        If txt IsNot Nothing Then t.Text = txt.Text
+        If cmb IsNot Nothing Then
+            t.TypeIndex = cmb.SelectedIndex
+            t.TypeText = cmb.Text
+        End If
+        Return t
+    End Function
+
+    Friend Sub ApplyTo(c As Control)
+        Dim chk = FindChild(Of CheckBox)(c)
+        Dim txt = FindChild(Of TextBox)(c)
+        Dim cmb = FindChild(Of ComboBox)(c)
+        If chk IsNot Nothing Then chk.Checked = Enabled
+        If txt IsNot Nothing Then txt.Text = Text
+        If cmb IsNot Nothing Then
+            If TypeIndex >= 0 AndAlso TypeIndex < cmb.Items.Count Then
+                cmb.SelectedIndex = TypeIndex
+            ElseIf cmb.DropDownStyle <> ComboBoxStyle.DropDownList Then
+                cmb.Text = TypeText
+            End If
+        End If
+    End Sub
+
+    Private Shared Function FindChild(Of T As Control)(parent As Control) As T
+        For Each child As Control In parent.Controls
+            If TypeOf child Is T Then Return DirectCast(child, T)
+            Dim inner As T = FindChild(Of T)(child)
+            If inner IsNot Nothing Then Return inner
+        Next
+        Return Nothing
+    End Function
+End Class
+
+''' <summary>Tree file: one transfer type's lines.</summary>
+Public Class TransferWayDto
+    Public Property TabName As String = ""
+    Public Property Lines As New List(Of DayLine)
+End Class
+
+''' <summary>One day in the Day By Day tab: its title and 13 lines.</summary>
+Public Class DayPlan
+    Public Property Title As String = ""
+    Public Property Lines As New List(Of DayLine)
+
+    Public Function Clone() As DayPlan
+        Return New DayPlan With {
+            .Title = Title,
+            .Lines = Lines.Select(Function(l) New DayLine With {.Enabled = l.Enabled, .Text = l.Text}).ToList()}
+    End Function
+
+    Public Overrides Function ToString() As String
+        Return Title   ' what ListBox2 shows
+    End Function
+End Class
+
+''' <summary>One line of a day: its text and whether it is ticked / active.</summary>
+Public Class DayLine
+    Public Property Enabled As Boolean
+    Public Property Text As String = ""
+End Class
+
 ''' <summary>
 ''' Extra data kept on a version node (node.Tag), next to its TabPage1 lists.
 ''' Nothing in a property = that part was never saved for this version.
@@ -2238,12 +2683,27 @@ Class VersionExtras
     Public Property DepartureArrival As DepartureArrivalInfo
     Public Property Legs As List(Of Object)   ' Flight / LayOver items from ListBox1
     Public Property Including As PricingItem.PricingCollection   ' Including tab rows (Panel2)
+    Public Property NotIncluding As PricingItem.PricingCollection   ' Not Including rows (pnlNotIncluding)
+    Public Property Days As List(Of DayPlan)   ' Day By Day tab (ListBox2)
+    Public Property PricingPolicy As PricingItem.PricingCollection   ' Pricing Policy tab rows
+    Public Property Additions As PricingItem.PricingCollection       ' Additions tab rows
+    Public Property TransferWays As Dictionary(Of String, List(Of DayLine))   ' per TabControl4 page
+    Public Property Laces As List(Of TypedLine)   ' Laces, Stamps, and Comments rows
+    Public Property Prices As List(Of PriceEntry)   ' Prices tab (ListBox3)
 
     Public Function Clone() As VersionExtras
         Return New VersionExtras With {
             .DepartureArrival = If(DepartureArrival Is Nothing, Nothing, DepartureArrival.Clone()),
             .Legs = If(Legs Is Nothing, Nothing, New List(Of Object)(Legs)),
-            .Including = CopyPricing(Including)}
+            .Including = CopyPricing(Including),
+            .NotIncluding = CopyPricing(NotIncluding),
+            .Days = If(Days Is Nothing, Nothing, Days.Select(Function(p) p.Clone()).ToList()),
+            .PricingPolicy = CopyPricing(PricingPolicy),
+            .Additions = CopyPricing(Additions),
+            .TransferWays = Form1.CopyTransferWays(TransferWays),
+            .Laces = If(Laces Is Nothing, Nothing, Laces.Select(Function(l) New TypedLine With {
+                .Enabled = l.Enabled, .Text = l.Text, .TypeText = l.TypeText, .TypeIndex = l.TypeIndex}).ToList()),
+            .Prices = If(Prices Is Nothing, Nothing, Prices.Select(Function(p) p.Clone()).ToList())}
     End Function
 
     Private Shared Function CopyPricing(src As PricingItem.PricingCollection) As PricingItem.PricingCollection
