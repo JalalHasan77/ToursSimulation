@@ -174,11 +174,55 @@ Public Class Form1
         End If
     End Sub
 
+    ''' <summary>
+    ''' Right-click on a node: trips and versions get Open / Delete; the
+    ''' older "offers" nodes keep their Countries / Cities / Stay menu.
+    ''' </summary>
     Private Sub TreeView1_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseClick
-        If e.Button = MouseButtons.Right Then
-            TreeView1.SelectedNode = e.Node   ' select the node first
+        If e.Button <> MouseButtons.Right Then Exit Sub
+        TreeView1.SelectedNode = e.Node   ' select the node first
+        If TypeOf e.Node Is TravelOffers Then
             ContextMenuStrip1.Show(TreeView1, e.Location)
+        ElseIf TypeOf e.Node Is TripRootNode OrElse TypeOf e.Node Is TravelFormData Then
+            cmsTrip.Show(TreeView1, e.Location)
         End If
+    End Sub
+
+    Private Sub mnuOpenNode_Click(sender As Object, e As EventArgs) Handles mnuOpenNode.Click
+        If TreeView1.SelectedNode IsNot Nothing Then OpenNode(TreeView1.SelectedNode)
+    End Sub
+
+    Private Sub mnuDeleteNode_Click(sender As Object, e As EventArgs) Handles mnuDeleteNode.Click
+        DeleteNode(TreeView1.SelectedNode)
+    End Sub
+
+    ''' <summary>Keyboard in the tree: Enter opens, Delete deletes.</summary>
+    Private Sub TreeView1_KeyDown(sender As Object, e As KeyEventArgs) Handles TreeView1.KeyDown
+        Select Case e.KeyCode
+            Case Keys.Enter
+                If TreeView1.SelectedNode IsNot Nothing Then OpenNode(TreeView1.SelectedNode)
+                e.Handled = True
+            Case Keys.Delete
+                DeleteNode(TreeView1.SelectedNode)
+                e.Handled = True
+        End Select
+    End Sub
+
+    ''' <summary>Deletes a trip (with all its versions) or one version, after asking.</summary>
+    Private Sub DeleteNode(node As TreeNode)
+        If node Is Nothing Then Exit Sub
+        Dim isTrip As Boolean = TypeOf node Is TripRootNode
+        If Not isTrip AndAlso Not TypeOf node Is TravelFormData Then Exit Sub
+
+        Dim what As String = If(isTrip,
+            "the trip """ & node.Text & """ and all its versions",
+            "the version """ & node.Text & """")
+        If MessageBox.Show("Delete " & what & "?", "Delete",
+                           MessageBoxButtons.YesNo, MessageBoxIcon.Warning) <> DialogResult.Yes Then Exit Sub
+
+        node.Remove()
+        UpdateEditingHeader()   ' closes the trip / version if it was the one open
+        SetStatus("Deleted " & what & ".")
     End Sub
 
     Private Sub CitiesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CitiesToolStripMenuItem.Click
@@ -726,7 +770,7 @@ Public Class Form1
         If _suppressLegLoad Then Exit Sub
         If ListBox1.SelectedItem Is Nothing Then Exit Sub
 
-        SetLoadedLeg(ListBox1.SelectedItem)   ' "Save Changes to Item" now targets this item
+        SetLoadedLeg(ListBox1.SelectedItem)   ' "Update Selected Item" now targets this item
 
         Dim selectedItem = ListBox1.SelectedItem
         Dim F As Flight = TryCast(selectedItem, Flight)
@@ -840,7 +884,7 @@ Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' "Save Changes to Item": writes what is on the Move / LayOver tab back
+    ''' "Update Selected Item": writes what is on the Move / LayOver tab back
     ''' into the ListBox1 item that was loaded by clicking it. The item keeps
     ''' its position and its type (a Flight stays a Flight, a LayOver stays a
     ''' LayOver, whichever inner tab is showing).
@@ -1190,6 +1234,7 @@ Public Class Form1
         Dim days As Integer
         If Not Integer.TryParse(txtDays.Text, days) OrElse days < 0 Then Exit Sub
 
+        CommitDayBoxes()   ' keep what is typed for the day on screen
         Dim old As List(Of DayPlan) = ListBox2.Items.OfType(Of DayPlan)().ToList()
         Dim showDates As Boolean = (TabControl5.SelectedTab Is tabSpecificDates)
         Dim d As Date = chkTravFrom.lcDateTimePicker.Value.Date
@@ -1217,15 +1262,25 @@ Public Class Form1
                 TextBoxWithCheckBox15}
     End Function
 
-    ''' <summary>Clicking a day shows its lines and ticks in the 13 boxes.</summary>
+    ''' <summary>The day whose lines are in the 13 boxes right now.</summary>
+    Private _shownDay As DayPlan
+
+    ''' <summary>
+    ''' Clicking a day first keeps the lines of the day shown before, then
+    ''' shows this day's lines and ticks in the 13 boxes.
+    ''' </summary>
     Private Sub ListBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox2.SelectedIndexChanged
+        CommitDayBoxes()
         Dim plan As DayPlan = TryCast(ListBox2.SelectedItem, DayPlan)
         btnSaveDay.Enabled = (plan IsNot Nothing)
-        If plan Is Nothing Then Exit Sub
+        ShowDayLines(plan)
+    End Sub
 
+    Private Sub ShowDayLines(plan As DayPlan)
+        _shownDay = plan
         Dim boxes = DayLineBoxes()
         For i As Integer = 0 To boxes.Length - 1
-            If i < plan.Lines.Count Then
+            If plan IsNot Nothing AndAlso i < plan.Lines.Count Then
                 boxes(i).CheckBox1.Checked = plan.Lines(i).Enabled
                 boxes(i).TextBox1.Text = plan.Lines(i).Text
             Else
@@ -1235,34 +1290,22 @@ Public Class Form1
         Next
     End Sub
 
-    ''' <summary>
-    ''' SAVE on the Day By Day tab: writes the 13 boxes (text + tick) into
-    ''' the day selected in ListBox2, replacing what it had.
-    ''' </summary>
+    ''' <summary>Writes the 13 boxes into the day they belong to (if it is still in the list).</summary>
+    Private Sub CommitDayBoxes()
+        If _shownDay Is Nothing OrElse Not ListBox2.Items.Contains(_shownDay) Then Exit Sub
+        _shownDay.Lines = DayLineBoxes().Select(Function(b) New DayLine With {.Enabled = b.CheckBox1.Checked, .Text = b.TextBox1.Text}).ToList()
+    End Sub
+
+    ''' <summary>"Save Day": writes the 13 boxes into the day selected in ListBox2.</summary>
     Private Sub btnSaveDay_Click(sender As Object, e As EventArgs) Handles btnSaveDay.Click
         Dim plan As DayPlan = TryCast(ListBox2.SelectedItem, DayPlan)
         If plan Is Nothing Then
             MessageBox.Show("Select a day in the list first.")
             Exit Sub
         End If
-
-        plan.Lines.Clear()
-        For Each box In DayLineBoxes()
-            plan.Lines.Add(New DayLine With {.Enabled = box.CheckBox1.Checked, .Text = box.TextBox1.Text})
-        Next
-    End Sub
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the Day By Day tab: stores a copy of
-    ''' every day in ListBox2 (title, 13 lines, ticks) on the selected version.
-    ''' </summary>
-    Private Sub btnSaveDaysToNode_Click(sender As Object, e As EventArgs) Handles btnSaveDaysToNode.Click
-        Dim node As TravelFormData = GetSelectedVersionNode()
-        If node Is Nothing Then Exit Sub
-
-        Dim days As List(Of DayPlan) = ListBox2.Items.OfType(Of DayPlan)().Select(Function(p) p.Clone()).ToList()
-        GetExtras(node).Days = days
-        MessageBox.Show(days.Count & " day(s) saved to """ & node.Text & """.")
+        _shownDay = plan
+        CommitDayBoxes()
+        SetStatus("Lines saved for " & plan.Title & ". Press ""Save"" at the top to store them in the version.")
     End Sub
 
     ''' <summary>
@@ -1271,10 +1314,12 @@ Public Class Form1
     ''' </summary>
     Private Sub LoadDays(days As List(Of DayPlan))
         If days Is Nothing Then Exit Sub
+        _shownDay = Nothing          ' the boxes belong to the old list: don't keep them
         ListBox2.Items.Clear()
         For Each p As DayPlan In days
             ListBox2.Items.Add(p.Clone())
         Next
+        ShowDayLines(Nothing)
         btnSaveDay.Enabled = False
     End Sub
 
@@ -1345,9 +1390,9 @@ Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' SAVE on the "Title And Sub Title" tab: adds a new ROOT node to
-    ''' TreeView1 whose text is the trip title. Destination versions are
-    ''' later added under it by btnSaveDestinations (TabPage1).
+    ''' "Create Trip" on the Trip Title tab: adds a new trip (root node) to
+    ''' the tree with this title and opens it. Its first version is made
+    ''' with "Save as New Version" in the header bar.
     ''' </summary>
     Private Sub Button8_Click_1(sender As Object, e As EventArgs) Handles Button8.Click
         Dim title As String = txbxTripTitle.TextBox1.Text.Trim()
@@ -1360,116 +1405,261 @@ Public Class Form1
         Dim root As New TripRootNode(
             New TitleField(txbxTripTitle.CheckBox1.Checked, title),
             New TitleField(txbxTripSubTitle.CheckBox1.Checked, txbxTripSubTitle.TextBox1.Text))
-
         TreeView1.Nodes.Add(root)
 
-        ' New trip: nothing loaded yet, lists start empty, and the first
-        ' SAVE VERSION goes under this root.
+        ' New trip: no version yet, and the destination lists start empty.
         SetCurrentVersion(Nothing)
         ResetCitiesStayAttraction()
+        SetCurrentTrip(root)
         TreeView1.SelectedNode = root
+        SetStatus("Trip """ & title & """ created. Fill in the tabs, then press ""Save as New Version"".")
+    End Sub
+
+    ''' <summary>"New Trip" on the tree toolbar: clears the title and goes to the Trip Title tab.</summary>
+    Private Sub tsbNewTrip_Click(sender As Object, e As EventArgs) Handles tsbNewTrip.Click
+        SetCurrentVersion(Nothing)
+        SetCurrentTrip(Nothing)
+        txbxTripTitle.TextBox1.Text = ""
+        txbxTripSubTitle.TextBox1.Text = ""
+        ResetCitiesStayAttraction()
+        TabControl1.SelectedTab = TitleAndSubTitle
+        txbxTripTitle.TextBox1.Focus()
+        SetStatus("Type the trip title, then press ""Create Trip"".")
+    End Sub
+
+    ' =========================================================================
+    '  Header bar: what is open + the two common Save buttons
+    ' =========================================================================
+
+    ''' <summary>
+    ''' "Save": writes every tab into the open version, replacing what it had.
+    ''' The trip title (Trip Title tab) is saved into the trip as well. If only
+    ''' a trip is open (no version yet), just the title is saved.
+    ''' </summary>
+    Private Sub btnSaveVersion_Click(sender As Object, e As EventArgs) Handles btnSaveVersion.Click
+        If Not IsOpen(_currentTrip) Then
+            MessageBox.Show("No trip is open. Create a trip, or double-click one in the tree.")
+            Exit Sub
+        End If
+
+        If Not IsOpen(_currentVersion) Then
+            SaveTripTitle(_currentTrip)
+            UpdateEditingHeader()
+            SetStatus("Trip title saved. This trip has no open version yet: press ""Save as New Version"" to save the tabs.")
+            Exit Sub
+        End If
+
+        Dim warning As String = ""
+        Dim data As TravelFormData = CaptureEditor(warning)
+        If data Is Nothing Then Exit Sub
+        SaveTripTitle(_currentTrip)
+
+        ' Swap the old node for the new one at the same position, same version number.
+        Dim old As TravelFormData = _currentVersion
+        Dim parent As TreeNode = old.Parent
+        Dim index As Integer = old.Index
+        data.Text = BuildVersionText(data, GetVersionNumber(old))
+        parent.Nodes.Insert(index, data)
+        old.Remove()
+
+        SetCurrentVersion(data)
+        SetStatus("Saved all tabs to """ & data.Text & """." & warning)
     End Sub
 
     ''' <summary>
-    ''' SAVE VERSION on TabPage1: saves CheckedListBox1-4 as a NEW copy
-    ''' (a new version node) under the same trip root as the currently
-    ''' loaded version. If no version is loaded yet (the first one for a
-    ''' trip), it goes under the root of whatever node is selected.
-    ''' Node text = checked countries joined by ", " + " V<n>", where n is
-    ''' one more than the highest version already under that root.
-    ''' The new copy becomes the currently loaded version, so further edits
-    ''' + "Save Changes" go into it, not into the one it was copied from.
+    ''' "Save as New Version": saves every tab as a new version under the open
+    ''' trip and opens it. The version that was open stays exactly as it was.
     ''' </summary>
-    Private Sub btnSaveDestinations_Click(sender As Object, e As EventArgs) Handles btnSaveDestinations.Click
-        ' ---- which trip root? ---------------------------------------------------
-        Dim startNode As TreeNode
-        If _currentVersion IsNot Nothing AndAlso _currentVersion.TreeView IsNot Nothing Then
-            startNode = _currentVersion          ' copy of the loaded version
-        Else
-            startNode = TreeView1.SelectedNode   ' first version of a trip
-        End If
-
-        If startNode Is Nothing Then
-            MessageBox.Show("Select a trip (root node) in the tree first.")
+    Private Sub btnSaveAsNewVersion_Click(sender As Object, e As EventArgs) Handles btnSaveAsNewVersion.Click
+        If Not IsOpen(_currentTrip) Then
+            MessageBox.Show("No trip is open. Create a trip, or double-click one in the tree.")
             Exit Sub
         End If
 
-        Dim root As TripRootNode = TryCast(GetRootNode(startNode), TripRootNode)
-        If root Is Nothing Then
-            MessageBox.Show("The selected node is not a trip. Create one on the ""Title And Sub Title"" tab first.")
-            Exit Sub
-        End If
+        Dim warning As String = ""
+        Dim data As TravelFormData = CaptureEditor(warning)
+        If data Is Nothing Then Exit Sub
+        SaveTripTitle(_currentTrip)
 
-        ' ---- save the four lists ------------------------------------------------
-        Dim data As TravelFormData = SaveTabPage1Data()
-        If data.Countries.Count = 0 Then
-            MessageBox.Show("Check at least one country first.")
-            Exit Sub
-        End If
-
-        ' ---- next version number under this root -------------------------------
+        ' Next version number = one more than the highest under this trip.
+        Dim root As TripRootNode = _currentTrip
         Dim version As Integer = root.Nodes.Count + 1
         For Each child As TreeNode In root.Nodes
             Dim n As Integer = GetVersionNumber(child)
             If n >= version Then version = n + 1
         Next
-
         data.Text = BuildVersionText(data, version)
-
-        ' A copy of the loaded version also copies its Departure & Arrival
-        ' info and its Travel And Layover legs.
-        If _currentVersion IsNot Nothing AndAlso TypeOf _currentVersion.Tag Is VersionExtras Then
-            data.Tag = DirectCast(_currentVersion.Tag, VersionExtras).Clone()
-        End If
 
         root.Nodes.Add(data)
         root.Expand()
-        SetCurrentVersion(data)   ' the new copy is now the one being edited
+        SetCurrentVersion(data)
+        SetStatus("Saved all tabs as the new version """ & data.Text & """." & warning)
     End Sub
 
     ''' <summary>
-    ''' Save Changes on TabPage1: overwrites the currently loaded version
-    ''' node with what is in CheckedListBox1-4 now. Keeps its place in the
-    ''' tree and its version number; only the countries part of the text
-    ''' is refreshed.
+    ''' Reads every tab into one version node: Destinations (Title, Countries,
+    ''' Cities, Stay, Attraction) plus Departure &amp; Arrival, the travel legs,
+    ''' Including / Not Including, Day By Day, Pricing Policy, Additions,
+    ''' Transfer Ways, Laces / Stamps / Comments and Prices.
+    ''' Returns Nothing (after a message) if it can't be saved.
     ''' </summary>
-    Private Sub btnSaveChanges_Click(sender As Object, e As EventArgs) Handles btnSaveChanges.Click
-        If _currentVersion Is Nothing OrElse _currentVersion.TreeView Is Nothing Then
-            SetCurrentVersion(Nothing)
-            MessageBox.Show("No version is loaded. Double-click a version in the tree first, or use SAVE VERSION.")
-            Exit Sub
-        End If
-
+    Private Function CaptureEditor(ByRef warning As String) As TravelFormData
+        warning = ""
         Dim data As TravelFormData = SaveTabPage1Data()
         If data.Countries.Count = 0 Then
-            MessageBox.Show("Check at least one country first.")
-            Exit Sub
+            TabControl1.SelectedTab = TabPage1
+            MessageBox.Show("Check at least one country on the Destinations tab first.")
+            Return Nothing
         End If
 
-        Dim old As TravelFormData = _currentVersion
-        Dim parent As TreeNode = old.Parent
-        Dim index As Integer = old.Index
+        ' Keep edits still sitting in the boxes of the Day By Day / Transfer Ways tabs.
+        CommitDayBoxes()
+        If TabControl4.SelectedTab IsNot Nothing Then CommitTransferBoxes(TabControl4.SelectedTab.Name)
 
-        data.Text = BuildVersionText(data, GetVersionNumber(old))
-        data.Tag = old.Tag   ' keep its Departure & Arrival info and travel legs
+        data.Tag = New VersionExtras With {
+            .DepartureArrival = CaptureDepartureArrival(warning),
+            .Legs = ListBox1.Items.Cast(Of Object)().Where(Function(i) TypeOf i Is Flight OrElse TypeOf i Is LayOver).ToList(),
+            .Including = CollectPricingRows(Panel2),
+            .NotIncluding = CollectPricingRows(pnlNotIncluding),
+            .Days = ListBox2.Items.OfType(Of DayPlan)().Select(Function(p) p.Clone()).ToList(),
+            .PricingPolicy = CollectPricingRows(tabPricingpolicy),
+            .Additions = CollectPricingRows(Additions),
+            .TransferWays = CopyTransferWays(_transferWayLines),
+            .Laces = TypedLineControls().Select(Function(c) TypedLine.FromControl(c)).ToList(),
+            .Prices = ListBox3.Items.OfType(Of PriceEntry)().Select(Function(p) p.Clone()).ToList()}
+        Return data
+    End Function
 
-        ' Swap the old node for the new one at the same position.
-        parent.Nodes.Insert(index, data)
-        old.Remove()
+    ''' <summary>
+    ''' Reads the Departure &amp; Arrival tab. Never blocks saving: empty
+    ''' Nights / Days count as 0, and a date problem comes back as a warning
+    ''' that is shown in the status bar.
+    ''' </summary>
+    Private Function CaptureDepartureArrival(ByRef warning As String) As DepartureArrivalInfo
+        Dim nights, days As Integer
+        Integer.TryParse(txtNights.Text, nights)
+        Integer.TryParse(txtDays.Text, days)
 
-        SetCurrentVersion(data)
+        Dim info As New DepartureArrivalInfo With {
+            .Mode = If(TabControl5.SelectedTab Is tabSpecificDates,
+                       DuringFilterMode.SpecificDates, DuringFilterMode.MonthsNames),
+            .RegFromEnabled = chkRegFrom.CheckBox1.Checked, .RegFrom = chkRegFrom.lcDateTimePicker.Value,
+            .RegToEnabled = chkRegTo.CheckBox1.Checked, .RegTo = chkRegTo.lcDateTimePicker.Value,
+            .TravFromEnabled = chkTravFrom.CheckBox1.Checked, .TravFrom = chkTravFrom.lcDateTimePicker.Value,
+            .TravToEnabled = chkTravTo.CheckBox1.Checked, .TravTo = chkTravTo.lcDateTimePicker.Value,
+            .RegMonthsEnabled = chkRegMonths.CheckBox1.Checked, .RegMonths = chkRegMonths.TextBox1.Text,
+            .TravMonthsEnabled = chkTravMonths.CheckBox1.Checked, .TravMonths = chkTravMonths.TextBox1.Text,
+            .Nights = nights,
+            .Days = days}
+
+        Dim errMsg As String = CheckDates(info)
+        If errMsg <> "" Then warning = "   Note (Departure & Arrival): " & errMsg
+        Return info
+    End Function
+
+    ''' <summary>Runs the BookingSearchFilter checks; returns "" when the dates are fine.</summary>
+    Private Function CheckDates(info As DepartureArrivalInfo) As String
+        Try
+            Dim filter = BookingSearchFilter.FromForm(
+                info.Mode,
+                info.RegFromEnabled, info.RegFrom, info.RegToEnabled, info.RegTo,
+                info.TravFromEnabled, info.TravFrom, info.TravToEnabled, info.TravTo,
+                info.RegMonthsEnabled, info.RegMonths, info.TravMonthsEnabled, info.TravMonths,
+                info.Nights, info.Days)
+            Dim errMsg As String = ""
+            If filter.IsValid(errMsg) Then Return ""
+            Return errMsg
+        Catch ex As Exception
+            Return ex.Message
+        End Try
+    End Function
+
+    ''' <summary>Copies the Trip Title tab into the trip node (its text in the tree).</summary>
+    Private Sub SaveTripTitle(root As TripRootNode)
+        Dim title As String = txbxTripTitle.TextBox1.Text.Trim()
+        If title = "" Then Exit Sub   ' keep the old title rather than blank it
+        root.Title = New TitleField(txbxTripTitle.CheckBox1.Checked, title)
+        root.SubTitle = New TitleField(txbxTripSubTitle.CheckBox1.Checked, txbxTripSubTitle.TextBox1.Text)
+        root.Text = title
+    End Sub
+
+    Private Sub ShowTripTitle(root As TripRootNode)
+        txbxTripTitle.CheckBox1.Checked = root.Title.IsEnabled
+        txbxTripTitle.TextBox1.Text = root.Title.Text
+        txbxTripSubTitle.CheckBox1.Checked = root.SubTitle.IsEnabled
+        txbxTripSubTitle.TextBox1.Text = root.SubTitle.Text
+    End Sub
+
+    ' ---- what is open --------------------------------------------------------
+
+    ''' <summary>The trip open in the editor (Nothing = none).</summary>
+    Private _currentTrip As TripRootNode
+    ''' <summary>The version open in the editor (Nothing = none, e.g. a brand-new trip).</summary>
+    Private _currentVersion As TravelFormData
+
+    Private Sub SetCurrentTrip(root As TripRootNode)
+        _currentTrip = root
+        UpdateEditingHeader()
+    End Sub
+
+    ''' <summary>Opens a version (its trip becomes the open trip too); Nothing closes it.</summary>
+    Private Sub SetCurrentVersion(node As TravelFormData)
+        _currentVersion = node
+        If node IsNot Nothing Then
+            _currentTrip = TryCast(GetRootNode(node), TripRootNode)
+            TreeView1.SelectedNode = node
+        End If
+        UpdateEditingHeader()
+    End Sub
+
+    ''' <summary>True if the node is still in the tree (not deleted or cleared).</summary>
+    Private Function IsOpen(node As TreeNode) As Boolean
+        Return node IsNot Nothing AndAlso node.TreeView IsNot Nothing
+    End Function
+
+    ''' <summary>
+    ''' Shows what is open in the header bar, enables the Save buttons and
+    ''' highlights the open trip / version in the tree.
+    ''' </summary>
+    Private Sub UpdateEditingHeader()
+        If Not IsOpen(_currentTrip) Then _currentTrip = Nothing
+        If Not IsOpen(_currentVersion) Then _currentVersion = Nothing
+
+        If _currentTrip Is Nothing Then
+            lblEditing.Text = "No trip open"
+            lblEditingDetail.Text = "Create a trip on the Trip Title tab, or double-click a trip or version in the tree to open it."
+        ElseIf _currentVersion Is Nothing Then
+            lblEditing.Text = "Trip: " & _currentTrip.Text
+            lblEditingDetail.Text = "No version open yet. Fill in the tabs, then press ""Save as New Version""."
+        Else
+            lblEditing.Text = "Trip: " & _currentTrip.Text & "   " & ChrW(8250) & "   " & _currentVersion.Text
+            lblEditingDetail.Text = """Save"" writes all tabs into this version.   ""Save as New Version"" keeps it and adds a copy."
+        End If
+
+        btnSaveVersion.Enabled = (_currentTrip IsNot Nothing)
+        btnSaveAsNewVersion.Enabled = (_currentTrip IsNot Nothing)
+        btnSaveVersion.BackColor = If(btnSaveVersion.Enabled, Color.FromArgb(0, 120, 215), Color.FromArgb(160, 170, 185))
+        HighlightOpenNodes()
+    End Sub
+
+    ''' <summary>Soft amber background on the open trip / version, blue text on the open trip.</summary>
+    Private Sub HighlightOpenNodes()
+        Dim openBack As Color = Color.FromArgb(255, 236, 179)
+        For Each root As TreeNode In TreeView1.Nodes
+            root.BackColor = If(root Is _currentTrip AndAlso _currentVersion Is Nothing, openBack, Color.Empty)
+            root.ForeColor = If(root Is _currentTrip, Color.FromArgb(0, 84, 166), Color.Empty)
+            For Each child As TreeNode In root.Nodes
+                child.BackColor = If(child Is _currentVersion, openBack, Color.Empty)
+            Next
+        Next
+    End Sub
+
+    ''' <summary>Shows a short message in the status bar at the bottom of the window.</summary>
+    Private Sub SetStatus(text As String)
+        lblStatus.Text = text
     End Sub
 
     ' ---- version helpers ----------------------------------------------------
-
-    ''' <summary>The version node currently loaded into TabPage1 (Nothing = none).</summary>
-    Private _currentVersion As TravelFormData
-
-    Private Sub SetCurrentVersion(node As TravelFormData)
-        _currentVersion = node
-        btnSaveChanges.Enabled = (node IsNot Nothing)
-        If node IsNot Nothing Then TreeView1.SelectedNode = node
-    End Sub
 
     Private Function GetRootNode(node As TreeNode) As TreeNode
         While node.Parent IsNot Nothing
@@ -1491,34 +1681,24 @@ Public Class Form1
     End Function
 
     ''' <summary>
-    ''' Loads a previously saved trip back into TabPage1 — the reverse of
-    ''' Button8_Click_1, which calls SaveTabPage1Data() and adds the result
-    ''' to TreeView1 as a TravelFormData node.
+    ''' Opens a tree node in the editor: a trip shows its title, a version
+    ''' fills every tab. The older TravelOffers nodes hold no trip data and
+    ''' are ignored.
     ''' </summary>
-    ''' <param name="node">
-    ''' A TreeView1 node, e.g. TreeView1.SelectedNode. TreeView1 also holds
-    ''' TravelOffers nodes (added by ToolStripButton1_Click and the
-    ''' CitiesToolStripMenuItem/StayToolStripMenuItem/TransferToolStripMenuItem
-    ''' handlers), which are a different node type — those are simply
-    ''' ignored here since they hold no TabPage1 data to load.
-    ''' </param>
-    Private Sub LoadTabPage1DataFromTreeNode(node As TreeNode)
-        ' A trip root node: put its title / sub title back.
+    Private Sub OpenNode(node As TreeNode)
         Dim root As TripRootNode = TryCast(node, TripRootNode)
         If root IsNot Nothing Then
-            txbxTripTitle.CheckBox1.Checked = root.Title.IsEnabled
-            txbxTripTitle.TextBox1.Text = root.Title.Text
-            txbxTripSubTitle.CheckBox1.Checked = root.SubTitle.IsEnabled
-            txbxTripSubTitle.TextBox1.Text = root.SubTitle.Text
-            TabControl1.SelectedTab = TitleAndSubTitle
-            ' Working on this trip now: next SAVE VERSION goes under it.
+            ShowTripTitle(root)
             SetCurrentVersion(Nothing)
+            SetCurrentTrip(root)
             TreeView1.SelectedNode = root
+            TabControl1.SelectedTab = TitleAndSubTitle
+            SetStatus("Opened the trip """ & root.Text & """.")
             Exit Sub
         End If
 
         Dim data As TravelFormData = TryCast(node, TravelFormData)
-        If data Is Nothing Then Exit Sub ' not a saved-trip node (e.g. a TravelOffers node) — nothing to load
+        If data Is Nothing Then Exit Sub
 
         LoadTabPage1Data(data)
         Dim extras As VersionExtras = TryCast(data.Tag, VersionExtras)
@@ -1534,92 +1714,18 @@ Public Class Form1
             LoadLaces(extras.Laces)
             LoadPrices(extras.Prices)
         End If
-        SetCurrentVersion(data)   ' Save Changes now writes back into this node
-        TabControl1.SelectedTab = TabPage1
+
+        ' The trip's own title wins over the copy stored inside the version.
+        Dim trip As TripRootNode = TryCast(GetRootNode(data), TripRootNode)
+        If trip IsNot Nothing Then ShowTripTitle(trip)
+
+        SetCurrentVersion(data)   ' stays on the current tab, so versions are easy to compare
+        SetStatus("Opened """ & data.Text & """.")
     End Sub
 
     Private Sub TreeView1_NodeMouseDoubleClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseDoubleClick
         TreeView1.SelectedNode = e.Node
-        LoadTabPage1DataFromTreeNode(e.Node)
-    End Sub
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the Departure &amp; Arrival tab: stores
-    ''' TabControl5 (Specific Dates or Months Names, with all 6 fields),
-    ''' txtNights and txtDays on the version sub-node selected in TreeView1.
-    ''' The info is kept in the node's Tag as a DepartureArrivalInfo.
-    ''' </summary>
-    Private Sub btnSaveDatesToNode_Click(sender As Object, e As EventArgs) Handles btnSaveDatesToNode.Click
-        ' ---- target: a version sub-node -----------------------------------------
-        Dim node As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
-        If node Is Nothing OrElse node.Parent Is Nothing Then
-            MessageBox.Show("Select a version (a sub-node under a trip) in the tree first.")
-            Exit Sub
-        End If
-
-        ' ---- read + check the numbers ---------------------------------------------
-        Dim nights, days As Integer
-        If Not Integer.TryParse(txtNights.Text, nights) OrElse Not Integer.TryParse(txtDays.Text, days) Then
-            MessageBox.Show("Nights and Days must be whole numbers.")
-            Exit Sub
-        End If
-
-        Dim info As New DepartureArrivalInfo With {
-            .Mode = If(TabControl5.SelectedTab Is tabSpecificDates,
-                       DuringFilterMode.SpecificDates, DuringFilterMode.MonthsNames),
-            .RegFromEnabled = chkRegFrom.CheckBox1.Checked, .RegFrom = chkRegFrom.lcDateTimePicker.Value,
-            .RegToEnabled = chkRegTo.CheckBox1.Checked, .RegTo = chkRegTo.lcDateTimePicker.Value,
-            .TravFromEnabled = chkTravFrom.CheckBox1.Checked, .TravFrom = chkTravFrom.lcDateTimePicker.Value,
-            .TravToEnabled = chkTravTo.CheckBox1.Checked, .TravTo = chkTravTo.lcDateTimePicker.Value,
-            .RegMonthsEnabled = chkRegMonths.CheckBox1.Checked, .RegMonths = chkRegMonths.TextBox1.Text,
-            .TravMonthsEnabled = chkTravMonths.CheckBox1.Checked, .TravMonths = chkTravMonths.TextBox1.Text,
-            .Nights = nights,
-            .Days = days}
-
-        ' ---- same validation the existing SAVE button runs ------------------------
-        Dim filter = BookingSearchFilter.FromForm(
-            info.Mode,
-            info.RegFromEnabled, info.RegFrom, info.RegToEnabled, info.RegTo,
-            info.TravFromEnabled, info.TravFrom, info.TravToEnabled, info.TravTo,
-            info.RegMonthsEnabled, info.RegMonths, info.TravMonthsEnabled, info.TravMonths,
-            info.Nights, info.Days)
-
-        Dim errMsg As String = ""
-        If Not filter.IsValid(errMsg) Then
-            MessageBox.Show(errMsg)
-            Exit Sub
-        End If
-
-        GetExtras(node).DepartureArrival = info
-        MessageBox.Show("Departure & Arrival saved to """ & node.Text & """.")
-    End Sub
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the Travel And Layover tab: stores every
-    ''' Flight / LayOver currently in ListBox1, in order, on the version
-    ''' sub-node selected in TreeView1. Replaces whatever legs were saved there.
-    ''' </summary>
-    Private Sub btnSaveLegsToNode_Click(sender As Object, e As EventArgs) Handles btnSaveLegsToNode.Click
-        Dim node As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
-        If node Is Nothing OrElse node.Parent Is Nothing Then
-            MessageBox.Show("Select a version (a sub-node under a trip) in the tree first.")
-            Exit Sub
-        End If
-
-        If ListBox1.Items.Count = 0 AndAlso
-           MessageBox.Show("The list is empty. Save it anyway (this removes any legs saved on """ &
-                           node.Text & """)?", "Save Travel And Layover",
-                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
-            Exit Sub
-        End If
-
-        Dim legs As New List(Of Object)
-        For Each item As Object In ListBox1.Items
-            If TypeOf item Is Flight OrElse TypeOf item Is LayOver Then legs.Add(item)
-        Next
-
-        GetExtras(node).Legs = legs
-        MessageBox.Show(legs.Count & " leg(s) saved to """ & node.Text & """.")
+        OpenNode(e.Node)
     End Sub
 
     ''' <summary>
@@ -1634,69 +1740,6 @@ Public Class Form1
             ListBox1.Items.Add(leg)
         Next
     End Sub
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the Including tab: stores every
-    ''' PricingWithCheckBox row in Panel2 (text, prices, icon and its
-    ''' ticked / active state) on the version sub-node selected in TreeView1.
-    ''' </summary>
-    Private Sub btnSaveIncludingToNode_Click(sender As Object, e As EventArgs) Handles btnSaveIncludingToNode.Click
-        Dim node As TravelFormData = GetSelectedVersionNode()
-        If node Is Nothing Then Exit Sub
-
-        Dim rows = CollectPricingRows(Panel2)
-        GetExtras(node).Including = rows
-        MessageBox.Show(rows.Count & " Including row(s) saved to """ & node.Text & """.")
-    End Sub
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the Not Including tab: same as the
-    ''' Including one, for the rows in pnlNotIncluding.
-    ''' </summary>
-    Private Sub btnSaveNotIncludingToNode_Click(sender As Object, e As EventArgs) Handles btnSaveNotIncludingToNode.Click
-        Dim node As TravelFormData = GetSelectedVersionNode()
-        If node Is Nothing Then Exit Sub
-
-        Dim rows = CollectPricingRows(pnlNotIncluding)
-        GetExtras(node).NotIncluding = rows
-        MessageBox.Show(rows.Count & " Not Including row(s) saved to """ & node.Text & """.")
-    End Sub
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the Pricing Policy tab: same as the
-    ''' Including one, for the PricingWithCheckBox rows on that tab.
-    ''' </summary>
-    Private Sub btnSavePricingPolicyToNode_Click(sender As Object, e As EventArgs) Handles btnSavePricingPolicyToNode.Click
-        Dim node As TravelFormData = GetSelectedVersionNode()
-        If node Is Nothing Then Exit Sub
-
-        Dim rows = CollectPricingRows(tabPricingpolicy)
-        GetExtras(node).PricingPolicy = rows
-        MessageBox.Show(rows.Count & " Pricing Policy row(s) saved to """ & node.Text & """.")
-    End Sub
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the Additions tab: same as the
-    ''' Including one, for the PricingWithCheckBox rows on that tab.
-    ''' </summary>
-    Private Sub btnSaveAdditionsToNode_Click(sender As Object, e As EventArgs) Handles btnSaveAdditionsToNode.Click
-        Dim node As TravelFormData = GetSelectedVersionNode()
-        If node Is Nothing Then Exit Sub
-
-        Dim rows = CollectPricingRows(Additions)
-        GetExtras(node).Additions = rows
-        MessageBox.Show(rows.Count & " Additions row(s) saved to """ & node.Text & """.")
-    End Sub
-
-    ''' <summary>The version sub-node selected in TreeView1, or Nothing (with a message).</summary>
-    Private Function GetSelectedVersionNode() As TravelFormData
-        Dim node As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
-        If node Is Nothing OrElse node.Parent Is Nothing Then
-            MessageBox.Show("Select a version (a sub-node under a trip) in the tree first.")
-            Return Nothing
-        End If
-        Return node
-    End Function
 
     ''' <summary>
     ''' The PricingWithCheckBox rows directly inside a container (a panel or
@@ -1746,20 +1789,36 @@ Public Class Form1
             OrderBy(Function(b) b.Top).ToList()
     End Function
 
-    ''' <summary>
-    ''' SAVE on the TransferWays tab: writes the line boxes (text + tick)
-    ''' into the transfer type selected in TabControl4, replacing what it had.
-    ''' </summary>
+    ''' <summary>"Save Lines": stores the line boxes for the transfer type selected in TabControl4.</summary>
     Private Sub btnSaveTransferWay_Click(sender As Object, e As EventArgs) Handles btnSaveTransferWay.Click
         If TabControl4.SelectedTab Is Nothing Then Exit Sub
+        _transferWayLines(TabControl4.SelectedTab.Name) = ReadTransferBoxes()
+        SetStatus("Lines saved for this transfer type. Press ""Save"" at the top to store them in the version.")
+    End Sub
 
-        _transferWayLines(TabControl4.SelectedTab.Name) =
-            TransferWayBoxes().Select(Function(b) New DayLine With {.Enabled = b.CheckBox1.Checked, .Text = b.TextBox1.Text}).ToList()
+    ''' <summary>Leaving a transfer type keeps what was typed for it.</summary>
+    Private Sub TabControl4_Deselecting(sender As Object, e As TabControlCancelEventArgs) Handles TabControl4.Deselecting
+        If e.TabPage IsNot Nothing Then CommitTransferBoxes(e.TabPage.Name)
     End Sub
 
     ''' <summary>Switching transfer type shows that type's saved lines.</summary>
     Private Sub TabControl4_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl4.SelectedIndexChanged
         ShowTransferWayLines()
+    End Sub
+
+    Private Function ReadTransferBoxes() As List(Of DayLine)
+        Return TransferWayBoxes().Select(Function(b) New DayLine With {.Enabled = b.CheckBox1.Checked, .Text = b.TextBox1.Text}).ToList()
+    End Function
+
+    ''' <summary>
+    ''' Keeps the boxes for the given transfer type. Empty boxes are not stored
+    ''' for a type that had nothing, so just looking at a type adds nothing.
+    ''' </summary>
+    Private Sub CommitTransferBoxes(tabName As String)
+        Dim lines = ReadTransferBoxes()
+        If _transferWayLines.ContainsKey(tabName) OrElse lines.Any(Function(l) l.Enabled OrElse l.Text <> "") Then
+            _transferWayLines(tabName) = lines
+        End If
     End Sub
 
     Private Sub ShowTransferWayLines()
@@ -1778,18 +1837,6 @@ Public Class Form1
                 boxes(i).TextBox1.Text = ""
             End If
         Next
-    End Sub
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the TransferWays tab: stores the lines
-    ''' of every transfer type saved with SAVE on the selected version.
-    ''' </summary>
-    Private Sub btnSaveTransferWaysToNode_Click(sender As Object, e As EventArgs) Handles btnSaveTransferWaysToNode.Click
-        Dim node As TravelFormData = GetSelectedVersionNode()
-        If node Is Nothing Then Exit Sub
-
-        GetExtras(node).TransferWays = CopyTransferWays(_transferWayLines)
-        MessageBox.Show(_transferWayLines.Count & " transfer type(s) saved to """ & node.Text & """.")
     End Sub
 
     ''' <summary>Puts saved transfer lines back. Nothing = never saved: leave as is.</summary>
@@ -1817,19 +1864,6 @@ Public Class Form1
         Return TabPage15.Controls.OfType(Of TextBoxWithTypeAndCheckbox.TextBoxWithTypeAndCheckbox)().
             OrderBy(Function(c) c.Top).ToList()
     End Function
-
-    ''' <summary>
-    ''' "Save to Selected Version" on the Laces, Stamps, and Comments tab:
-    ''' stores every row (tick, text and type) on the selected version.
-    ''' </summary>
-    Private Sub btnSaveLacesToNode_Click(sender As Object, e As EventArgs) Handles btnSaveLacesToNode.Click
-        Dim node As TravelFormData = GetSelectedVersionNode()
-        If node Is Nothing Then Exit Sub
-
-        Dim rows = TypedLineControls().Select(Function(c) TypedLine.FromControl(c)).ToList()
-        GetExtras(node).Laces = rows
-        MessageBox.Show(rows.Count & " row(s) saved to """ & node.Text & """.")
-    End Sub
 
     Private Sub LoadLaces(rows As List(Of TypedLine))
         If rows Is Nothing Then Exit Sub
@@ -1882,16 +1916,6 @@ Public Class Form1
             End If
         Next
         cmb.SelectedIndex = -1
-    End Sub
-
-    ''' <summary>"Save to Selected Version" on the Prices tab: stores all of ListBox3.</summary>
-    Private Sub btnSavePricesToNode_Click(sender As Object, e As EventArgs) Handles btnSavePricesToNode.Click
-        Dim node As TravelFormData = GetSelectedVersionNode()
-        If node Is Nothing Then Exit Sub
-
-        Dim prices = ListBox3.Items.OfType(Of PriceEntry)().Select(Function(p) p.Clone()).ToList()
-        GetExtras(node).Prices = prices
-        MessageBox.Show(prices.Count & " price(s) saved to """ & node.Text & """.")
     End Sub
 
     Private Sub LoadPrices(prices As List(Of PriceEntry))
@@ -1974,7 +1998,7 @@ Public Class Form1
                 Using writer As New StreamWriter(dlg.FileName)
                     serializer.Serialize(writer, treeFile)
                 End Using
-                MessageBox.Show("Tree saved (" & treeFile.Trips.Count & " trip(s)).")
+                SetStatus("Tree saved to " & dlg.FileName & " (" & treeFile.Trips.Count & " trip(s)).")
             Catch ex As Exception
                 MessageBox.Show("Could not save the tree:" & vbCrLf & ex.Message)
             End Try
@@ -2017,6 +2041,7 @@ Public Class Form1
             Next
             TreeView1.ExpandAll()
             TreeView1.EndUpdate()
+            SetStatus("Loaded " & treeFile.Trips.Count & " trip(s) from " & dlg.FileName & ". Double-click a version to open it.")
         End Using
     End Sub
 
@@ -2034,6 +2059,7 @@ Public Class Form1
     Private Sub ClearTreeAndForm()
         TreeView1.Nodes.Clear()
         SetCurrentVersion(Nothing)
+        SetCurrentTrip(Nothing)
         ResetCitiesStayAttraction()
         txbxTripTitle.TextBox1.Text = ""
         txbxTripSubTitle.TextBox1.Text = ""
@@ -2118,24 +2144,14 @@ Public Class Form1
         Return v
     End Function
 
+    ''' <summary>"Check Dates": runs the date checks and reports the result.</summary>
     Private Sub BtnSaveDepartureAndArrival_Click(sender As Object, e As EventArgs) Handles btnSaveDepartureAndArrival.Click
-        Dim mode As DuringFilterMode = If(TabControl5.SelectedTab Is tabSpecificDates,
-                                           DuringFilterMode.SpecificDates,
-                                           DuringFilterMode.MonthsNames)
-
-        Dim filter = BookingSearchFilter.FromForm(
-            mode,
-            chkRegFrom.CheckBox1.Checked, chkRegFrom.lcDateTimePicker.Value,
-            chkRegTo.CheckBox1.Checked, chkRegTo.lcDateTimePicker.Value,
-            chkTravFrom.CheckBox1.Checked, chkTravFrom.lcDateTimePicker.Value,
-            chkTravTo.CheckBox1.Checked, chkTravTo.lcDateTimePicker.Value,
-            chkRegMonths.CheckBox1.Checked, chkRegMonths.TextBox1.Text,
-            chkTravMonths.CheckBox1.Checked, chkTravMonths.TextBox1.Text,
-            CInt(txtNights.Text), CInt(txtDays.Text))
-
-        Dim errMsg As String = ""
-        If Not filter.IsValid(errMsg) Then
-            MessageBox.Show(errMsg)
+        Dim warning As String = ""
+        CaptureDepartureArrival(warning)
+        If warning = "" Then
+            SetStatus("The dates look fine.")
+        Else
+            MessageBox.Show(warning.Trim(), "Check Dates", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
 
@@ -2750,7 +2766,7 @@ End Class
 
 ''' <summary>
 ''' Root node of a trip in TreeView1, created by Button8 on the
-''' "Title And Sub Title" tab. Its children are TravelFormData versions.
+''' "Trip Title" tab ("Create Trip"). Its children are TravelFormData versions.
 ''' </summary>
 Class TripRootNode
     Inherits TreeNode
