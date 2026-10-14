@@ -1,6 +1,8 @@
-﻿Imports System.IO
+Imports System.IO
 Imports ToursSimulatorNestedClass.BookingFilters
 Imports ToursSimulatorNestedClass.TravelForm.Models
+Imports System.Xml.Serialization
+
 
 Public Class Form1
     Dim CHKSTT As Integer = CheckState.Unchecked
@@ -693,7 +695,7 @@ Public Class Form1
 
 
 
-    Private Sub CmbxDepartureFrom_SelectedIndexChanged(sender As Object, e As EventArgs)
+    Private Sub CmbxDepartureFrom_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbxDepartureFrom.SelectedIndexChanged
         If cmbxDepartureFrom.ComboBox1.SelectedItem Is Nothing Then Exit Sub
         Dim countryID As String = CType(cmbxDepartureFrom.ComboBox1.SelectedItem, TextValueParent).ID
 
@@ -709,7 +711,10 @@ Public Class Form1
 
 
     Private Sub ListBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox1.SelectedIndexChanged
+        If _suppressLegLoad Then Exit Sub
         If ListBox1.SelectedItem Is Nothing Then Exit Sub
+
+        SetLoadedLeg(ListBox1.SelectedItem)   ' "Save Changes to Item" now targets this item
 
         Dim selectedItem = ListBox1.SelectedItem
         Dim F As Flight = TryCast(selectedItem, Flight)
@@ -718,7 +723,7 @@ Public Class Form1
         If F IsNot Nothing Then
             ' Switch to Flight tab in TabControl2
             TabControl3.SelectedTab = TabControl3.TabPages("TabPage8")
-            SelectRadioButtonByTag("Airplane")
+            SelectRadioButtonByTag(If(String.IsNullOrEmpty(F.TransferMean), "Airplane", F.TransferMean))
 
             ' Text fields
             txtTitle.Text = F.Title
@@ -755,6 +760,19 @@ Public Class Form1
             ' Step 3: Set Airport (list is now populated by step 2)
             SetComboByID(cmbxArrivingLocation.ComboBox1, F.ArrivalPoint)
 
+            ' --- which controls are active (their checkboxes) ---
+            cmbxDepartureFrom.CheckBox1.Checked = F.DepartureFromActive
+            cmbxDepartureCity.CheckBox1.Checked = F.DepartureCityActive
+            cmbxDepartureLocation.CheckBox1.Checked = F.DeparturePointActive
+            cmbxDepartureDate.CheckBox1.Checked = F.DepartureDateActive
+            cmbxDepartureTime.CheckBox1.Checked = F.DepartureTimeActive
+            cmbxAirLine.CheckBox1.Checked = F.AirLineActive
+            cmbxArrivingTo.CheckBox1.Checked = F.ArrivingToActive
+            cmbxArrivingCity.CheckBox1.Checked = F.ArrivalCityActive
+            cmbxArrivingLocation.CheckBox1.Checked = F.ArrivalPointActive
+            ArrivalDate.CheckBox1.Checked = F.ArrivalDateActive
+            cmbxArrivalTime.CheckBox1.Checked = F.ArrivalTimeActive
+
         ElseIf L IsNot Nothing Then
 
 
@@ -766,7 +784,7 @@ Public Class Form1
             DateTimePicker2.Value = L.DepartureDate.Add(L.DepartureTime)
             DateTimePicker3.Value = L.ArrivalDate
             DateTimePicker4.Value = L.ArrivalDate.Add(L.ArrivalTime)
-            txbxDuration.Text = L.Duration
+            MaskedTextBox1.Text = L.Duration   ' the LayOver tab's duration box
         End If
     End Sub
 
@@ -800,75 +818,126 @@ Public Class Form1
 
     Private Sub Button2_Click_1(sender As Object, e As EventArgs) Handles Button2.Click
         If TabControl3.SelectedIndex = 0 Then
-
-            Dim F As New Flight
-            F.TransferMean = getChosedTransfer()
-            SelectRadioButtonByTag(F.TransferMean)
-            F.Title = txtTitle.Text
-            F.DepartureFrom = CType(cmbxDepartureFrom.ComboBox1.SelectedItem, TextValueParent)
-            F.DepartureCity = CType(cmbxDepartureCity.ComboBox1.SelectedItem, TextValueParent)
-            F.DeparturePoint = CType(cmbxDepartureLocation.ComboBox1.SelectedItem, TextValueParent)
-            F.DepartureDate = cmbxDepartureDate.lcDateTimePicker.Value.Date
-            F.DepartureTime = TimeSpan.Parse(cmbxDepartureTime.lcTime.Value.ToString("HH:mm"))
-
-
-            F.ArrivingTo = CType(cmbxArrivingTo.ComboBox1.SelectedItem, TextValueParent)
-            F.ArrivalCity = CType(cmbxArrivingCity.ComboBox1.SelectedItem, TextValueParent)
-            F.ArrivalPoint = CType(cmbxArrivingLocation.ComboBox1.SelectedItem, TextValueParent)
-            F.ArrivalDate = ArrivalDate.lcDateTimePicker.Value.Date
-            F.ArrivalTime = TimeSpan.Parse(cmbxArrivalTime.lcTime.Value.ToString("HH:mm"))
-
-            If F.TransferMean = "Airplane" Then
-                F.AirLine = CType(cmbxAirLine.ComboBox1.SelectedItem, TextValueParent)
-            Else
-                F.AirLine = Nothing
-            End If
-
-            ' ── Calculate Duration ────────────────────────────────
-            Dim DepartureDateTime As DateTime = F.DepartureDate.Add(F.DepartureTime)
-            Dim ArrivalDateTime As DateTime = F.ArrivalDate.Add(F.ArrivalTime)
-            Dim FlightDuration As TimeSpan = ArrivalDateTime - DepartureDateTime
-
-            ' Display in MaskedTextBox1 as dd:HH:mm:ss
-            txbxDuration.Text = String.Format("{0:0}:{1:0}:{2:0}:{3:0}",
-                                    FlightDuration.Days,
-                                    FlightDuration.Hours,
-                                    FlightDuration.Minutes,
-                                    FlightDuration.Seconds)
-            ' ──────────────────────────────────────────────────────
-            F.Duration = txbxDuration.Text
-            ListBox1.Items.Add(F)
-
+            ListBox1.Items.Add(BuildFlightFromForm())
         Else
-            Dim F As New LayOver
-            F.Title = txtTitle.Text
-
-            F.DepartureDate = DateTimePicker1.Value.Date
-            F.DepartureTime = TimeSpan.Parse(DateTimePicker2.Text)
-
-            F.ArrivalDate = DateTimePicker3.Value.Date
-            F.ArrivalTime = TimeSpan.Parse(DateTimePicker4.Text)
-
-            ' ── Calculate Duration ────────────────────────────────
-            Dim DepartureDateTime As DateTime = F.DepartureDate.Add(F.DepartureTime)
-            Dim ArrivalDateTime As DateTime = F.ArrivalDate.Add(F.ArrivalTime)
-            Dim FlightDuration As TimeSpan = ArrivalDateTime - DepartureDateTime
-
-            ' Display in MaskedTextBox1 as dd:HH:mm:ss
-            MaskedTextBox1.Text = String.Format("{0:0}:{1:0}:{2:0}:{3:0}",
-                                        FlightDuration.Days,
-                                        FlightDuration.Hours,
-                                        FlightDuration.Minutes,
-                                        FlightDuration.Seconds)
-            ' ──────────────────────────────────────────────────────
-
-            F.Duration = txbxDuration.Text
-            ListBox1.Items.Add(F)
-
+            ListBox1.Items.Add(BuildLayOverFromForm())
         End If
 
+        SetLoadedLeg(Nothing)   ' fields are about to be cleared: nothing is "loaded" any more
         ResetAllFields()
     End Sub
+
+    ''' <summary>
+    ''' "Save Changes to Item": writes what is on the Move / LayOver tab back
+    ''' into the ListBox1 item that was loaded by clicking it. The item keeps
+    ''' its position and its type (a Flight stays a Flight, a LayOver stays a
+    ''' LayOver, whichever inner tab is showing).
+    ''' </summary>
+    Private Sub btnUpdateLeg_Click(sender As Object, e As EventArgs) Handles btnUpdateLeg.Click
+        Dim index As Integer = If(_loadedLeg Is Nothing, -1, ListBox1.Items.IndexOf(_loadedLeg))
+        If index < 0 Then
+            SetLoadedLeg(Nothing)
+            MessageBox.Show("No item is loaded. Click an item in the list first.")
+            Exit Sub
+        End If
+
+        Dim updated As Object
+        If TypeOf _loadedLeg Is Flight Then
+            updated = BuildFlightFromForm()
+        Else
+            updated = BuildLayOverFromForm()
+        End If
+
+        ' Replace in place without re-running the click handler's reload.
+        _suppressLegLoad = True
+        Try
+            ListBox1.Items(index) = updated
+            ListBox1.SelectedIndex = index
+        Finally
+            _suppressLegLoad = False
+        End Try
+
+        SetLoadedLeg(updated)
+    End Sub
+
+    ' ---- ListBox1 item helpers ------------------------------------------------
+
+    ''' <summary>The ListBox1 item currently loaded into the fields (Nothing = none).</summary>
+    Private _loadedLeg As Object
+    Private _suppressLegLoad As Boolean
+
+    Private Sub SetLoadedLeg(leg As Object)
+        _loadedLeg = leg
+        btnUpdateLeg.Enabled = (leg IsNot Nothing)
+    End Sub
+
+    ''' <summary>Builds a Flight from the Move tab (as the ">>" button always did).</summary>
+    Private Function BuildFlightFromForm() As Flight
+        Dim F As New Flight
+        F.TransferMean = getChosedTransfer()
+        F.Title = txtTitle.Text
+        F.DepartureFrom = CType(cmbxDepartureFrom.ComboBox1.SelectedItem, TextValueParent)
+        F.DepartureCity = CType(cmbxDepartureCity.ComboBox1.SelectedItem, TextValueParent)
+        F.DeparturePoint = CType(cmbxDepartureLocation.ComboBox1.SelectedItem, TextValueParent)
+        F.DepartureDate = cmbxDepartureDate.lcDateTimePicker.Value.Date
+        F.DepartureTime = TimeSpan.Parse(cmbxDepartureTime.lcTime.Value.ToString("HH:mm"))
+
+        F.ArrivingTo = CType(cmbxArrivingTo.ComboBox1.SelectedItem, TextValueParent)
+        F.ArrivalCity = CType(cmbxArrivingCity.ComboBox1.SelectedItem, TextValueParent)
+        F.ArrivalPoint = CType(cmbxArrivingLocation.ComboBox1.SelectedItem, TextValueParent)
+        F.ArrivalDate = ArrivalDate.lcDateTimePicker.Value.Date
+        F.ArrivalTime = TimeSpan.Parse(cmbxArrivalTime.lcTime.Value.ToString("HH:mm"))
+
+        If F.TransferMean = "Airplane" Then
+            F.AirLine = CType(cmbxAirLine.ComboBox1.SelectedItem, TextValueParent)
+        Else
+            F.AirLine = Nothing
+        End If
+
+        ' ── Duration (shown in txbxDuration as d:h:m:s) ──────────────────
+        txbxDuration.Text = FormatDuration(F.DepartureDate.Add(F.DepartureTime),
+                                           F.ArrivalDate.Add(F.ArrivalTime))
+        F.Duration = txbxDuration.Text
+
+        ' ── which controls are active (their checkboxes) ─────────────────
+        F.DepartureFromActive = cmbxDepartureFrom.CheckBox1.Checked
+        F.DepartureCityActive = cmbxDepartureCity.CheckBox1.Checked
+        F.DeparturePointActive = cmbxDepartureLocation.CheckBox1.Checked
+        F.DepartureDateActive = cmbxDepartureDate.CheckBox1.Checked
+        F.DepartureTimeActive = cmbxDepartureTime.CheckBox1.Checked
+        F.AirLineActive = cmbxAirLine.CheckBox1.Checked
+        F.ArrivingToActive = cmbxArrivingTo.CheckBox1.Checked
+        F.ArrivalCityActive = cmbxArrivingCity.CheckBox1.Checked
+        F.ArrivalPointActive = cmbxArrivingLocation.CheckBox1.Checked
+        F.ArrivalDateActive = ArrivalDate.CheckBox1.Checked
+        F.ArrivalTimeActive = cmbxArrivalTime.CheckBox1.Checked
+
+        Return F
+    End Function
+
+    ''' <summary>Builds a LayOver from the LayOver tab.</summary>
+    Private Function BuildLayOverFromForm() As LayOver
+        Dim L As New LayOver
+        L.Title = txtTitle.Text
+
+        L.DepartureDate = DateTimePicker1.Value.Date
+        L.DepartureTime = TimeSpan.Parse(DateTimePicker2.Text)
+
+        L.ArrivalDate = DateTimePicker3.Value.Date
+        L.ArrivalTime = TimeSpan.Parse(DateTimePicker4.Text)
+
+        ' ── Duration (shown in MaskedTextBox1 as d:h:m:s) ────────────────
+        MaskedTextBox1.Text = FormatDuration(L.DepartureDate.Add(L.DepartureTime),
+                                             L.ArrivalDate.Add(L.ArrivalTime))
+        L.Duration = MaskedTextBox1.Text
+
+        Return L
+    End Function
+
+    Private Function FormatDuration(fromTime As DateTime, toTime As DateTime) As String
+        Dim d As TimeSpan = toTime - fromTime
+        Return String.Format("{0:0}:{1:0}:{2:0}:{3:0}", d.Days, d.Hours, d.Minutes, d.Seconds)
+    End Function
 
     Private Function getChosedTransfer() As String
         'Dim TransferMean As String = TabControl2.SelectedTab.Name
@@ -945,10 +1014,12 @@ Public Class Form1
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         ResetAllFields()
+        SetLoadedLeg(Nothing)
     End Sub
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
         ResetAllFields()
+        SetLoadedLeg(Nothing)   ' preparing a new item, not editing a loaded one
 
         Dim lastItem = ListBox1.Items(ListBox1.Items.Count - 1)
         Dim F As Flight = TryCast(lastItem, Flight)
@@ -1102,7 +1173,7 @@ Public Class Form1
 
             For I As Integer = 1 To CInt(txtNights.Text)
                 Dim day As String = String.Format("Day {0}", I)
-                If TabControl5.SelectedTab.Name = "TabPage16" Then
+                If TabControl5.SelectedTab.Name = "tabSpecificDates" Then
                     day = day & String.Format(" (" & S.ToString("yyyy-MM-dd") & ")")
                 End If
                 ListBox2.Items.Add(day)
@@ -1183,17 +1254,151 @@ Public Class Form1
         MsgBox(GetSelectedRadioButtonTag(TabPage8))
     End Sub
 
+    ''' <summary>
+    ''' SAVE on the "Title And Sub Title" tab: adds a new ROOT node to
+    ''' TreeView1 whose text is the trip title. Destination versions are
+    ''' later added under it by btnSaveDestinations (TabPage1).
+    ''' </summary>
     Private Sub Button8_Click_1(sender As Object, e As EventArgs) Handles Button8.Click
-        Dim A As New TravelFormData
-        A = SaveTabPage1Data()
+        Dim title As String = txbxTripTitle.TextBox1.Text.Trim()
+        If title = "" Then
+            MessageBox.Show("Please enter a trip title first.")
+            txbxTripTitle.TextBox1.Focus()
+            Exit Sub
+        End If
 
+        Dim root As New TripRootNode(
+            New TitleField(txbxTripTitle.CheckBox1.Checked, title),
+            New TitleField(txbxTripSubTitle.CheckBox1.Checked, txbxTripSubTitle.TextBox1.Text))
 
-        TreeView1.Nodes.Add(A)
+        TreeView1.Nodes.Add(root)
 
+        ' New trip: nothing loaded yet, lists start empty, and the first
+        ' SAVE VERSION goes under this root.
+        SetCurrentVersion(Nothing)
         ResetCitiesStayAttraction()
-
-
+        TreeView1.SelectedNode = root
     End Sub
+
+    ''' <summary>
+    ''' SAVE VERSION on TabPage1: saves CheckedListBox1-4 as a NEW copy
+    ''' (a new version node) under the same trip root as the currently
+    ''' loaded version. If no version is loaded yet (the first one for a
+    ''' trip), it goes under the root of whatever node is selected.
+    ''' Node text = checked countries joined by ", " + " V<n>", where n is
+    ''' one more than the highest version already under that root.
+    ''' The new copy becomes the currently loaded version, so further edits
+    ''' + "Save Changes" go into it, not into the one it was copied from.
+    ''' </summary>
+    Private Sub btnSaveDestinations_Click(sender As Object, e As EventArgs) Handles btnSaveDestinations.Click
+        ' ---- which trip root? ---------------------------------------------------
+        Dim startNode As TreeNode
+        If _currentVersion IsNot Nothing AndAlso _currentVersion.TreeView IsNot Nothing Then
+            startNode = _currentVersion          ' copy of the loaded version
+        Else
+            startNode = TreeView1.SelectedNode   ' first version of a trip
+        End If
+
+        If startNode Is Nothing Then
+            MessageBox.Show("Select a trip (root node) in the tree first.")
+            Exit Sub
+        End If
+
+        Dim root As TripRootNode = TryCast(GetRootNode(startNode), TripRootNode)
+        If root Is Nothing Then
+            MessageBox.Show("The selected node is not a trip. Create one on the ""Title And Sub Title"" tab first.")
+            Exit Sub
+        End If
+
+        ' ---- save the four lists ------------------------------------------------
+        Dim data As TravelFormData = SaveTabPage1Data()
+        If data.Countries.Count = 0 Then
+            MessageBox.Show("Check at least one country first.")
+            Exit Sub
+        End If
+
+        ' ---- next version number under this root -------------------------------
+        Dim version As Integer = root.Nodes.Count + 1
+        For Each child As TreeNode In root.Nodes
+            Dim n As Integer = GetVersionNumber(child)
+            If n >= version Then version = n + 1
+        Next
+
+        data.Text = BuildVersionText(data, version)
+
+        ' A copy of the loaded version also copies its Departure & Arrival
+        ' info and its Travel And Layover legs.
+        If _currentVersion IsNot Nothing AndAlso TypeOf _currentVersion.Tag Is VersionExtras Then
+            data.Tag = DirectCast(_currentVersion.Tag, VersionExtras).Clone()
+        End If
+
+        root.Nodes.Add(data)
+        root.Expand()
+        SetCurrentVersion(data)   ' the new copy is now the one being edited
+    End Sub
+
+    ''' <summary>
+    ''' Save Changes on TabPage1: overwrites the currently loaded version
+    ''' node with what is in CheckedListBox1-4 now. Keeps its place in the
+    ''' tree and its version number; only the countries part of the text
+    ''' is refreshed.
+    ''' </summary>
+    Private Sub btnSaveChanges_Click(sender As Object, e As EventArgs) Handles btnSaveChanges.Click
+        If _currentVersion Is Nothing OrElse _currentVersion.TreeView Is Nothing Then
+            SetCurrentVersion(Nothing)
+            MessageBox.Show("No version is loaded. Double-click a version in the tree first, or use SAVE VERSION.")
+            Exit Sub
+        End If
+
+        Dim data As TravelFormData = SaveTabPage1Data()
+        If data.Countries.Count = 0 Then
+            MessageBox.Show("Check at least one country first.")
+            Exit Sub
+        End If
+
+        Dim old As TravelFormData = _currentVersion
+        Dim parent As TreeNode = old.Parent
+        Dim index As Integer = old.Index
+
+        data.Text = BuildVersionText(data, GetVersionNumber(old))
+        data.Tag = old.Tag   ' keep its Departure & Arrival info and travel legs
+
+        ' Swap the old node for the new one at the same position.
+        parent.Nodes.Insert(index, data)
+        old.Remove()
+
+        SetCurrentVersion(data)
+    End Sub
+
+    ' ---- version helpers ----------------------------------------------------
+
+    ''' <summary>The version node currently loaded into TabPage1 (Nothing = none).</summary>
+    Private _currentVersion As TravelFormData
+
+    Private Sub SetCurrentVersion(node As TravelFormData)
+        _currentVersion = node
+        btnSaveChanges.Enabled = (node IsNot Nothing)
+        If node IsNot Nothing Then TreeView1.SelectedNode = node
+    End Sub
+
+    Private Function GetRootNode(node As TreeNode) As TreeNode
+        While node.Parent IsNot Nothing
+            node = node.Parent
+        End While
+        Return node
+    End Function
+
+    ''' <summary>Reads n from a node text ending in " V&lt;n&gt;"; 0 if none.</summary>
+    Private Function GetVersionNumber(node As TreeNode) As Integer
+        Dim vPos As Integer = node.Text.LastIndexOf(" V")
+        Dim n As Integer
+        If vPos >= 0 AndAlso Integer.TryParse(node.Text.Substring(vPos + 2), n) Then Return n
+        Return 0
+    End Function
+
+    Private Function BuildVersionText(data As TravelFormData, version As Integer) As String
+        Return String.Join(", ", data.Countries.Select(Function(c) c.Name)) & " V" & version
+    End Function
 
     ''' <summary>
     ''' Loads a previously saved trip back into TabPage1 — the reverse of
@@ -1208,16 +1413,365 @@ Public Class Form1
     ''' ignored here since they hold no TabPage1 data to load.
     ''' </param>
     Private Sub LoadTabPage1DataFromTreeNode(node As TreeNode)
+        ' A trip root node: put its title / sub title back.
+        Dim root As TripRootNode = TryCast(node, TripRootNode)
+        If root IsNot Nothing Then
+            txbxTripTitle.CheckBox1.Checked = root.Title.IsEnabled
+            txbxTripTitle.TextBox1.Text = root.Title.Text
+            txbxTripSubTitle.CheckBox1.Checked = root.SubTitle.IsEnabled
+            txbxTripSubTitle.TextBox1.Text = root.SubTitle.Text
+            TabControl1.SelectedTab = TitleAndSubTitle
+            ' Working on this trip now: next SAVE VERSION goes under it.
+            SetCurrentVersion(Nothing)
+            TreeView1.SelectedNode = root
+            Exit Sub
+        End If
+
         Dim data As TravelFormData = TryCast(node, TravelFormData)
         If data Is Nothing Then Exit Sub ' not a saved-trip node (e.g. a TravelOffers node) — nothing to load
 
         LoadTabPage1Data(data)
+        Dim extras As VersionExtras = TryCast(data.Tag, VersionExtras)
+        If extras IsNot Nothing Then
+            LoadDepartureArrival(extras.DepartureArrival)
+            LoadTravelLegs(extras.Legs)
+            LoadIncluding(extras.Including)
+        End If
+        SetCurrentVersion(data)   ' Save Changes now writes back into this node
+        TabControl1.SelectedTab = TabPage1
     End Sub
 
     Private Sub TreeView1_NodeMouseDoubleClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseDoubleClick
         TreeView1.SelectedNode = e.Node
         LoadTabPage1DataFromTreeNode(e.Node)
     End Sub
+
+    ''' <summary>
+    ''' "Save to Selected Version" on the Departure &amp; Arrival tab: stores
+    ''' TabControl5 (Specific Dates or Months Names, with all 6 fields),
+    ''' txtNights and txtDays on the version sub-node selected in TreeView1.
+    ''' The info is kept in the node's Tag as a DepartureArrivalInfo.
+    ''' </summary>
+    Private Sub btnSaveDatesToNode_Click(sender As Object, e As EventArgs) Handles btnSaveDatesToNode.Click
+        ' ---- target: a version sub-node -----------------------------------------
+        Dim node As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
+        If node Is Nothing OrElse node.Parent Is Nothing Then
+            MessageBox.Show("Select a version (a sub-node under a trip) in the tree first.")
+            Exit Sub
+        End If
+
+        ' ---- read + check the numbers ---------------------------------------------
+        Dim nights, days As Integer
+        If Not Integer.TryParse(txtNights.Text, nights) OrElse Not Integer.TryParse(txtDays.Text, days) Then
+            MessageBox.Show("Nights and Days must be whole numbers.")
+            Exit Sub
+        End If
+
+        Dim info As New DepartureArrivalInfo With {
+            .Mode = If(TabControl5.SelectedTab Is tabSpecificDates,
+                       DuringFilterMode.SpecificDates, DuringFilterMode.MonthsNames),
+            .RegFromEnabled = chkRegFrom.CheckBox1.Checked, .RegFrom = chkRegFrom.lcDateTimePicker.Value,
+            .RegToEnabled = chkRegTo.CheckBox1.Checked, .RegTo = chkRegTo.lcDateTimePicker.Value,
+            .TravFromEnabled = chkTravFrom.CheckBox1.Checked, .TravFrom = chkTravFrom.lcDateTimePicker.Value,
+            .TravToEnabled = chkTravTo.CheckBox1.Checked, .TravTo = chkTravTo.lcDateTimePicker.Value,
+            .RegMonthsEnabled = chkRegMonths.CheckBox1.Checked, .RegMonths = chkRegMonths.TextBox1.Text,
+            .TravMonthsEnabled = chkTravMonths.CheckBox1.Checked, .TravMonths = chkTravMonths.TextBox1.Text,
+            .Nights = nights,
+            .Days = days}
+
+        ' ---- same validation the existing SAVE button runs ------------------------
+        Dim filter = BookingSearchFilter.FromForm(
+            info.Mode,
+            info.RegFromEnabled, info.RegFrom, info.RegToEnabled, info.RegTo,
+            info.TravFromEnabled, info.TravFrom, info.TravToEnabled, info.TravTo,
+            info.RegMonthsEnabled, info.RegMonths, info.TravMonthsEnabled, info.TravMonths,
+            info.Nights, info.Days)
+
+        Dim errMsg As String = ""
+        If Not filter.IsValid(errMsg) Then
+            MessageBox.Show(errMsg)
+            Exit Sub
+        End If
+
+        GetExtras(node).DepartureArrival = info
+        MessageBox.Show("Departure & Arrival saved to """ & node.Text & """.")
+    End Sub
+
+    ''' <summary>
+    ''' "Save to Selected Version" on the Travel And Layover tab: stores every
+    ''' Flight / LayOver currently in ListBox1, in order, on the version
+    ''' sub-node selected in TreeView1. Replaces whatever legs were saved there.
+    ''' </summary>
+    Private Sub btnSaveLegsToNode_Click(sender As Object, e As EventArgs) Handles btnSaveLegsToNode.Click
+        Dim node As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
+        If node Is Nothing OrElse node.Parent Is Nothing Then
+            MessageBox.Show("Select a version (a sub-node under a trip) in the tree first.")
+            Exit Sub
+        End If
+
+        If ListBox1.Items.Count = 0 AndAlso
+           MessageBox.Show("The list is empty. Save it anyway (this removes any legs saved on """ &
+                           node.Text & """)?", "Save Travel And Layover",
+                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Exit Sub
+        End If
+
+        Dim legs As New List(Of Object)
+        For Each item As Object In ListBox1.Items
+            If TypeOf item Is Flight OrElse TypeOf item Is LayOver Then legs.Add(item)
+        Next
+
+        GetExtras(node).Legs = legs
+        MessageBox.Show(legs.Count & " leg(s) saved to """ & node.Text & """.")
+    End Sub
+
+    ''' <summary>
+    ''' Puts saved legs back into ListBox1. Does nothing if legs is Nothing
+    ''' (this version never had legs saved).
+    ''' </summary>
+    Private Sub LoadTravelLegs(legs As List(Of Object))
+        If legs Is Nothing Then Exit Sub
+        ListBox1.Items.Clear()
+        SetLoadedLeg(Nothing)
+        For Each leg As Object In legs
+            ListBox1.Items.Add(leg)
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' "Save to Selected Version" on the Including tab: stores every
+    ''' PricingWithCheckBox row in Panel2 (text, prices, icon and its
+    ''' ticked / active state) on the version sub-node selected in TreeView1.
+    ''' Uses the same ToPricingItem() as "SAVE V1".
+    ''' </summary>
+    Private Sub btnSaveIncludingToNode_Click(sender As Object, e As EventArgs) Handles btnSaveIncludingToNode.Click
+        Dim node As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
+        If node Is Nothing OrElse node.Parent Is Nothing Then
+            MessageBox.Show("Select a version (a sub-node under a trip) in the tree first.")
+            Exit Sub
+        End If
+
+        Dim rows As New PricingItem.PricingCollection()
+        For Each ctl As Control In Panel2.Controls
+            Dim row As PricingWithCheckBox.PricingWithCheckBox = TryCast(ctl, PricingWithCheckBox.PricingWithCheckBox)
+            If row IsNot Nothing Then rows.Add(row.ToPricingItem())
+        Next
+
+        GetExtras(node).Including = rows
+        MessageBox.Show(rows.Count & " Including row(s) saved to """ & node.Text & """.")
+    End Sub
+
+    ''' <summary>
+    ''' Puts saved Including rows back into Panel2, row by row in order
+    ''' (same matching as "Load V1"). Does nothing if rows is Nothing.
+    ''' </summary>
+    Private Sub LoadIncluding(rows As PricingItem.PricingCollection)
+        If rows Is Nothing Then Exit Sub
+
+        Dim index As Integer = 0
+        For Each ctl As Control In Panel2.Controls
+            Dim row As PricingWithCheckBox.PricingWithCheckBox = TryCast(ctl, PricingWithCheckBox.PricingWithCheckBox)
+            If row Is Nothing Then Continue For
+            If index >= rows.Count Then Exit For
+            row.FromPricingItem(rows(index))
+            index += 1
+        Next
+    End Sub
+
+    ''' <summary>Returns the node's VersionExtras, creating it if needed.</summary>
+    Private Function GetExtras(node As TreeNode) As VersionExtras
+        Dim extras As VersionExtras = TryCast(node.Tag, VersionExtras)
+        If extras Is Nothing Then
+            extras = New VersionExtras()
+            node.Tag = extras
+        End If
+        Return extras
+    End Function
+
+    ''' <summary>
+    ''' Puts a saved DepartureArrivalInfo back into the Departure &amp; Arrival
+    ''' tab. Does nothing if info is Nothing (version has none saved yet).
+    ''' </summary>
+    Private Sub LoadDepartureArrival(info As DepartureArrivalInfo)
+        If info Is Nothing Then Exit Sub
+
+        TabControl5.SelectedTab = If(info.Mode = DuringFilterMode.SpecificDates, tabSpecificDates, TabPage17)
+
+        chkRegFrom.CheckBox1.Checked = info.RegFromEnabled : chkRegFrom.lcDateTimePicker.Value = info.RegFrom
+        chkRegTo.CheckBox1.Checked = info.RegToEnabled : chkRegTo.lcDateTimePicker.Value = info.RegTo
+        chkTravFrom.CheckBox1.Checked = info.TravFromEnabled : chkTravFrom.lcDateTimePicker.Value = info.TravFrom
+        chkTravTo.CheckBox1.Checked = info.TravToEnabled : chkTravTo.lcDateTimePicker.Value = info.TravTo
+
+        chkRegMonths.CheckBox1.Checked = info.RegMonthsEnabled : chkRegMonths.TextBox1.Text = info.RegMonths
+        chkTravMonths.CheckBox1.Checked = info.TravMonthsEnabled : chkTravMonths.TextBox1.Text = info.TravMonths
+
+        ' Nights before Days: setting txtDays rebuilds the Day By Day list,
+        ' which reads txtNights.
+        txtNights.Text = info.Nights.ToString()
+        txtDays.Text = info.Days.ToString()
+    End Sub
+
+    ' =========================================================================
+    '  ToolStrip1: Save Tree / Load Tree / Clear Tree
+    '  Only trips (TripRootNode) and their versions (TravelFormData) are saved.
+    '  Older TravelOffers nodes from the first toolstrip button are skipped.
+    ' =========================================================================
+
+    Private Sub tsbSaveTree_Click(sender As Object, e As EventArgs) Handles tsbSaveTree.Click
+        Dim treeFile As New TreeFileDto()
+
+        For Each n As TreeNode In TreeView1.Nodes
+            Dim root As TripRootNode = TryCast(n, TripRootNode)
+            If root Is Nothing Then Continue For
+
+            Dim trip As New TripDto With {
+                .TitleEnabled = root.Title.IsEnabled, .Title = root.Title.Text,
+                .SubTitleEnabled = root.SubTitle.IsEnabled, .SubTitle = root.SubTitle.Text}
+
+            For Each child As TreeNode In root.Nodes
+                Dim v As TravelFormData = TryCast(child, TravelFormData)
+                If v IsNot Nothing Then trip.Versions.Add(VersionToDto(v))
+            Next
+            treeFile.Trips.Add(trip)
+        Next
+
+        If treeFile.Trips.Count = 0 Then
+            MessageBox.Show("There are no trips in the tree to save.")
+            Exit Sub
+        End If
+
+        Using dlg As New SaveFileDialog With {
+                .Filter = "Trip tree (*.xml)|*.xml|All files (*.*)|*.*",
+                .FileName = "Trips.xml"}
+            If dlg.ShowDialog() <> DialogResult.OK Then Exit Sub
+
+            Try
+                Dim serializer As New XmlSerializer(GetType(TreeFileDto))
+                Using writer As New StreamWriter(dlg.FileName)
+                    serializer.Serialize(writer, treeFile)
+                End Using
+                MessageBox.Show("Tree saved (" & treeFile.Trips.Count & " trip(s)).")
+            Catch ex As Exception
+                MessageBox.Show("Could not save the tree:" & vbCrLf & ex.Message)
+            End Try
+        End Using
+    End Sub
+
+    Private Sub tsbLoadTree_Click(sender As Object, e As EventArgs) Handles tsbLoadTree.Click
+        If TreeView1.Nodes.Count > 0 AndAlso
+           MessageBox.Show("Loading will replace the current tree. Continue?", "Load Tree",
+                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Exit Sub
+        End If
+
+        Using dlg As New OpenFileDialog With {
+                .Filter = "Trip tree (*.xml)|*.xml|All files (*.*)|*.*"}
+            If dlg.ShowDialog() <> DialogResult.OK Then Exit Sub
+
+            Dim treeFile As TreeFileDto
+            Try
+                Dim serializer As New XmlSerializer(GetType(TreeFileDto))
+                Using reader As New StreamReader(dlg.FileName)
+                    treeFile = CType(serializer.Deserialize(reader), TreeFileDto)
+                End Using
+            Catch ex As Exception
+                MessageBox.Show("Could not read the tree treeFile:" & vbCrLf & ex.Message)
+                Exit Sub
+            End Try
+
+            ClearTreeAndForm()
+
+            TreeView1.BeginUpdate()
+            For Each trip As TripDto In treeFile.Trips
+                Dim root As New TripRootNode(
+                    New TitleField(trip.TitleEnabled, trip.Title),
+                    New TitleField(trip.SubTitleEnabled, trip.SubTitle))
+                For Each v As VersionDto In trip.Versions
+                    root.Nodes.Add(DtoToVersion(v))
+                Next
+                TreeView1.Nodes.Add(root)
+            Next
+            TreeView1.ExpandAll()
+            TreeView1.EndUpdate()
+        End Using
+    End Sub
+
+    Private Sub tsbClearTree_Click(sender As Object, e As EventArgs) Handles tsbClearTree.Click
+        If TreeView1.Nodes.Count = 0 Then Exit Sub
+        If MessageBox.Show("Delete the whole tree and start anew?" & vbCrLf &
+                           "Anything not saved with ""Save Tree"" will be lost.", "Clear Tree",
+                           MessageBoxButtons.YesNo, MessageBoxIcon.Warning) <> DialogResult.Yes Then
+            Exit Sub
+        End If
+        ClearTreeAndForm()
+    End Sub
+
+    ''' <summary>Empties the tree and the Title / TabPage1 fields.</summary>
+    Private Sub ClearTreeAndForm()
+        TreeView1.Nodes.Clear()
+        SetCurrentVersion(Nothing)
+        ResetCitiesStayAttraction()
+        txbxTripTitle.TextBox1.Text = ""
+        txbxTripSubTitle.TextBox1.Text = ""
+    End Sub
+
+    Private Function VersionToDto(v As TravelFormData) As VersionDto
+        Dim d As New VersionDto With {
+            .Text = v.Text,
+            .TitleEnabled = v.Title.IsEnabled, .Title = v.Title.Text,
+            .SubTitleEnabled = v.SubTitle.IsEnabled, .SubTitle = v.SubTitle.Text}
+
+        d.Countries.AddRange(v.Countries.Select(Function(c) c.Name))
+        For Each c In v.Cities
+            d.Cities.Add(New CityDto With {.Name = c.Name, .State = CInt(c.State)})
+        Next
+        d.Stays.AddRange(v.Stays.Select(Function(s) s.Name))
+        d.Attractions.AddRange(v.Attractions.Select(Function(a) a.Name))
+
+        Dim extras As VersionExtras = TryCast(v.Tag, VersionExtras)
+        If extras IsNot Nothing Then
+            If extras.DepartureArrival IsNot Nothing Then
+                d.DepartureArrival = DepartureArrivalDto.FromInfo(extras.DepartureArrival)
+            End If
+            If extras.Legs IsNot Nothing Then
+                d.LegsSaved = True
+                For Each leg As Object In extras.Legs
+                    d.Legs.Add(LegDto.FromLeg(leg))
+                Next
+            End If
+            d.Including = extras.Including
+        End If
+        Return d
+    End Function
+
+    Private Function DtoToVersion(d As VersionDto) As TravelFormData
+        Dim v As New TravelFormData()
+        v.Title = New TitleField(d.TitleEnabled, d.Title)
+        v.SubTitle = New TitleField(d.SubTitleEnabled, d.SubTitle)
+
+        For Each name As String In d.Countries
+            v.Countries.Add(New CheckListItem(name:=name, isChecked:=True))
+        Next
+        For Each c As CityDto In d.Cities
+            v.Cities.Add(New CityListItem(name:=c.Name, state:=CType(c.State, TriState)))
+        Next
+        For Each name As String In d.Stays
+            v.Stays.Add(New CheckListItem(name:=name, isChecked:=True))
+        Next
+        For Each name As String In d.Attractions
+            v.Attractions.Add(New CheckListItem(name:=name, isChecked:=True))
+        Next
+
+        If d.DepartureArrival IsNot Nothing OrElse d.LegsSaved OrElse d.Including IsNot Nothing Then
+            Dim extras As New VersionExtras()
+            If d.DepartureArrival IsNot Nothing Then extras.DepartureArrival = d.DepartureArrival.ToInfo()
+            If d.LegsSaved Then extras.Legs = d.Legs.Select(Function(l) l.ToLeg()).ToList()
+            extras.Including = d.Including
+            v.Tag = extras
+        End If
+        v.Text = d.Text
+        Return v
+    End Function
 
     Private Sub BtnSaveDepartureAndArrival_Click(sender As Object, e As EventArgs) Handles btnSaveDepartureAndArrival.Click
         Dim mode As DuringFilterMode = If(TabControl5.SelectedTab Is tabSpecificDates,
@@ -1239,6 +1793,108 @@ Public Class Form1
             MessageBox.Show(errMsg)
         End If
     End Sub
+
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
+        Dim data As New PricingItem.PricingCollection
+
+        Dim tabPage As TabPage = TabControl1.TabPages("Including") ' or TabControl1.TabPages("TabPage1")
+        Dim found As Control() = tabPage.Controls.Find("Panel2", True) ' True = search nested controls too
+        Dim pnl As Panel = CType(found(0), Panel)
+
+
+        For Each ctl As Control In pnl.Controls
+
+            If TypeOf ctl Is PricingWithCheckBox.PricingWithCheckBox Then
+                data.Add(DirectCast(ctl, PricingWithCheckBox.PricingWithCheckBox).ToPricingItem())
+            End If
+
+        Next
+
+        SavePricing("Pricing.txt", data)
+    End Sub
+
+
+
+    Public Sub SavePricing(fileName As String, pricing As PricingItem.PricingCollection)
+
+        Dim serializer As New XmlSerializer(GetType(PricingItem.PricingCollection))
+
+        Using writer As New StreamWriter(fileName)
+            serializer.Serialize(writer, pricing)
+        End Using
+
+    End Sub
+
+    Public Function LoadPricing(fileName As String) As PricingItem.PricingCollection
+
+        If Not File.Exists(fileName) Then
+            Return New PricingItem.PricingCollection()
+        End If
+
+        Dim serializer As New XmlSerializer(GetType(PricingItem.PricingCollection))
+
+        Using reader As New StreamReader(fileName)
+            Return CType(serializer.Deserialize(reader), PricingItem.PricingCollection)
+        End Using
+
+    End Function
+
+    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+        Dim pricing = LoadPricing("Pricing.txt")
+
+        Dim index As Integer = 0
+
+        Dim tabPage As TabPage = TabControl1.TabPages("Including") ' or TabControl1.TabPages("TabPage1")
+        Dim found As Control() = tabPage.Controls.Find("Panel2", True) ' True = search nested controls too
+        Dim pnl As Panel = CType(found(0), Panel)
+
+
+        For Each ctl As Control In pnl.Controls
+
+            If TypeOf ctl Is PricingWithCheckBox.PricingWithCheckBox Then
+
+                If index < pricing.Count Then
+                    DirectCast(ctl, PricingWithCheckBox.PricingWithCheckBox).FromPricingItem(pricing(index))
+                    index += 1
+                End If
+
+            End If
+
+        Next
+    End Sub
+
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
+        Dim pricing As New PricingItem.PricingCollection
+        Dim tabPage As TabPage = TabControl1.TabPages("Including") ' or TabControl1.TabPages("TabPage1")
+        Dim found As Control() = tabPage.Controls.Find("Panel2", True) ' True = search nested controls too
+        Dim pnl As Panel = CType(found(0), Panel)
+
+        For Each c As Control In pnl.Controls
+            If TypeOf c Is PricingWithCheckBox.PricingWithCheckBox Then
+                pricing.Add(DirectCast(c, PricingWithCheckBox.PricingWithCheckBox).Pricing)
+            End If
+        Next
+
+        SavePricing("Pricing.txt", pricing)
+
+    End Sub
+
+    Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
+        Dim i As Integer = 0
+        Dim pricing = LoadPricing("Pricing.txt")
+
+        Dim tabPage As TabPage = TabControl1.TabPages("Including") ' or TabControl1.TabPages("TabPage1")
+        Dim found As Control() = tabPage.Controls.Find("Panel2", True) ' True = search nested controls too
+        Dim pnl As Panel = CType(found(0), Panel)
+
+        For Each c As Control In pnl.Controls
+            If TypeOf c Is PricingWithCheckBox.PricingWithCheckBox AndAlso i < pricing.Count Then
+                DirectCast(c, PricingWithCheckBox.PricingWithCheckBox).Pricing = pricing(i)
+                i += 1
+            End If
+        Next
+
+    End Sub
 End Class
 
 Public Class Flight
@@ -1256,6 +1912,20 @@ Public Class Flight
     Public Property ArrivalDate As Date
     Public Property ArrivalTime As TimeSpan
     Public Property Duration As String = String.Empty
+
+    ' Checkbox of each control on the Move tab: True = active / included.
+    ' Default True so items made before these existed count as active.
+    Public Property DepartureFromActive As Boolean = True
+    Public Property DepartureCityActive As Boolean = True
+    Public Property DeparturePointActive As Boolean = True
+    Public Property DepartureDateActive As Boolean = True
+    Public Property DepartureTimeActive As Boolean = True
+    Public Property AirLineActive As Boolean = True
+    Public Property ArrivingToActive As Boolean = True
+    Public Property ArrivalCityActive As Boolean = True
+    Public Property ArrivalPointActive As Boolean = True
+    Public Property ArrivalDateActive As Boolean = True
+    Public Property ArrivalTimeActive As Boolean = True
 
     Public Sub New()
     End Sub
@@ -1368,6 +2038,272 @@ End Class
 
 
 
+
+' =============================================================================
+'  Save Tree file format (XML). Plain public classes so XmlSerializer can
+'  write them; converted to/from the tree nodes in Form1.
+' =============================================================================
+
+Public Class TreeFileDto
+    Public Property Trips As New List(Of TripDto)
+End Class
+
+Public Class TripDto
+    Public Property TitleEnabled As Boolean
+    Public Property Title As String = ""
+    Public Property SubTitleEnabled As Boolean
+    Public Property SubTitle As String = ""
+    Public Property Versions As New List(Of VersionDto)
+End Class
+
+Public Class VersionDto
+    Public Property Text As String = ""
+    Public Property TitleEnabled As Boolean
+    Public Property Title As String = ""
+    Public Property SubTitleEnabled As Boolean
+    Public Property SubTitle As String = ""
+    Public Property Countries As New List(Of String)
+    Public Property Cities As New List(Of CityDto)
+    Public Property Stays As New List(Of String)
+    Public Property Attractions As New List(Of String)
+    Public Property DepartureArrival As DepartureArrivalDto   ' Nothing = not saved
+    Public Property LegsSaved As Boolean                      ' False = legs never saved
+    Public Property Legs As New List(Of LegDto)
+    ' Including tab rows, same XML format as Pricing.txt (Nothing = not saved)
+    Public Property Including As PricingItem.PricingCollection
+End Class
+
+''' <summary>One Flight or LayOver from ListBox1 (Kind tells which).</summary>
+Public Class LegDto
+    Public Property Kind As String = "Flight"   ' "Flight" or "LayOver"
+    Public Property TransferMean As String = ""
+    Public Property Title As String = ""
+    Public Property DepartureFrom As TvpDto
+    Public Property DepartureCity As TvpDto
+    Public Property DeparturePoint As TvpDto
+    Public Property DepartureDate As Date
+    Public Property DepartureTimeTicks As Long   ' TimeSpan isn't XML-serializable
+    Public Property AirLine As TvpDto
+    Public Property ArrivingTo As TvpDto
+    Public Property ArrivalCity As TvpDto
+    Public Property ArrivalPoint As TvpDto
+    Public Property ArrivalDate As Date
+    Public Property ArrivalTimeTicks As Long
+    Public Property Duration As String = ""
+
+    ' Flight only: checkbox of each Move-tab control. Default True so
+    ' files saved before these existed load as all-active.
+    Public Property DepartureFromActive As Boolean = True
+    Public Property DepartureCityActive As Boolean = True
+    Public Property DeparturePointActive As Boolean = True
+    Public Property DepartureDateActive As Boolean = True
+    Public Property DepartureTimeActive As Boolean = True
+    Public Property AirLineActive As Boolean = True
+    Public Property ArrivingToActive As Boolean = True
+    Public Property ArrivalCityActive As Boolean = True
+    Public Property ArrivalPointActive As Boolean = True
+    Public Property ArrivalDateActive As Boolean = True
+    Public Property ArrivalTimeActive As Boolean = True
+
+    Public Shared Function FromLeg(leg As Object) As LegDto
+        Dim f As Flight = TryCast(leg, Flight)
+        If f IsNot Nothing Then
+            Return New LegDto With {
+                .Kind = "Flight", .TransferMean = If(f.TransferMean, ""), .Title = f.Title,
+                .DepartureFrom = TvpDto.From(f.DepartureFrom), .DepartureCity = TvpDto.From(f.DepartureCity),
+                .DeparturePoint = TvpDto.From(f.DeparturePoint),
+                .DepartureDate = f.DepartureDate, .DepartureTimeTicks = f.DepartureTime.Ticks,
+                .AirLine = TvpDto.From(f.AirLine),
+                .ArrivingTo = TvpDto.From(f.ArrivingTo), .ArrivalCity = TvpDto.From(f.ArrivalCity),
+                .ArrivalPoint = TvpDto.From(f.ArrivalPoint),
+                .ArrivalDate = f.ArrivalDate, .ArrivalTimeTicks = f.ArrivalTime.Ticks,
+                .Duration = f.Duration,
+                .DepartureFromActive = f.DepartureFromActive,
+                .DepartureCityActive = f.DepartureCityActive,
+                .DeparturePointActive = f.DeparturePointActive,
+                .DepartureDateActive = f.DepartureDateActive,
+                .DepartureTimeActive = f.DepartureTimeActive,
+                .AirLineActive = f.AirLineActive,
+                .ArrivingToActive = f.ArrivingToActive,
+                .ArrivalCityActive = f.ArrivalCityActive,
+                .ArrivalPointActive = f.ArrivalPointActive,
+                .ArrivalDateActive = f.ArrivalDateActive,
+                .ArrivalTimeActive = f.ArrivalTimeActive}
+        End If
+
+        Dim l As LayOver = DirectCast(leg, LayOver)
+        Return New LegDto With {
+            .Kind = "LayOver", .Title = l.Title,
+            .DepartureDate = l.DepartureDate, .DepartureTimeTicks = l.DepartureTime.Ticks,
+            .ArrivalDate = l.ArrivalDate, .ArrivalTimeTicks = l.ArrivalTime.Ticks,
+            .Duration = l.Duration}
+    End Function
+
+    Public Function ToLeg() As Object
+        If Kind = "LayOver" Then
+            Return New LayOver(Title, DepartureDate, New TimeSpan(DepartureTimeTicks),
+                               ArrivalDate, New TimeSpan(ArrivalTimeTicks), Duration)
+        End If
+        Dim fl As New Flight(TransferMean, Title,
+                          TvpDto.ToTvp(DepartureFrom), TvpDto.ToTvp(DepartureCity), TvpDto.ToTvp(DeparturePoint),
+                          DepartureDate, New TimeSpan(DepartureTimeTicks),
+                          TvpDto.ToTvp(AirLine),
+                          TvpDto.ToTvp(ArrivingTo), TvpDto.ToTvp(ArrivalCity), TvpDto.ToTvp(ArrivalPoint),
+                          ArrivalDate, New TimeSpan(ArrivalTimeTicks),
+                          Duration)
+        fl.DepartureFromActive = DepartureFromActive
+        fl.DepartureCityActive = DepartureCityActive
+        fl.DeparturePointActive = DeparturePointActive
+        fl.DepartureDateActive = DepartureDateActive
+        fl.DepartureTimeActive = DepartureTimeActive
+        fl.AirLineActive = AirLineActive
+        fl.ArrivingToActive = ArrivingToActive
+        fl.ArrivalCityActive = ArrivalCityActive
+        fl.ArrivalPointActive = ArrivalPointActive
+        fl.ArrivalDateActive = ArrivalDateActive
+        fl.ArrivalTimeActive = ArrivalTimeActive
+        Return fl
+    End Function
+End Class
+
+''' <summary>A TextValueParent (combo item) in the file.</summary>
+Public Class TvpDto
+    Public Property Text As String = ""
+    Public Property ID As String = ""
+    Public Property ParentID As String = ""
+
+    Public Shared Function From(t As TextValueParent) As TvpDto
+        If t Is Nothing Then Return Nothing
+        Return New TvpDto With {.Text = If(t.Text, ""), .ID = If(t.ID, ""), .ParentID = If(t.parentID, "")}
+    End Function
+
+    Public Shared Function ToTvp(d As TvpDto) As TextValueParent
+        If d Is Nothing Then Return Nothing
+        Return New TextValueParent(Text:=d.Text, ID:=d.ID, ParentID:=d.ParentID)
+    End Function
+End Class
+
+Public Class CityDto
+    Public Property Name As String = ""
+    Public Property State As Integer   ' 0 Unchecked, 1 Checked, 2 Indeterminate
+End Class
+
+Public Class DepartureArrivalDto
+    Public Property SpecificDates As Boolean   ' False = Months Names
+    Public Property RegFromEnabled As Boolean
+    Public Property RegFrom As Date
+    Public Property RegToEnabled As Boolean
+    Public Property RegTo As Date
+    Public Property TravFromEnabled As Boolean
+    Public Property TravFrom As Date
+    Public Property TravToEnabled As Boolean
+    Public Property TravTo As Date
+    Public Property RegMonthsEnabled As Boolean
+    Public Property RegMonths As String = ""
+    Public Property TravMonthsEnabled As Boolean
+    Public Property TravMonths As String = ""
+    Public Property Nights As Integer
+    Public Property Days As Integer
+
+    Friend Shared Function FromInfo(i As DepartureArrivalInfo) As DepartureArrivalDto
+        Return New DepartureArrivalDto With {
+            .SpecificDates = (i.Mode = DuringFilterMode.SpecificDates),
+            .RegFromEnabled = i.RegFromEnabled, .RegFrom = i.RegFrom,
+            .RegToEnabled = i.RegToEnabled, .RegTo = i.RegTo,
+            .TravFromEnabled = i.TravFromEnabled, .TravFrom = i.TravFrom,
+            .TravToEnabled = i.TravToEnabled, .TravTo = i.TravTo,
+            .RegMonthsEnabled = i.RegMonthsEnabled, .RegMonths = i.RegMonths,
+            .TravMonthsEnabled = i.TravMonthsEnabled, .TravMonths = i.TravMonths,
+            .Nights = i.Nights, .Days = i.Days}
+    End Function
+
+    Friend Function ToInfo() As DepartureArrivalInfo
+        Return New DepartureArrivalInfo With {
+            .Mode = If(SpecificDates, DuringFilterMode.SpecificDates, DuringFilterMode.MonthsNames),
+            .RegFromEnabled = RegFromEnabled, .RegFrom = RegFrom,
+            .RegToEnabled = RegToEnabled, .RegTo = RegTo,
+            .TravFromEnabled = TravFromEnabled, .TravFrom = TravFrom,
+            .TravToEnabled = TravToEnabled, .TravTo = TravTo,
+            .RegMonthsEnabled = RegMonthsEnabled, .RegMonths = RegMonths,
+            .TravMonthsEnabled = TravMonthsEnabled, .TravMonths = TravMonths,
+            .Nights = Nights, .Days = Days}
+    End Function
+End Class
+
+''' <summary>
+''' Extra data kept on a version node (node.Tag), next to its TabPage1 lists.
+''' Nothing in a property = that part was never saved for this version.
+''' </summary>
+Class VersionExtras
+    Public Property DepartureArrival As DepartureArrivalInfo
+    Public Property Legs As List(Of Object)   ' Flight / LayOver items from ListBox1
+    Public Property Including As PricingItem.PricingCollection   ' Including tab rows (Panel2)
+
+    Public Function Clone() As VersionExtras
+        Return New VersionExtras With {
+            .DepartureArrival = If(DepartureArrival Is Nothing, Nothing, DepartureArrival.Clone()),
+            .Legs = If(Legs Is Nothing, Nothing, New List(Of Object)(Legs)),
+            .Including = CopyPricing(Including)}
+    End Function
+
+    Private Shared Function CopyPricing(src As PricingItem.PricingCollection) As PricingItem.PricingCollection
+        If src Is Nothing Then Return Nothing
+        Dim copy As New PricingItem.PricingCollection()
+        For Each item As PricingItem.PricingItem In src
+            copy.Add(item)
+        Next
+        Return copy
+    End Function
+End Class
+
+''' <summary>
+''' Departure &amp; Arrival tab values saved on a version node:
+''' TabControl5 mode + its date / month fields, nights and days.
+''' </summary>
+Class DepartureArrivalInfo
+    Public Property Mode As DuringFilterMode
+
+    ' Specific Dates tab
+    Public Property RegFromEnabled As Boolean
+    Public Property RegFrom As Date
+    Public Property RegToEnabled As Boolean
+    Public Property RegTo As Date
+    Public Property TravFromEnabled As Boolean
+    Public Property TravFrom As Date
+    Public Property TravToEnabled As Boolean
+    Public Property TravTo As Date
+
+    ' Months Names tab
+    Public Property RegMonthsEnabled As Boolean
+    Public Property RegMonths As String = ""
+    Public Property TravMonthsEnabled As Boolean
+    Public Property TravMonths As String = ""
+
+    ' Duration
+    Public Property Nights As Integer
+    Public Property Days As Integer
+
+    Public Function Clone() As DepartureArrivalInfo
+        Return DirectCast(Me.MemberwiseClone(), DepartureArrivalInfo)
+    End Function
+End Class
+
+''' <summary>
+''' Root node of a trip in TreeView1, created by Button8 on the
+''' "Title And Sub Title" tab. Its children are TravelFormData versions.
+''' </summary>
+Class TripRootNode
+    Inherits TreeNode
+
+    Public Property Title As TitleField
+    Public Property SubTitle As TitleField
+
+    Public Sub New(title As TitleField, subTitle As TitleField)
+        Me.Title = title
+        Me.SubTitle = subTitle
+        Me.Text = title.Text
+    End Sub
+End Class
 
 Class TravelOffers
     Inherits TreeNode
