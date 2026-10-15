@@ -53,6 +53,7 @@ Public Class Form1
         LoadExtendedServicesIntoTab("Including")
         LoadExtendedServicesIntoTab("NotIncluding", "pnlNotIncluding") ' editable rows, left
         LoadServicesIntoTab("NotIncluding")                           ' old rows, right, disabled
+        LoadVendors()                                                 ' Vendor tab
         '____________________________________________________________
     End Sub
 
@@ -184,6 +185,11 @@ Public Class Form1
         If TypeOf e.Node Is TravelOffers Then
             ContextMenuStrip1.Show(TreeView1, e.Location)
         ElseIf TypeOf e.Node Is TripRootNode OrElse TypeOf e.Node Is TravelFormData Then
+            mnuDuplicateNode.Visible = TypeOf e.Node Is TravelFormData   ' versions only
+            ' Compare: shown when this version is one of 2+ Ctrl+clicked versions.
+            Dim marked As Integer = _compareSet.Where(Function(v) IsOpen(v)).Count()
+            mnuCompareText.Visible = marked >= 2 AndAlso _compareSet.Contains(TryCast(e.Node, TravelFormData))
+            mnuCompareText.Text = "Compare and Show in Text (" & marked & " versions)"
             cmsTrip.Show(TreeView1, e.Location)
         End If
     End Sub
@@ -191,6 +197,653 @@ Public Class Form1
     Private Sub mnuOpenNode_Click(sender As Object, e As EventArgs) Handles mnuOpenNode.Click
         If TreeView1.SelectedNode IsNot Nothing Then OpenNode(TreeView1.SelectedNode)
     End Sub
+
+    ''' <summary>
+    ''' "Duplicate" (right-click a version): adds an independent copy of that
+    ''' version under the same trip, with the next version number. It copies
+    ''' what is saved in the version; the tabs on screen are not touched.
+    ''' </summary>
+    Private Sub mnuDuplicateNode_Click(sender As Object, e As EventArgs) Handles mnuDuplicateNode.Click
+        Dim source As TravelFormData = TryCast(TreeView1.SelectedNode, TravelFormData)
+        If source Is Nothing OrElse source.Parent Is Nothing Then Exit Sub
+        Dim root As TreeNode = source.Parent
+
+        ' Deep copy: the same XML round trip the tree file uses, so the copy
+        ' shares no lists or items with the original.
+        Dim serializer As New XmlSerializer(GetType(VersionDto))
+        Dim xml As New StringWriter()
+        serializer.Serialize(xml, VersionToDto(source))
+        Dim copy As TravelFormData = DtoToVersion(CType(serializer.Deserialize(New StringReader(xml.ToString())), VersionDto))
+
+        Dim version As Integer = root.Nodes.Count + 1
+        For Each child As TreeNode In root.Nodes
+            Dim n As Integer = GetVersionNumber(child)
+            If n >= version Then version = n + 1
+        Next
+        copy.Text = BuildVersionText(copy, version)
+
+        root.Nodes.Add(copy)
+        root.Expand()
+        TreeView1.SelectedNode = copy
+        HighlightOpenNodes()
+        If source Is _currentVersion Then
+            SetStatus("Duplicated """ & source.Text & """ as """ & copy.Text & """ (its last saved state; unsaved changes on screen are not in the copy). Double-click it to open.")
+        Else
+            SetStatus("Duplicated """ & source.Text & """ as """ & copy.Text & """. Double-click it to open.")
+        End If
+    End Sub
+
+    ' =========================================================================
+    '  "Show in Text": the saved trip / version as readable text in Notepad
+    ' =========================================================================
+
+    ''' <summary>
+    ''' "Show in Text" (right-click a trip or version): writes the saved data
+    ''' as plain text to a .txt file in the Temp folder and opens it.
+    ''' A trip shows all its versions. Only ticked / active items are listed.
+    ''' </summary>
+    Private Sub mnuShowAsText_Click(sender As Object, e As EventArgs) Handles mnuShowAsText.Click
+        Dim node As TreeNode = TreeView1.SelectedNode
+        Dim sb As New System.Text.StringBuilder()
+        Dim fileTitle As String
+
+        Dim trip As TripRootNode = TryCast(node, TripRootNode)
+        Dim version As TravelFormData = TryCast(node, TravelFormData)
+        If trip IsNot Nothing Then
+            AppendTripHeader(sb, trip)
+            If trip.Nodes.Count = 0 Then sb.AppendLine("(This trip has no versions yet.)")
+            For Each child As TreeNode In trip.Nodes
+                Dim v As TravelFormData = TryCast(child, TravelFormData)
+                If v IsNot Nothing Then AppendVersionText(sb, v)
+            Next
+            fileTitle = trip.Text
+        ElseIf version IsNot Nothing Then
+            Dim root As TripRootNode = TryCast(GetRootNode(version), TripRootNode)
+            If root IsNot Nothing Then AppendTripHeader(sb, root)
+            AppendVersionText(sb, version)
+            fileTitle = If(root Is Nothing, "", root.Text & " - ") & version.Text
+        Else
+            Exit Sub
+        End If
+
+        If version IsNot Nothing AndAlso version Is _currentVersion Then
+            sb.AppendLine()
+            sb.AppendLine("(This is the last saved state. Changes on screen that were not saved are not included.)")
+        End If
+
+        ' File name: the title without characters Windows does not allow.
+        For Each ch As Char In Path.GetInvalidFileNameChars()
+            fileTitle = fileTitle.Replace(ch, "_"c)
+        Next
+        Dim filePath As String = Path.Combine(Path.GetTempPath(), fileTitle & ".txt")
+        Try
+            File.WriteAllText(filePath, sb.ToString(), System.Text.Encoding.UTF8)
+            Process.Start(filePath)   ' opens in the default text editor (Notepad)
+            SetStatus("Opened """ & filePath & """.")
+        Catch ex As Exception
+            MessageBox.Show("Could not create or open the text file:" & vbCrLf & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub AppendTripHeader(sb As System.Text.StringBuilder, trip As TripRootNode)
+        sb.AppendLine("Trip: " & trip.Title.Text)
+        If trip.SubTitle IsNot Nothing AndAlso trip.SubTitle.Text.Trim() <> "" Then sb.AppendLine("Sub Title: " & trip.SubTitle.Text)
+        sb.AppendLine("Only ticked / active items are listed.")
+    End Sub
+
+    ''' <summary>One version, section by section. Empty sections are left out.</summary>
+    Private Sub AppendVersionText(sb As System.Text.StringBuilder, v As TravelFormData)
+        sb.AppendLine()
+        sb.AppendLine(New String("="c, 60))
+        sb.AppendLine("Version: " & v.Text)
+        sb.AppendLine(New String("="c, 60))
+
+        ' ---- Destinations -------------------------------------------------------
+        Line(sb, "Countries", v.Countries.Select(Function(c) c.Name))
+        Line(sb, "Cities", v.Cities.Where(Function(c) c.State = TriState.Checked).Select(Function(c) c.Name))
+        Line(sb, "Cities (grey tick)", v.Cities.Where(Function(c) c.State = TriState.Indeterminate).Select(Function(c) c.Name))
+        Line(sb, "Stay", v.Stays.Select(Function(s) s.Name))
+        Line(sb, "Attractions", v.Attractions.Select(Function(a) a.Name))
+
+        Dim x As VersionExtras = TryCast(v.Tag, VersionExtras)
+        If x Is Nothing Then Exit Sub
+
+        ' ---- Departure & Arrival ----------------------------------------------------
+        Dim da As DepartureArrivalInfo = x.DepartureArrival
+        If da IsNot Nothing Then
+            Section(sb, "Departure & Arrival")
+            If da.Mode = DuringFilterMode.SpecificDates Then
+                DateRange(sb, "Registration", da.RegFromEnabled, da.RegFrom, da.RegToEnabled, da.RegTo)
+                DateRange(sb, "Travel", da.TravFromEnabled, da.TravFrom, da.TravToEnabled, da.TravTo)
+            Else
+                If da.RegMonthsEnabled AndAlso da.RegMonths.Trim() <> "" Then sb.AppendLine("Registration months: " & da.RegMonths)
+                If da.TravMonthsEnabled AndAlso da.TravMonths.Trim() <> "" Then sb.AppendLine("Travel months: " & da.TravMonths)
+            End If
+            If da.Days > 0 OrElse da.Nights > 0 Then sb.AppendLine("Duration: " & da.Days & " days / " & da.Nights & " nights")
+        End If
+
+        ' ---- Travel and layovers --------------------------------------------------------
+        If x.Legs IsNot Nothing AndAlso x.Legs.Count > 0 Then
+            Section(sb, "Travel And Layover")
+            Dim n As Integer = 0
+            For Each leg As Object In x.Legs
+                n += 1
+                Dim f As Flight = TryCast(leg, Flight)
+                Dim l As LayOver = TryCast(leg, LayOver)
+                If f IsNot Nothing Then
+                    sb.AppendLine(n & ". " & If(f.Title <> "", f.Title, "Move") & If(f.TransferMean <> "", " (" & f.TransferMean & ")", ""))
+                    Dim fromParts As New List(Of String)
+                    If f.DepartureFromActive AndAlso f.DepartureFrom IsNot Nothing Then fromParts.Add(f.DepartureFrom.Text)
+                    If f.DepartureCityActive AndAlso f.DepartureCity IsNot Nothing Then fromParts.Add(f.DepartureCity.Text)
+                    If f.DeparturePointActive AndAlso f.DeparturePoint IsNot Nothing Then fromParts.Add(f.DeparturePoint.Text)
+                    Dim toParts As New List(Of String)
+                    If f.ArrivingToActive AndAlso f.ArrivingTo IsNot Nothing Then toParts.Add(f.ArrivingTo.Text)
+                    If f.ArrivalCityActive AndAlso f.ArrivalCity IsNot Nothing Then toParts.Add(f.ArrivalCity.Text)
+                    If f.ArrivalPointActive AndAlso f.ArrivalPoint IsNot Nothing Then toParts.Add(f.ArrivalPoint.Text)
+                    If fromParts.Count > 0 Then sb.AppendLine("   From: " & String.Join(", ", fromParts) & WhenText(f.DepartureDateActive, f.DepartureDate, f.DepartureTimeActive, f.DepartureTime))
+                    If toParts.Count > 0 Then sb.AppendLine("   To:   " & String.Join(", ", toParts) & WhenText(f.ArrivalDateActive, f.ArrivalDate, f.ArrivalTimeActive, f.ArrivalTime))
+                    If f.AirLineActive AndAlso f.AirLine IsNot Nothing Then sb.AppendLine("   Operator: " & f.AirLine.Text)
+                    If f.Duration <> "" Then sb.AppendLine("   Duration: " & f.Duration)
+                ElseIf l IsNot Nothing Then
+                    sb.AppendLine(n & ". " & If(l.Title <> "", l.Title, "Layover") & " (layover)")
+                    sb.AppendLine("   From " & l.DepartureDate.ToString("yyyy-MM-dd") & " " & l.DepartureTime.ToString("hh\:mm") &
+                                  " to " & l.ArrivalDate.ToString("yyyy-MM-dd") & " " & l.ArrivalTime.ToString("hh\:mm"))
+                    If l.Duration <> "" Then sb.AppendLine("   Duration: " & l.Duration)
+                End If
+            Next
+        End If
+
+        ' ---- Day by day ----------------------------------------------------------------
+        If x.Days IsNot Nothing Then
+            Dim daysWithLines = x.Days.Where(Function(d) d.Lines.Any(Function(ln) ln.Enabled AndAlso ln.Text.Trim() <> "")).ToList()
+            If daysWithLines.Count > 0 Then
+                Section(sb, "Day By Day")
+                For Each d As DayPlan In daysWithLines
+                    sb.AppendLine(d.Title & ":")
+                    For Each ln As DayLine In d.Lines.Where(Function(l2) l2.Enabled AndAlso l2.Text.Trim() <> "")
+                        sb.AppendLine("   - " & ln.Text)
+                    Next
+                Next
+            End If
+        End If
+
+        ' ---- Service lists ------------------------------------------------------------------
+        PricingSection(sb, "Including", x.Including)
+        PricingSection(sb, "Not Including", x.NotIncluding)
+        PricingSection(sb, "Pricing Policy", x.PricingPolicy)
+        PricingSection(sb, "Additions", x.Additions)
+
+        ' ---- Transfer ways ---------------------------------------------------------------
+        If x.TransferWays IsNot Nothing Then
+            Dim used = x.TransferWays.Where(Function(kv) kv.Value.Any(Function(ln) ln.Enabled AndAlso ln.Text.Trim() <> "")).ToList()
+            If used.Count > 0 Then
+                Section(sb, "Transfer Ways")
+                For Each kv In used
+                    sb.AppendLine(TransferWayName(kv.Key) & ":")
+                    For Each ln As DayLine In kv.Value.Where(Function(l2) l2.Enabled AndAlso l2.Text.Trim() <> "")
+                        sb.AppendLine("   - " & ln.Text)
+                    Next
+                Next
+            End If
+        End If
+
+        ' ---- Laces, stamps, comments -----------------------------------------------------
+        If x.Laces IsNot Nothing Then
+            Dim rows = x.Laces.Where(Function(t) t.Enabled AndAlso t.Text.Trim() <> "").ToList()
+            If rows.Count > 0 Then
+                Section(sb, "Laces, Stamps, and Comments")
+                For Each t As TypedLine In rows
+                    sb.AppendLine("- " & If(t.TypeText.Trim() <> "", "[" & t.TypeText.Trim() & "] ", "") & t.Text)
+                Next
+            End If
+        End If
+
+        ' ---- Vendor --------------------------------------------------------------------------
+        If x.Vendor IsNot Nothing Then
+            Section(sb, "Vendor")
+            For Each ln As String In VendorLines(x.Vendor)
+                sb.AppendLine(ln)
+            Next
+        End If
+
+        ' ---- Prices --------------------------------------------------------------------------
+        If x.Prices IsNot Nothing AndAlso x.Prices.Count > 0 Then
+            Section(sb, "Prices")
+            For Each p As PriceEntry In x.Prices
+                sb.AppendLine("- " & p.Amount.ToString("#,##0.##") & " " & p.Currency)
+            Next
+        End If
+    End Sub
+
+    ''' <summary>"Label: a, b, c" — left out when there is nothing to list.</summary>
+    Private Sub Line(sb As System.Text.StringBuilder, label As String, items As IEnumerable(Of String))
+        Dim list = items.Where(Function(s) s IsNot Nothing AndAlso s.Trim() <> "").ToList()
+        If list.Count > 0 Then sb.AppendLine(label & ": " & String.Join(", ", list))
+    End Sub
+
+    Private Sub Section(sb As System.Text.StringBuilder, title As String)
+        sb.AppendLine()
+        sb.AppendLine(title)
+        sb.AppendLine(New String("-"c, title.Length))
+    End Sub
+
+    Private Sub DateRange(sb As System.Text.StringBuilder, label As String,
+                          fromOn As Boolean, fromDate As Date, toOn As Boolean, toDate As Date)
+        If Not fromOn AndAlso Not toOn Then Exit Sub
+        sb.AppendLine(label & ": " & If(fromOn, "from " & fromDate.ToString("yyyy-MM-dd") & " ", "") &
+                      If(toOn, "to " & toDate.ToString("yyyy-MM-dd"), "").TrimEnd())
+    End Sub
+
+    Private Function WhenText(dateOn As Boolean, d As Date, timeOn As Boolean, t As TimeSpan) As String
+        Dim parts As New List(Of String)
+        If dateOn Then parts.Add(d.ToString("yyyy-MM-dd"))
+        If timeOn Then parts.Add(t.ToString("hh\:mm"))
+        Return If(parts.Count = 0, "", "  (" & String.Join(" ", parts) & ")")
+    End Function
+
+    ''' <summary>Ticked rows of a pricing list: "- Title (Sub title): prices".</summary>
+    Private Sub PricingSection(sb As System.Text.StringBuilder, title As String, rows As PricingItem.PricingCollection)
+        If rows Is Nothing Then Exit Sub
+        Dim ticked = rows.Where(Function(r) r IsNot Nothing AndAlso r.Enabled AndAlso Not String.IsNullOrWhiteSpace(r.Title)).ToList()
+        If ticked.Count = 0 Then Exit Sub
+        Section(sb, title)
+        For Each r As PricingItem.PricingItem In ticked
+            Dim text As String = "- " & r.Title.Trim()
+            If r.IsSubTitleActive AndAlso Not String.IsNullOrWhiteSpace(r.SubTitle) Then text &= " (" & r.SubTitle.Trim() & ")"
+            Dim prices = If(r.Prices, New List(Of String)).Where(Function(p) Not String.IsNullOrWhiteSpace(p)).ToList()
+            If prices.Count > 0 Then text &= ": " & String.Join(", ", prices)
+            sb.AppendLine(text)
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Readable name of a Transfer Ways tab: its Text if set in the designer,
+    ''' otherwise its icon file name (e.g. "Train.jpg" -> "Train").
+    ''' </summary>
+    Private Function TransferWayName(tabName As String) As String
+        Dim page As TabPage = TabControl4.TabPages.Cast(Of TabPage)().FirstOrDefault(Function(p) p.Name = tabName)
+        If page Is Nothing Then Return tabName
+        If page.Text.Trim() <> "" Then Return page.Text.Trim()
+        If TabControl4.ImageList IsNot Nothing AndAlso page.ImageIndex >= 0 AndAlso page.ImageIndex < TabControl4.ImageList.Images.Count Then
+            Dim key As String = Path.GetFileNameWithoutExtension(TabControl4.ImageList.Images.Keys(page.ImageIndex)).Replace("_", " ")
+            Return Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(key.ToLower())
+        End If
+        Return tabName
+    End Function
+
+    ' =========================================================================
+    '  Compare: Ctrl+click versions in the tree, then right-click one of them
+    '  -> "Compare and Show in Text"
+    ' =========================================================================
+
+    ''' <summary>Versions marked with Ctrl+click for comparing, in the order they were marked.</summary>
+    Private ReadOnly _compareSet As New List(Of TravelFormData)
+
+    ''' <summary>Ctrl+click toggles a version in the compare set; a plain click clears the set.</summary>
+    Private Sub TreeView1_CompareClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseClick
+        If e.Button <> MouseButtons.Left Then Exit Sub
+        Dim v As TravelFormData = TryCast(e.Node, TravelFormData)
+
+        If (Control.ModifierKeys And Keys.Control) = Keys.Control AndAlso v IsNot Nothing Then
+            If _compareSet.Contains(v) Then _compareSet.Remove(v) Else _compareSet.Add(v)
+            If _compareSet.Count = 0 Then
+                SetStatus("No versions marked for comparing.")
+            Else
+                SetStatus(_compareSet.Count & " version(s) marked for comparing. Ctrl+click more, then right-click one of them and choose ""Compare and Show in Text"". A click without Ctrl clears the marks.")
+            End If
+            HighlightOpenNodes()
+        ElseIf _compareSet.Count > 0 Then
+            _compareSet.Clear()
+            HighlightOpenNodes()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' "Compare and Show in Text": for each section, what is the same in all
+    ''' marked versions and what each version has that is not in all of them.
+    ''' Only ticked / active items are compared, as in "Show in Text".
+    ''' </summary>
+    Private Sub mnuCompareText_Click(sender As Object, e As EventArgs) Handles mnuCompareText.Click
+        Dim versions As List(Of TravelFormData) = _compareSet.Where(Function(v) IsOpen(v)).ToList()
+        If versions.Count < 2 Then
+            MessageBox.Show("Ctrl+click at least two versions in the tree first.")
+            Exit Sub
+        End If
+
+        Dim fileTitle As String = "Compare - " & String.Join(" vs ", versions.Select(Function(v) v.Text))
+        If fileTitle.Length > 120 Then fileTitle = fileTitle.Substring(0, 120)
+        OpenTextFile(fileTitle, BuildCompareText(versions))
+    End Sub
+
+    ''' <summary>The comparison text for 2+ versions (see "Compare and Show in Text").</summary>
+    Private Function BuildCompareText(versions As List(Of TravelFormData)) As String
+        Dim names As List(Of String) = versions.Select(Function(v) VersionLabel(v)).ToList()
+        Dim data As List(Of List(Of KeyValuePair(Of String, List(Of String)))) = versions.Select(Function(v) CompareSections(v)).ToList()
+
+        Dim sb As New System.Text.StringBuilder()
+        sb.AppendLine("Comparison of " & versions.Count & " versions:")
+        For Each n As String In names
+            sb.AppendLine("  - " & n)
+        Next
+        sb.AppendLine("Only ticked / active items are compared.")
+
+        ' Section titles in the order they first appear.
+        Dim sectionTitles As New List(Of String)
+        For Each d In data
+            For Each kv In d
+                If Not sectionTitles.Contains(kv.Key) Then sectionTitles.Add(kv.Key)
+            Next
+        Next
+
+        Dim differentSections As New List(Of String)
+        For Each title As String In sectionTitles
+            ' Items of this section in each version (empty when the version has none).
+            Dim itemsPerVersion As New List(Of List(Of String))
+            For Each d In data
+                Dim found = d.FirstOrDefault(Function(kv) kv.Key = title)
+                itemsPerVersion.Add(If(found.Value, New List(Of String)))
+            Next
+            If itemsPerVersion.All(Function(l) l.Count = 0) Then Continue For
+
+            Dim common As List(Of String) = itemsPerVersion(0).
+                Where(Function(item) itemsPerVersion.All(Function(l) l.Contains(item))).Distinct().ToList()
+
+            Section(sb, title)
+            If common.Count > 0 Then
+                sb.AppendLine("Same in all:")
+                For Each item As String In common
+                    sb.AppendLine("   " & item)
+                Next
+            End If
+
+            Dim anyDifference As Boolean = itemsPerVersion.Any(Function(l) l.Any(Function(item) Not common.Contains(item)))
+            If Not anyDifference Then
+                sb.AppendLine("No differences.")
+            Else
+                differentSections.Add(title)
+                sb.AppendLine("Different:")
+                For i As Integer = 0 To versions.Count - 1
+                    Dim own = itemsPerVersion(i).Where(Function(item) Not common.Contains(item)).Distinct().ToList()
+                    sb.AppendLine("   " & names(i) & ":")
+                    If own.Count = 0 Then
+                        sb.AppendLine("      (nothing that the others lack)")
+                    Else
+                        For Each item As String In own
+                            sb.AppendLine("      + " & item)
+                        Next
+                    End If
+                Next
+            End If
+        Next
+
+        sb.AppendLine()
+        sb.AppendLine(New String("="c, 60))
+        sb.AppendLine(If(differentSections.Count = 0,
+                         "Summary: the versions are the same in every section.",
+                         "Summary: differences in " & String.Join(", ", differentSections) & "."))
+        Return sb.ToString()
+    End Function
+
+    ''' <summary>"Trip › Version", so versions of different trips can be told apart.</summary>
+    Private Function VersionLabel(v As TravelFormData) As String
+        Dim root As TripRootNode = TryCast(GetRootNode(v), TripRootNode)
+        Return If(root Is Nothing, "", root.Text & " " & ChrW(8250) & " ") & v.Text
+    End Function
+
+    ''' <summary>
+    ''' A version as sections of one-line items, ready to compare. Things that
+    ''' always differ between versions (day dates, the order of legs) are left
+    ''' out of the items so they don't show up as differences.
+    ''' </summary>
+    Private Function CompareSections(v As TravelFormData) As List(Of KeyValuePair(Of String, List(Of String)))
+        Dim result As New List(Of KeyValuePair(Of String, List(Of String)))
+        Dim add = Sub(title As String, items As IEnumerable(Of String))
+                      result.Add(New KeyValuePair(Of String, List(Of String))(title,
+                          items.Where(Function(s) Not String.IsNullOrWhiteSpace(s)).Select(Function(s) s.Trim()).ToList()))
+                  End Sub
+
+        add("Countries", v.Countries.Select(Function(c) c.Name))
+        add("Cities", v.Cities.Where(Function(c) c.State <> TriState.Unchecked).
+                Select(Function(c) c.Name & If(c.State = TriState.Indeterminate, " (grey tick)", "")))
+        add("Stay", v.Stays.Select(Function(s) s.Name))
+        add("Attractions", v.Attractions.Select(Function(a) a.Name))
+
+        Dim x As VersionExtras = TryCast(v.Tag, VersionExtras)
+        If x Is Nothing Then Return result
+
+        Dim da As DepartureArrivalInfo = x.DepartureArrival
+        If da IsNot Nothing Then
+            Dim items As New List(Of String)
+            If da.Mode = DuringFilterMode.SpecificDates Then
+                If da.RegFromEnabled OrElse da.RegToEnabled Then items.Add("Registration: " & If(da.RegFromEnabled, "from " & da.RegFrom.ToString("yyyy-MM-dd") & " ", "") & If(da.RegToEnabled, "to " & da.RegTo.ToString("yyyy-MM-dd"), ""))
+                If da.TravFromEnabled OrElse da.TravToEnabled Then items.Add("Travel: " & If(da.TravFromEnabled, "from " & da.TravFrom.ToString("yyyy-MM-dd") & " ", "") & If(da.TravToEnabled, "to " & da.TravTo.ToString("yyyy-MM-dd"), ""))
+            Else
+                If da.RegMonthsEnabled Then items.Add("Registration months: " & da.RegMonths)
+                If da.TravMonthsEnabled Then items.Add("Travel months: " & da.TravMonths)
+            End If
+            If da.Days > 0 OrElse da.Nights > 0 Then items.Add("Duration: " & da.Days & " days / " & da.Nights & " nights")
+            add("Departure & Arrival", items)
+        End If
+
+        If x.Legs IsNot Nothing Then add("Travel And Layover", x.Legs.Select(Function(l) LegSummary(l)))
+
+        If x.Days IsNot Nothing Then
+            ' "Day 3 (2026-05-01)" -> "Day 3", so a date shift alone isn't a difference.
+            add("Day By Day", x.Days.SelectMany(Function(d) d.Lines.
+                Where(Function(ln) ln.Enabled AndAlso ln.Text.Trim() <> "").
+                Select(Function(ln) d.Title.Split("("c)(0).Trim() & ": " & ln.Text)))
+        End If
+
+        add("Including", PricingItems(x.Including))
+        add("Not Including", PricingItems(x.NotIncluding))
+        add("Pricing Policy", PricingItems(x.PricingPolicy))
+        add("Additions", PricingItems(x.Additions))
+
+        If x.TransferWays IsNot Nothing Then
+            add("Transfer Ways", x.TransferWays.SelectMany(Function(kv) kv.Value.
+                Where(Function(ln) ln.Enabled AndAlso ln.Text.Trim() <> "").
+                Select(Function(ln) TransferWayName(kv.Key) & ": " & ln.Text)))
+        End If
+
+        If x.Laces IsNot Nothing Then
+            add("Laces, Stamps, and Comments", x.Laces.Where(Function(t) t.Enabled AndAlso t.Text.Trim() <> "").
+                Select(Function(t) If(t.TypeText.Trim() <> "", "[" & t.TypeText.Trim() & "] ", "") & t.Text))
+        End If
+
+        If x.Prices IsNot Nothing Then add("Prices", x.Prices.Select(Function(p) p.Amount.ToString("#,##0.##") & " " & p.Currency))
+        add("Vendor", VendorLines(x.Vendor))
+        Return result
+    End Function
+
+    ''' <summary>One travel leg on one line, using only its active fields.</summary>
+    Private Function LegSummary(leg As Object) As String
+        Dim f As Flight = TryCast(leg, Flight)
+        If f IsNot Nothing Then
+            Dim fromParts As New List(Of String), toParts As New List(Of String)
+            If f.DepartureFromActive AndAlso f.DepartureFrom IsNot Nothing Then fromParts.Add(f.DepartureFrom.Text)
+            If f.DepartureCityActive AndAlso f.DepartureCity IsNot Nothing Then fromParts.Add(f.DepartureCity.Text)
+            If f.DeparturePointActive AndAlso f.DeparturePoint IsNot Nothing Then fromParts.Add(f.DeparturePoint.Text)
+            If f.ArrivingToActive AndAlso f.ArrivingTo IsNot Nothing Then toParts.Add(f.ArrivingTo.Text)
+            If f.ArrivalCityActive AndAlso f.ArrivalCity IsNot Nothing Then toParts.Add(f.ArrivalCity.Text)
+            If f.ArrivalPointActive AndAlso f.ArrivalPoint IsNot Nothing Then toParts.Add(f.ArrivalPoint.Text)
+            Dim s As String = If(f.Title <> "", f.Title, "Move") & If(f.TransferMean <> "", " (" & f.TransferMean & ")", "")
+            If fromParts.Count > 0 OrElse toParts.Count > 0 Then s &= ": " & String.Join(", ", fromParts) & " -> " & String.Join(", ", toParts)
+            s &= WhenText(f.DepartureDateActive, f.DepartureDate, f.DepartureTimeActive, f.DepartureTime)
+            If f.AirLineActive AndAlso f.AirLine IsNot Nothing Then s &= ", operator " & f.AirLine.Text
+            If f.Duration <> "" Then s &= ", duration " & f.Duration
+            Return s
+        End If
+        Dim l As LayOver = TryCast(leg, LayOver)
+        If l IsNot Nothing Then
+            Return If(l.Title <> "", l.Title, "Layover") & " (layover): " &
+                   l.DepartureDate.ToString("yyyy-MM-dd") & " " & l.DepartureTime.ToString("hh\:mm") & " to " &
+                   l.ArrivalDate.ToString("yyyy-MM-dd") & " " & l.ArrivalTime.ToString("hh\:mm") &
+                   If(l.Duration <> "", ", duration " & l.Duration, "")
+        End If
+        Return ""
+    End Function
+
+    ''' <summary>Ticked rows of a pricing list as "Title (Sub title): prices".</summary>
+    Private Function PricingItems(rows As PricingItem.PricingCollection) As IEnumerable(Of String)
+        If rows Is Nothing Then Return New List(Of String)
+        Return rows.Where(Function(r) r IsNot Nothing AndAlso r.Enabled AndAlso Not String.IsNullOrWhiteSpace(r.Title)).
+            Select(Function(r)
+                       Dim text As String = r.Title.Trim()
+                       If r.IsSubTitleActive AndAlso Not String.IsNullOrWhiteSpace(r.SubTitle) Then text &= " (" & r.SubTitle.Trim() & ")"
+                       Dim prices = If(r.Prices, New List(Of String)).Where(Function(p) Not String.IsNullOrWhiteSpace(p)).ToList()
+                       If prices.Count > 0 Then text &= ": " & String.Join(", ", prices)
+                       Return text
+                   End Function).ToList()
+    End Function
+
+    ''' <summary>Writes text to a .txt in the Temp folder and opens it in the default editor.</summary>
+    Private Sub OpenTextFile(fileTitle As String, text As String)
+        For Each ch As Char In Path.GetInvalidFileNameChars()
+            fileTitle = fileTitle.Replace(ch, "_"c)
+        Next
+        Dim filePath As String = Path.Combine(Path.GetTempPath(), fileTitle & ".txt")
+        Try
+            File.WriteAllText(filePath, text, System.Text.Encoding.UTF8)
+            Process.Start(filePath)
+            SetStatus("Opened """ & filePath & """.")
+        Catch ex As Exception
+            MessageBox.Show("Could not create or open the text file:" & vbCrLf & ex.Message)
+        End Try
+    End Sub
+
+    ' =========================================================================
+    '  Vendor tab: radio-button list of the Vendors table, search, details
+    ' =========================================================================
+
+    ''' <summary>All vendors read from the Vendors table (sorted by name).</summary>
+    Private _vendors As New List(Of VendorInfo)
+    ''' <summary>The vendor chosen on the Vendor tab (Nothing = none).</summary>
+    Private _selectedVendor As VendorInfo
+
+    ''' <summary>Reads the Vendors table and builds the radio-button list.</summary>
+    Private Sub LoadVendors()
+        Try
+            Dim dt As DataTable = GetDataTable("SELECT * FROM Vendors")
+            _vendors = dt.Rows.Cast(Of DataRow)().Select(Function(r) VendorInfo.FromRow(r)).
+                OrderBy(Function(v) v.DisplayName, StringComparer.CurrentCultureIgnoreCase).ToList()
+        Catch ex As Exception
+            _vendors = New List(Of VendorInfo)
+            lblVendorCount.Text = "Could not read the Vendors table: " & ex.Message
+            Exit Sub
+        End Try
+        FillVendorList()
+    End Sub
+
+    Private Sub FillVendorList()
+        pnlVendorList.SuspendLayout()
+        pnlVendorList.Controls.Clear()
+        For Each v As VendorInfo In _vendors
+            Dim rb As New RadioButton With {
+                .AutoSize = True, .Text = v.DisplayName, .Tag = v,
+                .Font = New Font("Segoe UI", 9.75!), .Margin = New Padding(3, 2, 3, 2)}
+            AddHandler rb.CheckedChanged, AddressOf VendorRadio_CheckedChanged
+            pnlVendorList.Controls.Add(rb)
+        Next
+        pnlVendorList.ResumeLayout()
+        ApplyVendorFilter()
+        MarkSelectedVendorRadio()
+    End Sub
+
+    Private Sub txtVendorSearch_TextChanged(sender As Object, e As EventArgs) Handles txtVendorSearch.TextChanged
+        ApplyVendorFilter()
+    End Sub
+
+    ''' <summary>Shows only the vendors whose English or Arabic name (or ID) contains the search text.</summary>
+    Private Sub ApplyVendorFilter()
+        Dim q As String = txtVendorSearch.Text.Trim()
+        Dim shown As Integer = 0
+        pnlVendorList.SuspendLayout()
+        For Each rb As RadioButton In pnlVendorList.Controls.OfType(Of RadioButton)()
+            Dim v As VendorInfo = DirectCast(rb.Tag, VendorInfo)
+            Dim match As Boolean = q = "" OrElse
+                v.TitleEn.IndexOf(q, StringComparison.CurrentCultureIgnoreCase) >= 0 OrElse
+                v.TitleAr.IndexOf(q, StringComparison.CurrentCultureIgnoreCase) >= 0 OrElse
+                v.Id = q
+            rb.Visible = match OrElse rb.Checked   ' keep the chosen one visible
+            If rb.Visible Then shown += 1
+        Next
+        pnlVendorList.ResumeLayout()
+        lblVendorCount.Text = If(q = "", _vendors.Count & " vendor(s)", shown & " of " & _vendors.Count & " vendor(s) match")
+    End Sub
+
+    Private Sub VendorRadio_CheckedChanged(sender As Object, e As EventArgs)
+        Dim rb As RadioButton = DirectCast(sender, RadioButton)
+        If Not rb.Checked Then Exit Sub
+        _selectedVendor = DirectCast(rb.Tag, VendorInfo).Clone()
+        ShowVendorFields(_selectedVendor)
+    End Sub
+
+    ''' <summary>Chooses a vendor (Nothing = none): ticks its radio button and shows its fields.</summary>
+    Private Sub SelectVendor(v As VendorInfo)
+        _selectedVendor = If(v Is Nothing, Nothing, v.Clone())
+        MarkSelectedVendorRadio()
+        ShowVendorFields(_selectedVendor)
+    End Sub
+
+    Private Sub MarkSelectedVendorRadio()
+        For Each rb As RadioButton In pnlVendorList.Controls.OfType(Of RadioButton)()
+            Dim isIt As Boolean = _selectedVendor IsNot Nothing AndAlso DirectCast(rb.Tag, VendorInfo).Id = _selectedVendor.Id
+            If rb.Checked <> isIt Then rb.Checked = isIt
+            If isIt Then rb.Visible = True : pnlVendorList.ScrollControlIntoView(rb)
+        Next
+    End Sub
+
+    Private Sub ShowVendorFields(v As VendorInfo)
+        If v Is Nothing Then v = New VendorInfo()
+        txtVendorID.Text = v.Id
+        txtVendorTitleAr.Text = v.TitleAr
+        txtVendorTitleEn.Text = v.TitleEn
+        txtVendorNationality.Text = v.Nationality
+        txtVendorarNationality.Text = v.ArNationality
+        txtVendorInstegram.Text = v.Instagram
+        txtVendorWebSite.Text = v.WebSite
+        txtVendorContact1.Text = v.Contact1
+        txtVendorContact2.Text = v.Contact2
+        txtVendorContact3.Text = v.Contact3
+        txtVendorWhatsapp1.Text = v.Whatsapp1
+        txtVendorWhatsapp2.Text = v.Whatsapp2
+        txtVendorWhatsapp3.Text = v.Whatsapp3
+    End Sub
+
+    ''' <summary>"Save" on the Vendor tab: stores the chosen vendor in the open version only.</summary>
+    Private Sub btnSaveVendor_Click(sender As Object, e As EventArgs) Handles btnSaveVendor.Click
+        If Not IsOpen(_currentVersion) Then
+            MessageBox.Show("No version is open. Double-click a version in the tree first" &
+                            If(IsOpen(_currentTrip), ", or press ""Save as New Version"".", "."))
+            Exit Sub
+        End If
+        GetExtras(_currentVersion).Vendor = If(_selectedVendor Is Nothing, Nothing, _selectedVendor.Clone())
+        SetStatus(If(_selectedVendor Is Nothing,
+                     "Vendor removed from """ & _currentVersion.Text & """.",
+                     "Vendor """ & _selectedVendor.DisplayName & """ saved to """ & _currentVersion.Text & """."))
+    End Sub
+
+    Private Sub btnClearVendor_Click(sender As Object, e As EventArgs) Handles btnClearVendor.Click
+        SelectVendor(Nothing)
+        SetStatus("No vendor selected. Press Save to remove the vendor from the open version.")
+    End Sub
+
+    ''' <summary>The vendor as text lines, for "Show in Text" and "Compare".</summary>
+    Private Function VendorLines(v As VendorInfo) As List(Of String)
+        Dim lines As New List(Of String)
+        If v Is Nothing Then Return lines
+        lines.Add("Vendor: " & v.DisplayName & If(v.Id <> "", " (ID " & v.Id & ")", ""))
+        Dim add = Sub(label As String, value As String)
+                      If Not String.IsNullOrWhiteSpace(value) Then lines.Add(label & ": " & value.Trim())
+                  End Sub
+        add("Nationality", v.Nationality)
+        add("Nationality (Arabic)", v.ArNationality)
+        add("Instagram", v.Instagram)
+        add("Website", v.WebSite)
+        add("Contact 1", v.Contact1) : add("Contact 2", v.Contact2) : add("Contact 3", v.Contact3)
+        add("WhatsApp 1", v.Whatsapp1) : add("WhatsApp 2", v.Whatsapp2) : add("WhatsApp 3", v.Whatsapp3)
+        Return lines
+    End Function
 
     Private Sub mnuDeleteNode_Click(sender As Object, e As EventArgs) Handles mnuDeleteNode.Click
         DeleteNode(TreeView1.SelectedNode)
@@ -1526,7 +2179,8 @@ Public Class Form1
             .Additions = CollectPricingRows(Additions),
             .TransferWays = CopyTransferWays(_transferWayLines),
             .Laces = TypedLineControls().Select(Function(c) TypedLine.FromControl(c)).ToList(),
-            .Prices = ListBox3.Items.OfType(Of PriceEntry)().Select(Function(p) p.Clone()).ToList()}
+            .Prices = ListBox3.Items.OfType(Of PriceEntry)().Select(Function(p) p.Clone()).ToList(),
+            .Vendor = If(_selectedVendor Is Nothing, Nothing, _selectedVendor.Clone())}
         Return data
     End Function
 
@@ -1624,6 +2278,7 @@ Public Class Form1
     Private Sub UpdateEditingHeader()
         If Not IsOpen(_currentTrip) Then _currentTrip = Nothing
         If Not IsOpen(_currentVersion) Then _currentVersion = Nothing
+        _compareSet.RemoveAll(Function(v) Not IsOpen(v))   ' deleted / cleared versions
 
         If _currentTrip Is Nothing Then
             lblEditing.Text = "No trip open"
@@ -1649,7 +2304,12 @@ Public Class Form1
             root.BackColor = If(root Is _currentTrip AndAlso _currentVersion Is Nothing, openBack, Color.Empty)
             root.ForeColor = If(root Is _currentTrip, Color.FromArgb(0, 84, 166), Color.Empty)
             For Each child As TreeNode In root.Nodes
-                child.BackColor = If(child Is _currentVersion, openBack, Color.Empty)
+                Dim v As TravelFormData = TryCast(child, TravelFormData)
+                If v IsNot Nothing AndAlso _compareSet.Contains(v) Then
+                    child.BackColor = Color.FromArgb(204, 228, 255)   ' marked for comparing (light blue)
+                Else
+                    child.BackColor = If(child Is _currentVersion, openBack, Color.Empty)
+                End If
             Next
         Next
     End Sub
@@ -1714,6 +2374,7 @@ Public Class Form1
             LoadLaces(extras.Laces)
             LoadPrices(extras.Prices)
         End If
+        SelectVendor(If(extras Is Nothing, Nothing, extras.Vendor))   ' no vendor saved = none selected
 
         ' The trip's own title wins over the copy stored inside the version.
         Dim trip As TripRootNode = TryCast(GetRootNode(data), TripRootNode)
@@ -2100,6 +2761,7 @@ Public Class Form1
             End If
             d.Laces = extras.Laces
             d.Prices = extras.Prices
+            d.Vendor = extras.Vendor
         End If
         Return d
     End Function
@@ -2124,7 +2786,7 @@ Public Class Form1
 
         If d.DepartureArrival IsNot Nothing OrElse d.LegsSaved OrElse d.Including IsNot Nothing OrElse d.NotIncluding IsNot Nothing OrElse d.Days IsNot Nothing _
            OrElse d.PricingPolicy IsNot Nothing OrElse d.Additions IsNot Nothing _
-           OrElse d.TransferWays IsNot Nothing OrElse d.Laces IsNot Nothing OrElse d.Prices IsNot Nothing Then
+           OrElse d.TransferWays IsNot Nothing OrElse d.Laces IsNot Nothing OrElse d.Prices IsNot Nothing OrElse d.Vendor IsNot Nothing Then
             Dim extras As New VersionExtras()
             If d.DepartureArrival IsNot Nothing Then extras.DepartureArrival = d.DepartureArrival.ToInfo()
             If d.LegsSaved Then extras.Legs = d.Legs.Select(Function(l) l.ToLeg()).ToList()
@@ -2138,6 +2800,7 @@ Public Class Form1
             End If
             extras.Laces = d.Laces
             extras.Prices = d.Prices
+            extras.Vendor = d.Vendor
             v.Tag = extras
         End If
         v.Text = d.Text
@@ -2439,6 +3102,7 @@ Public Class VersionDto
     Public Property TransferWays As List(Of TransferWayDto)   ' Nothing = not saved
     Public Property Laces As List(Of TypedLine)
     Public Property Prices As List(Of PriceEntry)
+    Public Property Vendor As VendorInfo
 End Class
 
 ''' <summary>One Flight or LayOver from ListBox1 (Kind tells which).</summary>
@@ -2598,6 +3262,59 @@ Public Class DepartureArrivalDto
     End Function
 End Class
 
+''' <summary>
+''' One row of the Vendors table, as kept in a version (a copy, so the trip
+''' still shows the vendor details it was saved with).
+''' </summary>
+Public Class VendorInfo
+    Public Property Id As String = ""
+    Public Property TitleAr As String = ""
+    Public Property TitleEn As String = ""
+    Public Property Nationality As String = ""
+    Public Property ArNationality As String = ""
+    Public Property Instagram As String = ""
+    Public Property WebSite As String = ""
+    Public Property Contact1 As String = ""
+    Public Property Contact2 As String = ""
+    Public Property Contact3 As String = ""
+    Public Property Whatsapp1 As String = ""
+    Public Property Whatsapp2 As String = ""
+    Public Property Whatsapp3 As String = ""
+
+    ''' <summary>"English name (Arabic name)", or whichever exists.</summary>
+    Public ReadOnly Property DisplayName As String
+        Get
+            If TitleEn.Trim() <> "" AndAlso TitleAr.Trim() <> "" Then Return TitleEn.Trim() & "  (" & TitleAr.Trim() & ")"
+            If TitleEn.Trim() <> "" Then Return TitleEn.Trim()
+            If TitleAr.Trim() <> "" Then Return TitleAr.Trim()
+            Return "Vendor " & Id
+        End Get
+    End Property
+
+    Friend Shared Function FromRow(r As DataRow) As VendorInfo
+        Return New VendorInfo With {
+            .Id = Col(r, "ID"), .TitleAr = Col(r, "TitleAr"), .TitleEn = Col(r, "TitleEn"),
+            .Nationality = Col(r, "Nationality"), .ArNationality = Col(r, "arNationality"),
+            .Instagram = Col(r, "Instegram"), .WebSite = Col(r, "WebSite"),
+            .Contact1 = Col(r, "Contact1"), .Contact2 = Col(r, "Contact2"), .Contact3 = Col(r, "Contact3"),
+            .Whatsapp1 = Col(r, "Whatsapp1"), .Whatsapp2 = Col(r, "Whatsapp2"), .Whatsapp3 = Col(r, "Whatsapp3")}
+    End Function
+
+    ''' <summary>Column value as text; "" when the column is missing or empty.</summary>
+    Private Shared Function Col(r As DataRow, name As String) As String
+        If Not r.Table.Columns.Contains(name) OrElse IsDBNull(r(name)) Then Return ""
+        Return r(name).ToString().Trim()
+    End Function
+
+    Public Function Clone() As VendorInfo
+        Return DirectCast(Me.MemberwiseClone(), VendorInfo)
+    End Function
+
+    Public Overrides Function ToString() As String
+        Return DisplayName
+    End Function
+End Class
+
 ''' <summary>One row of the Prices tab (ListBox3).</summary>
 Public Class PriceEntry
     Public Property Amount As Double
@@ -2706,6 +3423,7 @@ Class VersionExtras
     Public Property TransferWays As Dictionary(Of String, List(Of DayLine))   ' per TabControl4 page
     Public Property Laces As List(Of TypedLine)   ' Laces, Stamps, and Comments rows
     Public Property Prices As List(Of PriceEntry)   ' Prices tab (ListBox3)
+    Public Property Vendor As VendorInfo   ' Vendor tab (Nothing = no vendor)
 
     Public Function Clone() As VersionExtras
         Return New VersionExtras With {
@@ -2719,7 +3437,8 @@ Class VersionExtras
             .TransferWays = Form1.CopyTransferWays(TransferWays),
             .Laces = If(Laces Is Nothing, Nothing, Laces.Select(Function(l) New TypedLine With {
                 .Enabled = l.Enabled, .Text = l.Text, .TypeText = l.TypeText, .TypeIndex = l.TypeIndex}).ToList()),
-            .Prices = If(Prices Is Nothing, Nothing, Prices.Select(Function(p) p.Clone()).ToList())}
+            .Prices = If(Prices Is Nothing, Nothing, Prices.Select(Function(p) p.Clone()).ToList()),
+            .Vendor = If(Vendor Is Nothing, Nothing, Vendor.Clone())}
     End Function
 
     Private Shared Function CopyPricing(src As PricingItem.PricingCollection) As PricingItem.PricingCollection
