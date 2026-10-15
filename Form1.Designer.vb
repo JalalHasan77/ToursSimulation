@@ -24,34 +24,38 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
+        Me.lnkAddAttraction = New System.Windows.Forms.LinkLabel()
+        Me.lnkAddStay = New System.Windows.Forms.LinkLabel()
+        Me.lnkAddCity = New System.Windows.Forms.LinkLabel()
+        Me.lnkAddCountry = New System.Windows.Forms.LinkLabel()
+        Me.txtVendorWhatsapp3 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorWhatsapp2 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorWhatsapp1 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorContact3 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorContact2 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorContact1 = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorWebSite = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorInstegram = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorarNationality = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorNationality = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorTitleEn = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorTitleAr = New TextBoxWithCheckBox.TextBoxWithCheckBox()
+        Me.txtVendorID = New TextBoxWithCheckBox.TextBoxWithCheckBox()
         Me.lblVendorHint = New System.Windows.Forms.Label()
         Me.btnClearVendor = New System.Windows.Forms.Button()
         Me.btnSaveVendor = New System.Windows.Forms.Button()
-        Me.txtVendorWhatsapp3 = New System.Windows.Forms.TextBox()
         Me.lblVendorWhatsapp3 = New System.Windows.Forms.Label()
-        Me.txtVendorWhatsapp2 = New System.Windows.Forms.TextBox()
         Me.lblVendorWhatsapp2 = New System.Windows.Forms.Label()
-        Me.txtVendorWhatsapp1 = New System.Windows.Forms.TextBox()
         Me.lblVendorWhatsapp1 = New System.Windows.Forms.Label()
-        Me.txtVendorContact3 = New System.Windows.Forms.TextBox()
         Me.lblVendorContact3 = New System.Windows.Forms.Label()
-        Me.txtVendorContact2 = New System.Windows.Forms.TextBox()
         Me.lblVendorContact2 = New System.Windows.Forms.Label()
-        Me.txtVendorContact1 = New System.Windows.Forms.TextBox()
         Me.lblVendorContact1 = New System.Windows.Forms.Label()
-        Me.txtVendorWebSite = New System.Windows.Forms.TextBox()
         Me.lblVendorWebSite = New System.Windows.Forms.Label()
-        Me.txtVendorInstegram = New System.Windows.Forms.TextBox()
         Me.lblVendorInstegram = New System.Windows.Forms.Label()
-        Me.txtVendorarNationality = New System.Windows.Forms.TextBox()
         Me.lblVendorarNationality = New System.Windows.Forms.Label()
-        Me.txtVendorNationality = New System.Windows.Forms.TextBox()
         Me.lblVendorNationality = New System.Windows.Forms.Label()
-        Me.txtVendorTitleEn = New System.Windows.Forms.TextBox()
         Me.lblVendorTitleEn = New System.Windows.Forms.Label()
-        Me.txtVendorTitleAr = New System.Windows.Forms.TextBox()
         Me.lblVendorTitleAr = New System.Windows.Forms.Label()
-        Me.txtVendorID = New System.Windows.Forms.TextBox()
         Me.lblVendorID = New System.Windows.Forms.Label()
         Me.lblVendorDetails = New System.Windows.Forms.Label()
         Me.lblVendorCount = New System.Windows.Forms.Label()
@@ -641,6 +645,10 @@ Partial Class Form1
         Me.TabPage1.Controls.Add(Me.Label5)
         Me.TabPage1.Controls.Add(Me.Label6)
         Me.TabPage1.Controls.Add(Me.lblCountries)
+        Me.TabPage1.Controls.Add(Me.lnkAddCountry)
+        Me.TabPage1.Controls.Add(Me.lnkAddCity)
+        Me.TabPage1.Controls.Add(Me.lnkAddStay)
+        Me.TabPage1.Controls.Add(Me.lnkAddAttraction)
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
@@ -2687,7 +2695,7 @@ Partial Class Form1
         Me.mnuCompareText.Font = New System.Drawing.Font("Segoe UI", 9!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.mnuCompareText.Name = "mnuCompareText"
         Me.mnuCompareText.Size = New System.Drawing.Size(260, 22)
-        Me.mnuCompareText.Text = "Compare and Show in Text"
+        Me.mnuCompareText.Text = "Compare and Show"
         Me.mnuCompareText.Visible = False
         '
         'tabVendor
@@ -2698,34 +2706,34 @@ Partial Class Form1
         Me.tabVendor.Controls.Add(Me.lblVendorCount)
         Me.tabVendor.Controls.Add(Me.lblVendorDetails)
         Me.tabVendor.Controls.Add(Me.lblVendorID)
-        Me.tabVendor.Controls.Add(Me.txtVendorID)
         Me.tabVendor.Controls.Add(Me.lblVendorTitleAr)
-        Me.tabVendor.Controls.Add(Me.txtVendorTitleAr)
         Me.tabVendor.Controls.Add(Me.lblVendorTitleEn)
-        Me.tabVendor.Controls.Add(Me.txtVendorTitleEn)
         Me.tabVendor.Controls.Add(Me.lblVendorNationality)
-        Me.tabVendor.Controls.Add(Me.txtVendorNationality)
         Me.tabVendor.Controls.Add(Me.lblVendorarNationality)
-        Me.tabVendor.Controls.Add(Me.txtVendorarNationality)
         Me.tabVendor.Controls.Add(Me.lblVendorInstegram)
-        Me.tabVendor.Controls.Add(Me.txtVendorInstegram)
         Me.tabVendor.Controls.Add(Me.lblVendorWebSite)
-        Me.tabVendor.Controls.Add(Me.txtVendorWebSite)
         Me.tabVendor.Controls.Add(Me.lblVendorContact1)
-        Me.tabVendor.Controls.Add(Me.txtVendorContact1)
         Me.tabVendor.Controls.Add(Me.lblVendorContact2)
-        Me.tabVendor.Controls.Add(Me.txtVendorContact2)
         Me.tabVendor.Controls.Add(Me.lblVendorContact3)
-        Me.tabVendor.Controls.Add(Me.txtVendorContact3)
         Me.tabVendor.Controls.Add(Me.lblVendorWhatsapp1)
-        Me.tabVendor.Controls.Add(Me.txtVendorWhatsapp1)
         Me.tabVendor.Controls.Add(Me.lblVendorWhatsapp2)
-        Me.tabVendor.Controls.Add(Me.txtVendorWhatsapp2)
         Me.tabVendor.Controls.Add(Me.lblVendorWhatsapp3)
-        Me.tabVendor.Controls.Add(Me.txtVendorWhatsapp3)
         Me.tabVendor.Controls.Add(Me.btnSaveVendor)
         Me.tabVendor.Controls.Add(Me.btnClearVendor)
         Me.tabVendor.Controls.Add(Me.lblVendorHint)
+        Me.tabVendor.Controls.Add(Me.txtVendorID)
+        Me.tabVendor.Controls.Add(Me.txtVendorTitleAr)
+        Me.tabVendor.Controls.Add(Me.txtVendorTitleEn)
+        Me.tabVendor.Controls.Add(Me.txtVendorNationality)
+        Me.tabVendor.Controls.Add(Me.txtVendorarNationality)
+        Me.tabVendor.Controls.Add(Me.txtVendorInstegram)
+        Me.tabVendor.Controls.Add(Me.txtVendorWebSite)
+        Me.tabVendor.Controls.Add(Me.txtVendorContact1)
+        Me.tabVendor.Controls.Add(Me.txtVendorContact2)
+        Me.tabVendor.Controls.Add(Me.txtVendorContact3)
+        Me.tabVendor.Controls.Add(Me.txtVendorWhatsapp1)
+        Me.tabVendor.Controls.Add(Me.txtVendorWhatsapp2)
+        Me.tabVendor.Controls.Add(Me.txtVendorWhatsapp3)
         Me.tabVendor.Location = New System.Drawing.Point(4, 24)
         Me.tabVendor.Name = "tabVendor"
         Me.tabVendor.Padding = New System.Windows.Forms.Padding(3)
@@ -2787,239 +2795,107 @@ Partial Class Form1
         '
         'lblVendorID
         '
-        Me.lblVendorID.Location = New System.Drawing.Point(340, 42)
+        Me.lblVendorID.Location = New System.Drawing.Point(340, 41)
         Me.lblVendorID.Name = "lblVendorID"
         Me.lblVendorID.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorID.TabIndex = 10
         Me.lblVendorID.Text = "ID"
         '
-        'txtVendorID
-        '
-        Me.txtVendorID.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorID.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorID.Location = New System.Drawing.Point(475, 38)
-        Me.txtVendorID.Name = "txtVendorID"
-        Me.txtVendorID.ReadOnly = True
-        Me.txtVendorID.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorID.TabIndex = 11
-        '
         'lblVendorTitleAr
         '
-        Me.lblVendorTitleAr.Location = New System.Drawing.Point(340, 72)
+        Me.lblVendorTitleAr.Location = New System.Drawing.Point(340, 71)
         Me.lblVendorTitleAr.Name = "lblVendorTitleAr"
         Me.lblVendorTitleAr.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorTitleAr.TabIndex = 12
         Me.lblVendorTitleAr.Text = "Title (Arabic)"
         '
-        'txtVendorTitleAr
-        '
-        Me.txtVendorTitleAr.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorTitleAr.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorTitleAr.Location = New System.Drawing.Point(475, 68)
-        Me.txtVendorTitleAr.Name = "txtVendorTitleAr"
-        Me.txtVendorTitleAr.ReadOnly = True
-        Me.txtVendorTitleAr.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorTitleAr.TabIndex = 13
-        Me.txtVendorTitleAr.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        '
         'lblVendorTitleEn
         '
-        Me.lblVendorTitleEn.Location = New System.Drawing.Point(340, 102)
+        Me.lblVendorTitleEn.Location = New System.Drawing.Point(340, 101)
         Me.lblVendorTitleEn.Name = "lblVendorTitleEn"
         Me.lblVendorTitleEn.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorTitleEn.TabIndex = 14
         Me.lblVendorTitleEn.Text = "Title (English)"
         '
-        'txtVendorTitleEn
-        '
-        Me.txtVendorTitleEn.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorTitleEn.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorTitleEn.Location = New System.Drawing.Point(475, 98)
-        Me.txtVendorTitleEn.Name = "txtVendorTitleEn"
-        Me.txtVendorTitleEn.ReadOnly = True
-        Me.txtVendorTitleEn.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorTitleEn.TabIndex = 15
-        '
         'lblVendorNationality
         '
-        Me.lblVendorNationality.Location = New System.Drawing.Point(340, 132)
+        Me.lblVendorNationality.Location = New System.Drawing.Point(340, 131)
         Me.lblVendorNationality.Name = "lblVendorNationality"
         Me.lblVendorNationality.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorNationality.TabIndex = 16
         Me.lblVendorNationality.Text = "Nationality"
         '
-        'txtVendorNationality
-        '
-        Me.txtVendorNationality.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorNationality.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorNationality.Location = New System.Drawing.Point(475, 128)
-        Me.txtVendorNationality.Name = "txtVendorNationality"
-        Me.txtVendorNationality.ReadOnly = True
-        Me.txtVendorNationality.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorNationality.TabIndex = 17
-        '
         'lblVendorarNationality
         '
-        Me.lblVendorarNationality.Location = New System.Drawing.Point(340, 162)
+        Me.lblVendorarNationality.Location = New System.Drawing.Point(340, 161)
         Me.lblVendorarNationality.Name = "lblVendorarNationality"
         Me.lblVendorarNationality.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorarNationality.TabIndex = 18
         Me.lblVendorarNationality.Text = "Nationality (Arabic)"
         '
-        'txtVendorarNationality
-        '
-        Me.txtVendorarNationality.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorarNationality.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorarNationality.Location = New System.Drawing.Point(475, 158)
-        Me.txtVendorarNationality.Name = "txtVendorarNationality"
-        Me.txtVendorarNationality.ReadOnly = True
-        Me.txtVendorarNationality.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorarNationality.TabIndex = 19
-        Me.txtVendorarNationality.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        '
         'lblVendorInstegram
         '
-        Me.lblVendorInstegram.Location = New System.Drawing.Point(340, 192)
+        Me.lblVendorInstegram.Location = New System.Drawing.Point(340, 191)
         Me.lblVendorInstegram.Name = "lblVendorInstegram"
         Me.lblVendorInstegram.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorInstegram.TabIndex = 20
         Me.lblVendorInstegram.Text = "Instagram"
         '
-        'txtVendorInstegram
-        '
-        Me.txtVendorInstegram.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorInstegram.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorInstegram.Location = New System.Drawing.Point(475, 188)
-        Me.txtVendorInstegram.Name = "txtVendorInstegram"
-        Me.txtVendorInstegram.ReadOnly = True
-        Me.txtVendorInstegram.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorInstegram.TabIndex = 21
-        '
         'lblVendorWebSite
         '
-        Me.lblVendorWebSite.Location = New System.Drawing.Point(340, 222)
+        Me.lblVendorWebSite.Location = New System.Drawing.Point(340, 221)
         Me.lblVendorWebSite.Name = "lblVendorWebSite"
         Me.lblVendorWebSite.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorWebSite.TabIndex = 22
         Me.lblVendorWebSite.Text = "Website"
         '
-        'txtVendorWebSite
-        '
-        Me.txtVendorWebSite.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorWebSite.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorWebSite.Location = New System.Drawing.Point(475, 218)
-        Me.txtVendorWebSite.Name = "txtVendorWebSite"
-        Me.txtVendorWebSite.ReadOnly = True
-        Me.txtVendorWebSite.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorWebSite.TabIndex = 23
-        '
         'lblVendorContact1
         '
-        Me.lblVendorContact1.Location = New System.Drawing.Point(340, 252)
+        Me.lblVendorContact1.Location = New System.Drawing.Point(340, 251)
         Me.lblVendorContact1.Name = "lblVendorContact1"
         Me.lblVendorContact1.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorContact1.TabIndex = 24
         Me.lblVendorContact1.Text = "Contact 1"
         '
-        'txtVendorContact1
-        '
-        Me.txtVendorContact1.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorContact1.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorContact1.Location = New System.Drawing.Point(475, 248)
-        Me.txtVendorContact1.Name = "txtVendorContact1"
-        Me.txtVendorContact1.ReadOnly = True
-        Me.txtVendorContact1.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorContact1.TabIndex = 25
-        '
         'lblVendorContact2
         '
-        Me.lblVendorContact2.Location = New System.Drawing.Point(340, 282)
+        Me.lblVendorContact2.Location = New System.Drawing.Point(340, 281)
         Me.lblVendorContact2.Name = "lblVendorContact2"
         Me.lblVendorContact2.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorContact2.TabIndex = 26
         Me.lblVendorContact2.Text = "Contact 2"
         '
-        'txtVendorContact2
-        '
-        Me.txtVendorContact2.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorContact2.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorContact2.Location = New System.Drawing.Point(475, 278)
-        Me.txtVendorContact2.Name = "txtVendorContact2"
-        Me.txtVendorContact2.ReadOnly = True
-        Me.txtVendorContact2.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorContact2.TabIndex = 27
-        '
         'lblVendorContact3
         '
-        Me.lblVendorContact3.Location = New System.Drawing.Point(340, 312)
+        Me.lblVendorContact3.Location = New System.Drawing.Point(340, 311)
         Me.lblVendorContact3.Name = "lblVendorContact3"
         Me.lblVendorContact3.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorContact3.TabIndex = 28
         Me.lblVendorContact3.Text = "Contact 3"
         '
-        'txtVendorContact3
-        '
-        Me.txtVendorContact3.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorContact3.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorContact3.Location = New System.Drawing.Point(475, 308)
-        Me.txtVendorContact3.Name = "txtVendorContact3"
-        Me.txtVendorContact3.ReadOnly = True
-        Me.txtVendorContact3.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorContact3.TabIndex = 29
-        '
         'lblVendorWhatsapp1
         '
-        Me.lblVendorWhatsapp1.Location = New System.Drawing.Point(340, 342)
+        Me.lblVendorWhatsapp1.Location = New System.Drawing.Point(340, 341)
         Me.lblVendorWhatsapp1.Name = "lblVendorWhatsapp1"
         Me.lblVendorWhatsapp1.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorWhatsapp1.TabIndex = 30
         Me.lblVendorWhatsapp1.Text = "WhatsApp 1"
         '
-        'txtVendorWhatsapp1
-        '
-        Me.txtVendorWhatsapp1.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorWhatsapp1.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorWhatsapp1.Location = New System.Drawing.Point(475, 338)
-        Me.txtVendorWhatsapp1.Name = "txtVendorWhatsapp1"
-        Me.txtVendorWhatsapp1.ReadOnly = True
-        Me.txtVendorWhatsapp1.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorWhatsapp1.TabIndex = 31
-        '
         'lblVendorWhatsapp2
         '
-        Me.lblVendorWhatsapp2.Location = New System.Drawing.Point(340, 372)
+        Me.lblVendorWhatsapp2.Location = New System.Drawing.Point(340, 371)
         Me.lblVendorWhatsapp2.Name = "lblVendorWhatsapp2"
         Me.lblVendorWhatsapp2.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorWhatsapp2.TabIndex = 32
         Me.lblVendorWhatsapp2.Text = "WhatsApp 2"
         '
-        'txtVendorWhatsapp2
-        '
-        Me.txtVendorWhatsapp2.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorWhatsapp2.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorWhatsapp2.Location = New System.Drawing.Point(475, 368)
-        Me.txtVendorWhatsapp2.Name = "txtVendorWhatsapp2"
-        Me.txtVendorWhatsapp2.ReadOnly = True
-        Me.txtVendorWhatsapp2.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorWhatsapp2.TabIndex = 33
-        '
         'lblVendorWhatsapp3
         '
-        Me.lblVendorWhatsapp3.Location = New System.Drawing.Point(340, 402)
+        Me.lblVendorWhatsapp3.Location = New System.Drawing.Point(340, 401)
         Me.lblVendorWhatsapp3.Name = "lblVendorWhatsapp3"
         Me.lblVendorWhatsapp3.Size = New System.Drawing.Size(130, 15)
         Me.lblVendorWhatsapp3.TabIndex = 34
         Me.lblVendorWhatsapp3.Text = "WhatsApp 3"
-        '
-        'txtVendorWhatsapp3
-        '
-        Me.txtVendorWhatsapp3.BackColor = System.Drawing.SystemColors.Window
-        Me.txtVendorWhatsapp3.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtVendorWhatsapp3.Location = New System.Drawing.Point(475, 398)
-        Me.txtVendorWhatsapp3.Name = "txtVendorWhatsapp3"
-        Me.txtVendorWhatsapp3.ReadOnly = True
-        Me.txtVendorWhatsapp3.Size = New System.Drawing.Size(360, 25)
-        Me.txtVendorWhatsapp3.TabIndex = 35
         '
         'btnSaveVendor
         '
@@ -3048,7 +2924,170 @@ Partial Class Form1
         Me.lblVendorHint.Name = "lblVendorHint"
         Me.lblVendorHint.Size = New System.Drawing.Size(400, 13)
         Me.lblVendorHint.TabIndex = 99
-        Me.lblVendorHint.Text = "Save stores the selected vendor in the open version (the header Save does too)."
+        Me.lblVendorHint.Text = "Tick a field to include it (ticked fields can be edited). Save stores the vendor in the open version."
+        '
+        'txtVendorID
+        '
+        Me.txtVendorID.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorID.length = 330
+        Me.txtVendorID.Location = New System.Drawing.Point(470, 37)
+        Me.txtVendorID.Name = "txtVendorID"
+        Me.txtVendorID.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorID.TabIndex = 11
+        '
+        'txtVendorTitleAr
+        '
+        Me.txtVendorTitleAr.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorTitleAr.length = 330
+        Me.txtVendorTitleAr.Location = New System.Drawing.Point(470, 67)
+        Me.txtVendorTitleAr.Name = "txtVendorTitleAr"
+        Me.txtVendorTitleAr.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorTitleAr.TabIndex = 13
+        Me.txtVendorTitleAr.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        '
+        'txtVendorTitleEn
+        '
+        Me.txtVendorTitleEn.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorTitleEn.length = 330
+        Me.txtVendorTitleEn.Location = New System.Drawing.Point(470, 97)
+        Me.txtVendorTitleEn.Name = "txtVendorTitleEn"
+        Me.txtVendorTitleEn.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorTitleEn.TabIndex = 15
+        '
+        'txtVendorNationality
+        '
+        Me.txtVendorNationality.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorNationality.length = 330
+        Me.txtVendorNationality.Location = New System.Drawing.Point(470, 127)
+        Me.txtVendorNationality.Name = "txtVendorNationality"
+        Me.txtVendorNationality.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorNationality.TabIndex = 17
+        '
+        'txtVendorarNationality
+        '
+        Me.txtVendorarNationality.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorarNationality.length = 330
+        Me.txtVendorarNationality.Location = New System.Drawing.Point(470, 157)
+        Me.txtVendorarNationality.Name = "txtVendorarNationality"
+        Me.txtVendorarNationality.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorarNationality.TabIndex = 19
+        Me.txtVendorarNationality.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        '
+        'txtVendorInstegram
+        '
+        Me.txtVendorInstegram.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorInstegram.length = 330
+        Me.txtVendorInstegram.Location = New System.Drawing.Point(470, 187)
+        Me.txtVendorInstegram.Name = "txtVendorInstegram"
+        Me.txtVendorInstegram.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorInstegram.TabIndex = 21
+        '
+        'txtVendorWebSite
+        '
+        Me.txtVendorWebSite.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorWebSite.length = 330
+        Me.txtVendorWebSite.Location = New System.Drawing.Point(470, 217)
+        Me.txtVendorWebSite.Name = "txtVendorWebSite"
+        Me.txtVendorWebSite.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorWebSite.TabIndex = 23
+        '
+        'txtVendorContact1
+        '
+        Me.txtVendorContact1.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorContact1.length = 330
+        Me.txtVendorContact1.Location = New System.Drawing.Point(470, 247)
+        Me.txtVendorContact1.Name = "txtVendorContact1"
+        Me.txtVendorContact1.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorContact1.TabIndex = 25
+        '
+        'txtVendorContact2
+        '
+        Me.txtVendorContact2.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorContact2.length = 330
+        Me.txtVendorContact2.Location = New System.Drawing.Point(470, 277)
+        Me.txtVendorContact2.Name = "txtVendorContact2"
+        Me.txtVendorContact2.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorContact2.TabIndex = 27
+        '
+        'txtVendorContact3
+        '
+        Me.txtVendorContact3.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorContact3.length = 330
+        Me.txtVendorContact3.Location = New System.Drawing.Point(470, 307)
+        Me.txtVendorContact3.Name = "txtVendorContact3"
+        Me.txtVendorContact3.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorContact3.TabIndex = 29
+        '
+        'txtVendorWhatsapp1
+        '
+        Me.txtVendorWhatsapp1.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorWhatsapp1.length = 330
+        Me.txtVendorWhatsapp1.Location = New System.Drawing.Point(470, 337)
+        Me.txtVendorWhatsapp1.Name = "txtVendorWhatsapp1"
+        Me.txtVendorWhatsapp1.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorWhatsapp1.TabIndex = 31
+        '
+        'txtVendorWhatsapp2
+        '
+        Me.txtVendorWhatsapp2.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorWhatsapp2.length = 330
+        Me.txtVendorWhatsapp2.Location = New System.Drawing.Point(470, 367)
+        Me.txtVendorWhatsapp2.Name = "txtVendorWhatsapp2"
+        Me.txtVendorWhatsapp2.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorWhatsapp2.TabIndex = 33
+        '
+        'txtVendorWhatsapp3
+        '
+        Me.txtVendorWhatsapp3.BackColor = System.Drawing.Color.Transparent
+        Me.txtVendorWhatsapp3.length = 330
+        Me.txtVendorWhatsapp3.Location = New System.Drawing.Point(470, 397)
+        Me.txtVendorWhatsapp3.Name = "txtVendorWhatsapp3"
+        Me.txtVendorWhatsapp3.Size = New System.Drawing.Size(407, 23)
+        Me.txtVendorWhatsapp3.TabIndex = 35
+        '
+        'lnkAddCountry
+        '
+        Me.lnkAddCountry.AutoSize = True
+        Me.lnkAddCountry.Font = New System.Drawing.Font("Segoe UI", 9!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lnkAddCountry.Location = New System.Drawing.Point(560, 19)
+        Me.lnkAddCountry.Name = "lnkAddCountry"
+        Me.lnkAddCountry.Size = New System.Drawing.Size(28, 15)
+        Me.lnkAddCountry.TabIndex = 95
+        Me.lnkAddCountry.TabStop = True
+        Me.lnkAddCountry.Text = "Add"
+        '
+        'lnkAddCity
+        '
+        Me.lnkAddCity.AutoSize = True
+        Me.lnkAddCity.Font = New System.Drawing.Font("Segoe UI", 9!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lnkAddCity.Location = New System.Drawing.Point(182, 215)
+        Me.lnkAddCity.Name = "lnkAddCity"
+        Me.lnkAddCity.Size = New System.Drawing.Size(28, 15)
+        Me.lnkAddCity.TabIndex = 95
+        Me.lnkAddCity.TabStop = True
+        Me.lnkAddCity.Text = "Add"
+        '
+        'lnkAddStay
+        '
+        Me.lnkAddStay.AutoSize = True
+        Me.lnkAddStay.Font = New System.Drawing.Font("Segoe UI", 9!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lnkAddStay.Location = New System.Drawing.Point(371, 215)
+        Me.lnkAddStay.Name = "lnkAddStay"
+        Me.lnkAddStay.Size = New System.Drawing.Size(28, 15)
+        Me.lnkAddStay.TabIndex = 95
+        Me.lnkAddStay.TabStop = True
+        Me.lnkAddStay.Text = "Add"
+        '
+        'lnkAddAttraction
+        '
+        Me.lnkAddAttraction.AutoSize = True
+        Me.lnkAddAttraction.Font = New System.Drawing.Font("Segoe UI", 9!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lnkAddAttraction.Location = New System.Drawing.Point(560, 215)
+        Me.lnkAddAttraction.Name = "lnkAddAttraction"
+        Me.lnkAddAttraction.Size = New System.Drawing.Size(28, 15)
+        Me.lnkAddAttraction.TabIndex = 95
+        Me.lnkAddAttraction.TabStop = True
+        Me.lnkAddAttraction.Text = "Add"
         '
         'Form1
         '
@@ -3072,6 +3111,10 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button8, "Add a new trip to the tree with this title.")
         Me.ToolTip1.SetToolTip(Me.btnSaveVendor, "Store the selected vendor in the open version.")
         Me.ToolTip1.SetToolTip(Me.txtVendorSearch, "Type part of a vendor name (English or Arabic) to filter the list.")
+        Me.ToolTip1.SetToolTip(Me.lnkAddCountry, "Add a new country to the database")
+        Me.ToolTip1.SetToolTip(Me.lnkAddCity, "Add a new city")
+        Me.ToolTip1.SetToolTip(Me.lnkAddStay, "Add a new place to stay")
+        Me.ToolTip1.SetToolTip(Me.lnkAddAttraction, "Add a new attraction")
         Me.MinimumSize = New System.Drawing.Size(1100, 700)
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.ContextMenuStrip1.ResumeLayout(False)
@@ -3369,32 +3412,36 @@ Partial Class Form1
     Friend WithEvents lblVendorCount As System.Windows.Forms.Label
     Friend WithEvents lblVendorDetails As System.Windows.Forms.Label
     Friend WithEvents lblVendorID As System.Windows.Forms.Label
-    Friend WithEvents txtVendorID As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorTitleAr As System.Windows.Forms.Label
-    Friend WithEvents txtVendorTitleAr As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorTitleEn As System.Windows.Forms.Label
-    Friend WithEvents txtVendorTitleEn As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorNationality As System.Windows.Forms.Label
-    Friend WithEvents txtVendorNationality As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorarNationality As System.Windows.Forms.Label
-    Friend WithEvents txtVendorarNationality As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorInstegram As System.Windows.Forms.Label
-    Friend WithEvents txtVendorInstegram As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorWebSite As System.Windows.Forms.Label
-    Friend WithEvents txtVendorWebSite As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorContact1 As System.Windows.Forms.Label
-    Friend WithEvents txtVendorContact1 As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorContact2 As System.Windows.Forms.Label
-    Friend WithEvents txtVendorContact2 As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorContact3 As System.Windows.Forms.Label
-    Friend WithEvents txtVendorContact3 As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorWhatsapp1 As System.Windows.Forms.Label
-    Friend WithEvents txtVendorWhatsapp1 As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorWhatsapp2 As System.Windows.Forms.Label
-    Friend WithEvents txtVendorWhatsapp2 As System.Windows.Forms.TextBox
     Friend WithEvents lblVendorWhatsapp3 As System.Windows.Forms.Label
-    Friend WithEvents txtVendorWhatsapp3 As System.Windows.Forms.TextBox
     Friend WithEvents btnSaveVendor As System.Windows.Forms.Button
     Friend WithEvents btnClearVendor As System.Windows.Forms.Button
     Friend WithEvents lblVendorHint As System.Windows.Forms.Label
+    Friend WithEvents txtVendorID As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorTitleAr As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorTitleEn As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorNationality As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorarNationality As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorInstegram As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorWebSite As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorContact1 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorContact2 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorContact3 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorWhatsapp1 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorWhatsapp2 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents txtVendorWhatsapp3 As TextBoxWithCheckBox.TextBoxWithCheckBox
+    Friend WithEvents lnkAddCountry As System.Windows.Forms.LinkLabel
+    Friend WithEvents lnkAddCity As System.Windows.Forms.LinkLabel
+    Friend WithEvents lnkAddStay As System.Windows.Forms.LinkLabel
+    Friend WithEvents lnkAddAttraction As System.Windows.Forms.LinkLabel
 End Class

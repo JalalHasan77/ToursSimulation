@@ -76,10 +76,26 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddAttractionDialog.Designer.vb" />
+    <Compile Include="AddAttractionDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddCityDialog.Designer.vb" />
+    <Compile Include="AddCityDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddCountryDialog.Designer.vb" />
+    <Compile Include="AddCountryDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="AddLocations.Designer.vb">
       <DependentUpon>AddLocations.vb</DependentUpon>
     </Compile>
     <Compile Include="AddLocations.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddStayDialog.Designer.vb" />
+    <Compile Include="AddStayDialog.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="BookingSearchFilter.vb" />
@@ -141,9 +157,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AddAttractionDialog.resx" />
+    <EmbeddedResource Include="AddCityDialog.resx" />
+    <EmbeddedResource Include="AddCountryDialog.resx" />
     <EmbeddedResource Include="AddLocations.resx">
       <DependentUpon>AddLocations.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="AddStayDialog.resx" />
     <EmbeddedResource Include="Countries.resx">
       <DependentUpon>Countries.vb</DependentUpon>
     </EmbeddedResource>

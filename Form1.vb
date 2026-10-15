@@ -189,7 +189,7 @@ Public Class Form1
             ' Compare: shown when this version is one of 2+ Ctrl+clicked versions.
             Dim marked As Integer = _compareSet.Where(Function(v) IsOpen(v)).Count()
             mnuCompareText.Visible = marked >= 2 AndAlso _compareSet.Contains(TryCast(e.Node, TravelFormData))
-            mnuCompareText.Text = "Compare and Show in Text (" & marked & " versions)"
+            mnuCompareText.Text = "Compare and Show (" & marked & " versions)"
             cmsTrip.Show(TreeView1, e.Location)
         End If
     End Sub
@@ -473,7 +473,7 @@ Public Class Form1
 
     ' =========================================================================
     '  Compare: Ctrl+click versions in the tree, then right-click one of them
-    '  -> "Compare and Show in Text"
+    '  -> "Compare and Show" (CSV of the differences)
     ' =========================================================================
 
     ''' <summary>Versions marked with Ctrl+click for comparing, in the order they were marked.</summary>
@@ -489,7 +489,7 @@ Public Class Form1
             If _compareSet.Count = 0 Then
                 SetStatus("No versions marked for comparing.")
             Else
-                SetStatus(_compareSet.Count & " version(s) marked for comparing. Ctrl+click more, then right-click one of them and choose ""Compare and Show in Text"". A click without Ctrl clears the marks.")
+                SetStatus(_compareSet.Count & " version(s) marked for comparing. Ctrl+click more, then right-click one of them and choose ""Compare and Show"". A click without Ctrl clears the marks.")
             End If
             HighlightOpenNodes()
         ElseIf _compareSet.Count > 0 Then
@@ -499,8 +499,8 @@ Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' "Compare and Show in Text": for each section, what is the same in all
-    ''' marked versions and what each version has that is not in all of them.
+    ''' "Compare and Show": a CSV (opens in Excel) with only the differences
+    ''' between the marked versions, one table per version side by side.
     ''' Only ticked / active items are compared, as in "Show in Text".
     ''' </summary>
     Private Sub mnuCompareText_Click(sender As Object, e As EventArgs) Handles mnuCompareText.Click
@@ -512,20 +512,46 @@ Public Class Form1
 
         Dim fileTitle As String = "Compare - " & String.Join(" vs ", versions.Select(Function(v) v.Text))
         If fileTitle.Length > 120 Then fileTitle = fileTitle.Substring(0, 120)
-        OpenTextFile(fileTitle, BuildCompareText(versions))
+        OpenTextFile(fileTitle, BuildCompareCsv(versions), ".csv")   ' opens in Excel
     End Sub
 
-    ''' <summary>The comparison text for 2+ versions (see "Compare and Show in Text").</summary>
-    Private Function BuildCompareText(versions As List(Of TravelFormData)) As String
-        Dim names As List(Of String) = versions.Select(Function(v) VersionLabel(v)).ToList()
+    ''' <summary>
+    ''' The comparison of 2+ versions as CSV (opens in Excel), laid out like:
+    '''
+    '''   Countries
+    '''      Azerbaijan                         (same in all: values only)
+    '''   Cities
+    '''   (blank) | Azerbaijan V1 | Azerbaijan V2      (different: one column per version)
+    '''           |    Quba       |    Quba            (in all versions: same row)
+    '''           |       + Qabala|       + Baku       (only in some versions)
+    '''   Departure & Arrival
+    '''           | Registration  |                    (a field that differs ...)
+    '''           |               | Azerbaijan V1 | Azerbaijan V2
+    '''           |               | 2026-10-01 ...| 2026-10-02 ...
+    '''           | Travel        | 2026-10-14 ...     (... and one that is the same)
+    '''   Day By Day
+    '''      Day 1
+    '''           | Breakfast                          (lines; columns when they differ)
+    '''
+    ''' Only ticked / active items are compared, as in "Show in Text".
+    ''' </summary>
+    Private Function BuildCompareCsv(versions As List(Of TravelFormData)) As String
+        ' Column headers: the version name, or "Trip › Version" when versions of different trips are compared.
+        Dim sameTrip As Boolean = versions.Select(Function(v) GetRootNode(v)).Distinct().Count() = 1
+        Dim heads As List(Of String) = versions.Select(Function(v) If(sameTrip, v.Text, VersionLabel(v))).ToList()
         Dim data As List(Of List(Of KeyValuePair(Of String, List(Of String)))) = versions.Select(Function(v) CompareSections(v)).ToList()
 
-        Dim sb As New System.Text.StringBuilder()
-        sb.AppendLine("Comparison of " & versions.Count & " versions:")
-        For Each n As String In names
-            sb.AppendLine("  - " & n)
+        Dim csv As New System.Text.StringBuilder()
+        Dim row = Sub(cells As IEnumerable(Of String))
+                      csv.AppendLine(String.Join(",", cells.Select(Function(c) CsvCell(c))))
+                  End Sub
+
+        row({"Comparison of " & versions.Count & " versions:"})
+        For Each v As TravelFormData In versions
+            row({"  - " & VersionLabel(v)})
         Next
-        sb.AppendLine("Only ticked / active items are compared.")
+        row({"Only ticked / active items are compared."})
+        row({""})
 
         ' Section titles in the order they first appear.
         Dim sectionTitles As New List(Of String)
@@ -535,53 +561,125 @@ Public Class Form1
             Next
         Next
 
-        Dim differentSections As New List(Of String)
         For Each title As String In sectionTitles
-            ' Items of this section in each version (empty when the version has none).
-            Dim itemsPerVersion As New List(Of List(Of String))
+            Dim lists As New List(Of List(Of String))
             For Each d In data
                 Dim found = d.FirstOrDefault(Function(kv) kv.Key = title)
-                itemsPerVersion.Add(If(found.Value, New List(Of String)))
+                lists.Add(If(found.Value, New List(Of String)).Distinct().ToList())
             Next
-            If itemsPerVersion.All(Function(l) l.Count = 0) Then Continue For
+            If lists.All(Function(l) l.Count = 0) Then Continue For
 
-            Dim common As List(Of String) = itemsPerVersion(0).
-                Where(Function(item) itemsPerVersion.All(Function(l) l.Contains(item))).Distinct().ToList()
-
-            Section(sb, title)
-            If common.Count > 0 Then
-                sb.AppendLine("Same in all:")
-                For Each item As String In common
-                    sb.AppendLine("   " & item)
-                Next
-            End If
-
-            Dim anyDifference As Boolean = itemsPerVersion.Any(Function(l) l.Any(Function(item) Not common.Contains(item)))
-            If Not anyDifference Then
-                sb.AppendLine("No differences.")
-            Else
-                differentSections.Add(title)
-                sb.AppendLine("Different:")
-                For i As Integer = 0 To versions.Count - 1
-                    Dim own = itemsPerVersion(i).Where(Function(item) Not common.Contains(item)).Distinct().ToList()
-                    sb.AppendLine("   " & names(i) & ":")
-                    If own.Count = 0 Then
-                        sb.AppendLine("      (nothing that the others lack)")
+            row({title})
+            Select Case title
+                Case "Departure & Arrival", "Vendor"
+                    ' "Field: value" items, compared field by field.
+                    If AllSame(lists) Then
+                        For Each item As String In lists(0) : row({"   " & item}) : Next
                     Else
-                        For Each item As String In own
-                            sb.AppendLine("      + " & item)
-                        Next
+                        CsvFields(lists, heads, row)
                     End If
-                Next
+                Case "Day By Day", "Transfer Ways"
+                    ' "Group: line" items (day or transfer type), lines compared per group.
+                    CsvGroups(lists, heads, row)
+                Case Else
+                    CsvList(lists, heads, row, 0)
+            End Select
+            row({""})
+        Next
+        Return csv.ToString()
+    End Function
+
+    ''' <summary>True when every version has exactly the same items.</summary>
+    Private Function AllSame(lists As List(Of List(Of String))) As Boolean
+        Return lists.All(Function(l) l.Count = lists(0).Count AndAlso l.All(Function(i) lists(0).Contains(i)))
+    End Function
+
+    ''' <summary>
+    ''' A plain list. Same in all: one value per row (indented in column A, or
+    ''' in the column after "lead"). Different: a header row with the version
+    ''' names, the values all versions share on the same rows, then each
+    ''' version's own values marked "+".
+    ''' </summary>
+    Private Sub CsvList(lists As List(Of List(Of String)), heads As List(Of String),
+                        row As Action(Of IEnumerable(Of String)), lead As Integer)
+        Dim pad As IEnumerable(Of String) = Enumerable.Repeat("", lead)
+        If AllSame(lists) Then
+            For Each item As String In lists(0)
+                row(pad.Concat({If(lead = 0, "   " & item, item)}))
+            Next
+            Exit Sub
+        End If
+
+        Dim common As List(Of String) = lists(0).Where(Function(i) lists.All(Function(l) l.Contains(i))).ToList()
+        Dim own As List(Of List(Of String)) = lists.Select(Function(l) l.Where(Function(i) Not common.Contains(i)).ToList()).ToList()
+        Dim cols As IEnumerable(Of String) = Enumerable.Repeat("", Math.Max(lead, 1))   ' versions start in column B
+
+        row(cols.Concat(heads))
+        For Each item As String In common
+            row(cols.Concat(Enumerable.Repeat("   " & item, lists.Count)))
+        Next
+        For r As Integer = 0 To own.Max(Function(l) l.Count) - 1
+            Dim rr As Integer = r
+            row(cols.Concat(own.Select(Function(l) If(rr < l.Count, "      + " & l(rr), ""))))
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' "Field: value" items: a field with the same value everywhere is one row
+    ''' (field in B, value in C); a field that differs gets a row with the
+    ''' field, a row of version names and a row of their values (from C).
+    ''' </summary>
+    Private Sub CsvFields(lists As List(Of List(Of String)), heads As List(Of String), row As Action(Of IEnumerable(Of String)))
+        Dim fields As New List(Of String)
+        Dim valuesOf = Function(l As List(Of String), field As String) As String
+                           Return String.Join("; ", l.Where(Function(i) SplitItem(i).Key = field).Select(Function(i) SplitItem(i).Value))
+                       End Function
+        For Each l In lists
+            For Each i In l
+                Dim f As String = SplitItem(i).Key
+                If Not fields.Contains(f) Then fields.Add(f)
+            Next
+        Next
+        For Each f As String In fields
+            Dim vals As List(Of String) = lists.Select(Function(l) valuesOf(l, f)).ToList()
+            If vals.All(Function(v) v = vals(0)) Then
+                row({"", f, vals(0)})
+            Else
+                row({"", f})
+                row({"", ""}.Concat(heads))
+                row({"", ""}.Concat(vals.Select(Function(v) If(v = "", "(none)", v))))
+                row({""})
             End If
         Next
+    End Sub
 
-        sb.AppendLine()
-        sb.AppendLine(New String("="c, 60))
-        sb.AppendLine(If(differentSections.Count = 0,
-                         "Summary: the versions are the same in every section.",
-                         "Summary: differences in " & String.Join(", ", differentSections) & "."))
-        Return sb.ToString()
+    ''' <summary>"Group: line" items: each group (day / transfer type) in A, its lines from B.</summary>
+    Private Sub CsvGroups(lists As List(Of List(Of String)), heads As List(Of String), row As Action(Of IEnumerable(Of String)))
+        Dim groups As New List(Of String)
+        For Each l In lists
+            For Each i In l
+                Dim g As String = SplitItem(i).Key
+                If Not groups.Contains(g) Then groups.Add(g)
+            Next
+        Next
+        For Each g As String In groups
+            Dim gg As String = g
+            row({"   " & g})
+            CsvList(lists.Select(Function(l) l.Where(Function(i) SplitItem(i).Key = gg).Select(Function(i) SplitItem(i).Value).ToList()).ToList(),
+                    heads, row, 1)
+        Next
+    End Sub
+
+    ''' <summary>"Key: value" -> (Key, value); an item without ": " is all key.</summary>
+    Private Function SplitItem(item As String) As KeyValuePair(Of String, String)
+        Dim p As Integer = item.IndexOf(": ")
+        If p < 0 Then Return New KeyValuePair(Of String, String)(item, "")
+        Return New KeyValuePair(Of String, String)(item.Substring(0, p), item.Substring(p + 2))
+    End Function
+
+    ''' <summary>One CSV cell, always quoted (keeps commas in prices and Arabic text intact).</summary>
+    Private Function CsvCell(text As String) As String
+        Return """" & If(text, "").Replace("""", """""") & """"
     End Function
 
     ''' <summary>"Trip › Version", so versions of different trips can be told apart.</summary>
@@ -697,13 +795,13 @@ Public Class Form1
     End Function
 
     ''' <summary>Writes text to a .txt in the Temp folder and opens it in the default editor.</summary>
-    Private Sub OpenTextFile(fileTitle As String, text As String)
+    Private Sub OpenTextFile(fileTitle As String, text As String, Optional extension As String = ".txt")
         For Each ch As Char In Path.GetInvalidFileNameChars()
             fileTitle = fileTitle.Replace(ch, "_"c)
         Next
-        Dim filePath As String = Path.Combine(Path.GetTempPath(), fileTitle & ".txt")
+        Dim filePath As String = Path.Combine(Path.GetTempPath(), fileTitle & extension)
         Try
-            File.WriteAllText(filePath, text, System.Text.Encoding.UTF8)
+            File.WriteAllText(filePath, text, System.Text.Encoding.UTF8)   ' UTF-8 with BOM: Excel shows Arabic correctly
             Process.Start(filePath)
             SetStatus("Opened """ & filePath & """.")
         Catch ex As Exception
@@ -771,10 +869,14 @@ Public Class Form1
         lblVendorCount.Text = If(q = "", _vendors.Count & " vendor(s)", shown & " of " & _vendors.Count & " vendor(s) match")
     End Sub
 
+    ''' <summary>True while code (not the user) ticks a radio button, so the saved vendor isn't replaced.</summary>
+    Private _markingVendorRadio As Boolean
+
     Private Sub VendorRadio_CheckedChanged(sender As Object, e As EventArgs)
         Dim rb As RadioButton = DirectCast(sender, RadioButton)
-        If Not rb.Checked Then Exit Sub
+        If Not rb.Checked OrElse _markingVendorRadio Then Exit Sub
         _selectedVendor = DirectCast(rb.Tag, VendorInfo).Clone()
+        _selectedVendor.TickFilledFields()   ' fields with a value start ticked
         ShowVendorFields(_selectedVendor)
     End Sub
 
@@ -785,30 +887,58 @@ Public Class Form1
         ShowVendorFields(_selectedVendor)
     End Sub
 
+    ''' <summary>Ticks the radio button of the chosen vendor (no reload of its database values).</summary>
     Private Sub MarkSelectedVendorRadio()
-        For Each rb As RadioButton In pnlVendorList.Controls.OfType(Of RadioButton)()
-            Dim isIt As Boolean = _selectedVendor IsNot Nothing AndAlso DirectCast(rb.Tag, VendorInfo).Id = _selectedVendor.Id
-            If rb.Checked <> isIt Then rb.Checked = isIt
-            If isIt Then rb.Visible = True : pnlVendorList.ScrollControlIntoView(rb)
-        Next
+        _markingVendorRadio = True
+        Try
+            For Each rb As RadioButton In pnlVendorList.Controls.OfType(Of RadioButton)()
+                Dim isIt As Boolean = _selectedVendor IsNot Nothing AndAlso DirectCast(rb.Tag, VendorInfo).Id = _selectedVendor.Id
+                If rb.Checked <> isIt Then rb.Checked = isIt
+                If isIt Then rb.Visible = True : pnlVendorList.ScrollControlIntoView(rb)
+            Next
+        Finally
+            _markingVendorRadio = False
+        End Try
     End Sub
 
+    ''' <summary>The checkbox-linked field boxes of the Vendor tab, by VendorInfo field key.</summary>
+    Private Function VendorBoxes() As Dictionary(Of String, TextBoxWithCheckBox.TextBoxWithCheckBox)
+        Return New Dictionary(Of String, TextBoxWithCheckBox.TextBoxWithCheckBox) From {
+            {"ID", txtVendorID}, {"TitleAr", txtVendorTitleAr}, {"TitleEn", txtVendorTitleEn},
+            {"Nationality", txtVendorNationality}, {"arNationality", txtVendorarNationality},
+            {"Instegram", txtVendorInstegram}, {"WebSite", txtVendorWebSite},
+            {"Contact1", txtVendorContact1}, {"Contact2", txtVendorContact2}, {"Contact3", txtVendorContact3},
+            {"Whatsapp1", txtVendorWhatsapp1}, {"Whatsapp2", txtVendorWhatsapp2}, {"Whatsapp3", txtVendorWhatsapp3}}
+    End Function
+
+    ''' <summary>
+    ''' Fills the field boxes from a vendor: its values, and a tick on every
+    ''' field that is active (not in InactiveFields). Nothing clears them.
+    ''' The ID is shown but can't be edited.
+    ''' </summary>
     Private Sub ShowVendorFields(v As VendorInfo)
-        If v Is Nothing Then v = New VendorInfo()
-        txtVendorID.Text = v.Id
-        txtVendorTitleAr.Text = v.TitleAr
-        txtVendorTitleEn.Text = v.TitleEn
-        txtVendorNationality.Text = v.Nationality
-        txtVendorarNationality.Text = v.ArNationality
-        txtVendorInstegram.Text = v.Instagram
-        txtVendorWebSite.Text = v.WebSite
-        txtVendorContact1.Text = v.Contact1
-        txtVendorContact2.Text = v.Contact2
-        txtVendorContact3.Text = v.Contact3
-        txtVendorWhatsapp1.Text = v.Whatsapp1
-        txtVendorWhatsapp2.Text = v.Whatsapp2
-        txtVendorWhatsapp3.Text = v.Whatsapp3
+        For Each kv In VendorBoxes()
+            Dim box As TextBoxWithCheckBox.TextBoxWithCheckBox = kv.Value
+            box.TextBox1.Text = If(v Is Nothing, "", v.GetField(kv.Key))
+            box.CheckBox1.Checked = v IsNot Nothing AndAlso v.IsActive(kv.Key)
+            box.CheckBox1.Enabled = (v IsNot Nothing)   ' nothing to tick without a vendor
+        Next
+        txtVendorID.TextBox1.ReadOnly = True
     End Sub
+
+    ''' <summary>
+    ''' The vendor as it is on screen: the text in each box (edits included)
+    ''' and which fields are ticked. Nothing when no vendor is chosen.
+    ''' </summary>
+    Private Function VendorFromBoxes() As VendorInfo
+        If _selectedVendor Is Nothing Then Return Nothing
+        Dim v As New VendorInfo()
+        For Each kv In VendorBoxes()
+            v.SetField(kv.Key, kv.Value.TextBox1.Text.Trim())
+            If Not kv.Value.CheckBox1.Checked Then v.InactiveFields.Add(kv.Key)
+        Next
+        Return v
+    End Function
 
     ''' <summary>"Save" on the Vendor tab: stores the chosen vendor in the open version only.</summary>
     Private Sub btnSaveVendor_Click(sender As Object, e As EventArgs) Handles btnSaveVendor.Click
@@ -817,7 +947,7 @@ Public Class Form1
                             If(IsOpen(_currentTrip), ", or press ""Save as New Version"".", "."))
             Exit Sub
         End If
-        GetExtras(_currentVersion).Vendor = If(_selectedVendor Is Nothing, Nothing, _selectedVendor.Clone())
+        GetExtras(_currentVersion).Vendor = VendorFromBoxes()
         SetStatus(If(_selectedVendor Is Nothing,
                      "Vendor removed from """ & _currentVersion.Text & """.",
                      "Vendor """ & _selectedVendor.DisplayName & """ saved to """ & _currentVersion.Text & """."))
@@ -828,20 +958,29 @@ Public Class Form1
         SetStatus("No vendor selected. Press Save to remove the vendor from the open version.")
     End Sub
 
-    ''' <summary>The vendor as text lines, for "Show in Text" and "Compare".</summary>
+    ''' <summary>The vendor's ticked fields as text lines, for "Show in Text" and "Compare".</summary>
     Private Function VendorLines(v As VendorInfo) As List(Of String)
         Dim lines As New List(Of String)
         If v Is Nothing Then Return lines
-        lines.Add("Vendor: " & v.DisplayName & If(v.Id <> "", " (ID " & v.Id & ")", ""))
-        Dim add = Sub(label As String, value As String)
-                      If Not String.IsNullOrWhiteSpace(value) Then lines.Add(label & ": " & value.Trim())
-                  End Sub
-        add("Nationality", v.Nationality)
-        add("Nationality (Arabic)", v.ArNationality)
-        add("Instagram", v.Instagram)
-        add("Website", v.WebSite)
-        add("Contact 1", v.Contact1) : add("Contact 2", v.Contact2) : add("Contact 3", v.Contact3)
-        add("WhatsApp 1", v.Whatsapp1) : add("WhatsApp 2", v.Whatsapp2) : add("WhatsApp 3", v.Whatsapp3)
+        Dim active = Function(key As String) If(v.IsActive(key), v.GetField(key).Trim(), "")
+        Dim name As String = active("TitleEn")
+        If active("TitleAr") <> "" Then name = If(name = "", active("TitleAr"), name & "  (" & active("TitleAr") & ")")
+        If active("ID") <> "" Then name = If(name = "", "ID " & active("ID"), name & " (ID " & active("ID") & ")")
+        If name <> "" Then lines.Add("Vendor: " & name)
+        Dim labels As New List(Of KeyValuePair(Of String, String)) From {
+            New KeyValuePair(Of String, String)("Nationality", "Nationality"),
+            New KeyValuePair(Of String, String)("arNationality", "Nationality (Arabic)"),
+            New KeyValuePair(Of String, String)("Instegram", "Instagram"),
+            New KeyValuePair(Of String, String)("WebSite", "Website"),
+            New KeyValuePair(Of String, String)("Contact1", "Contact 1"),
+            New KeyValuePair(Of String, String)("Contact2", "Contact 2"),
+            New KeyValuePair(Of String, String)("Contact3", "Contact 3"),
+            New KeyValuePair(Of String, String)("Whatsapp1", "WhatsApp 1"),
+            New KeyValuePair(Of String, String)("Whatsapp2", "WhatsApp 2"),
+            New KeyValuePair(Of String, String)("Whatsapp3", "WhatsApp 3")}
+        For Each f In labels
+            If active(f.Key) <> "" Then lines.Add(f.Value & ": " & active(f.Key))
+        Next
         Return lines
     End Function
 
@@ -1010,6 +1149,307 @@ Public Class Form1
             Next
         End If
     End Sub
+
+    ' =========================================================================
+    '  Destinations tab: "Add" links above the lists
+    ' =========================================================================
+
+    ''' <summary>
+    ''' "Add" above Countries: asks for the English and Arabic names and the
+    ''' region, inserts the country into DesCountry and adds it to the list.
+    ''' </summary>
+    Private Sub lnkAddCountry_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles lnkAddCountry.LinkClicked
+        Using dlg As New AddCountryDialog()
+            For Each item As Object In CheckedListBox1.Items
+                dlg.ExistingNames.Add(item.ToString())
+            Next
+            If dlg.ShowDialog(Me) <> DialogResult.OK Then Exit Sub
+
+            Dim newId As Integer
+            Try
+                newId = InsertCountry(dlg.NameEn, dlg.NameAr, dlg.RegionID)
+            Catch ex As Exception
+                MessageBox.Show("Could not add the country to the database:" & vbCrLf & ex.Message, "Add Country",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            End Try
+
+            ' Show it in the Countries list at its alphabetical place, selected.
+            Dim newItem As New TextValueParent(Text:=dlg.NameEn, ID:=newId.ToString())
+            Dim index As Integer = 0
+            While index < CheckedListBox1.Items.Count AndAlso
+                  String.Compare(CheckedListBox1.Items(index).ToString(), dlg.NameEn, StringComparison.CurrentCultureIgnoreCase) < 0
+                index += 1
+            End While
+            CheckedListBox1.Items.Insert(index, newItem)
+            CheckedListBox1.TopIndex = Math.Max(0, index - 2)
+            SetStatus("Country """ & dlg.NameEn & """ added (ID " & newId & "). Tick it to use it in this trip.")
+        End Using
+    End Sub
+
+    ''' <summary>
+    ''' Inserts a country into DesCountry and returns its new CountryID
+    ''' (the highest existing ID + 1). Values are passed as parameters, so
+    ''' quotes and Arabic text are stored safely. regionId Nothing = no region.
+    ''' </summary>
+    Private Function InsertCountry(nameEn As String, nameAr As String, regionId As Object) As Integer
+        Dim newId As Integer = 1
+        Dim dt As DataTable = GetDataTable("SELECT MAX(CountryID) AS MaxID FROM DesCountry")
+        If dt.Rows.Count > 0 AndAlso Not IsDBNull(dt.Rows(0)("MaxID")) Then newId = CInt(dt.Rows(0)("MaxID")) + 1
+
+        ' RegionID: a number if it looks like one, otherwise the text as is, or NULL.
+        Dim region As Object = DBNull.Value
+        If regionId IsNot Nothing Then
+            Dim n As Integer
+            region = If(Integer.TryParse(regionId.ToString(), n), CObj(n), CObj(regionId.ToString()))
+        End If
+
+        Using con As New Data.OleDb.OleDbConnection(DBConnection)
+            Using cmd As New Data.OleDb.OleDbCommand(
+                    "INSERT INTO DesCountry (CountryID, CountryNameEn, CountryNameAr, RegionID) VALUES (?, ?, ?, ?)", con)
+                cmd.Parameters.AddWithValue("@CountryID", newId)
+                cmd.Parameters.AddWithValue("@CountryNameEn", nameEn)
+                cmd.Parameters.AddWithValue("@CountryNameAr", nameAr)
+                cmd.Parameters.AddWithValue("@RegionID", region)
+                con.Open()
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+        Return newId
+    End Function
+
+    ''' <summary>
+    ''' "Add" above Cities: asks for the country (ticked countries first) and
+    ''' the English / Arabic city names, inserts the city into DesCities and,
+    ''' if its country is ticked, shows it in the Cities list.
+    ''' </summary>
+    Private Sub lnkAddCity_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles lnkAddCity.LinkClicked
+        Dim ticked As List(Of TextValueParent) = CheckedListBox1.CheckedItems.Cast(Of Object)().OfType(Of TextValueParent)().ToList()
+        Dim all As List(Of TextValueParent) = CheckedListBox1.Items.Cast(Of Object)().OfType(Of TextValueParent)().ToList()
+
+        ' Preselect the highlighted country if it is ticked, otherwise the first ticked one.
+        Dim highlighted As TextValueParent = TryCast(CheckedListBox1.SelectedItem, TextValueParent)
+        Dim preselect As String = If(highlighted IsNot Nothing AndAlso ticked.Contains(highlighted), highlighted.ID,
+                                     If(ticked.Count > 0, ticked(0).ID, ""))
+
+        Using dlg As New AddCityDialog()
+            dlg.SetCountries(ticked, all, preselect)
+            If dlg.ShowDialog(Me) <> DialogResult.OK Then Exit Sub
+
+            Dim country As TextValueParent = dlg.Country
+            Dim newId As Integer
+            Try
+                newId = InsertCity(dlg.NameEn, dlg.NameAr, country.ID)
+            Catch ex As Exception
+                MessageBox.Show("Could not add the city to the database:" & vbCrLf & ex.Message, "Add City",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            End Try
+
+            If AddCityToList(New TextValueParent(Text:=dlg.NameEn, ID:=newId.ToString(), ParentID:=country.ID)) Then
+                SetStatus("City """ & dlg.NameEn & """ added to " & country.Text & " (ID " & newId & "). Tick it to use it in this trip.")
+            Else
+                SetStatus("City """ & dlg.NameEn & """ added to " & country.Text & " (ID " & newId & "). Tick " & country.Text & " to see it in the Cities list.")
+            End If
+        End Using
+    End Sub
+
+    ''' <summary>Puts a new city into the Cities list under its country (see AddUnderHeader).</summary>
+    Private Function AddCityToList(city As TextValueParent) As Boolean
+        Return AddUnderHeader(CheckedListBox2, city)
+    End Function
+
+    ''' <summary>
+    ''' Puts a new item into a Destinations list under its parent's
+    ''' "----Parent----" header (matched by ParentID), in alphabetical order.
+    ''' False when the parent has no header in the list (not ticked), so
+    ''' there is nowhere to show it yet.
+    ''' </summary>
+    Private Function AddUnderHeader(list As CheckedListBox, newItem As TextValueParent) As Boolean
+        Dim header As Integer = -1
+        For i As Integer = 0 To list.Items.Count - 1
+            Dim item As TextValueParent = TryCast(list.Items(i), TextValueParent)
+            If item IsNot Nothing AndAlso item.ID = "" AndAlso item.parentID = newItem.parentID Then header = i : Exit For
+        Next
+        If header < 0 Then Return False
+
+        Dim index As Integer = header + 1
+        While index < list.Items.Count
+            Dim item As TextValueParent = TryCast(list.Items(index), TextValueParent)
+            If item Is Nothing OrElse item.parentID <> newItem.parentID OrElse item.ID = "" Then Exit While
+            If String.Compare(item.Text, newItem.Text, StringComparison.CurrentCultureIgnoreCase) > 0 Then Exit While
+            index += 1
+        End While
+        list.Items.Insert(index, newItem)
+        list.TopIndex = Math.Max(0, index - 2)
+        Return True
+    End Function
+
+    ''' <summary>
+    ''' Inserts a city into DesCities and returns its new CityID (the highest
+    ''' existing ID + 1). Values are passed as parameters (safe for quotes and Arabic).
+    ''' </summary>
+    Private Function InsertCity(nameEn As String, nameAr As String, countryId As String) As Integer
+        Dim newId As Integer = 1
+        Dim dt As DataTable = GetDataTable("SELECT MAX(CityID) AS MaxID FROM DesCities")
+        If dt.Rows.Count > 0 AndAlso Not IsDBNull(dt.Rows(0)("MaxID")) Then newId = CInt(dt.Rows(0)("MaxID")) + 1
+
+        Using con As New Data.OleDb.OleDbConnection(DBConnection)
+            Using cmd As New Data.OleDb.OleDbCommand(
+                    "INSERT INTO DesCities (CityID, CityNameEn, CityNameAr, CountryID) VALUES (?, ?, ?, ?)", con)
+                cmd.Parameters.AddWithValue("@CityID", newId)
+                cmd.Parameters.AddWithValue("@CityNameEn", nameEn)
+                cmd.Parameters.AddWithValue("@CityNameAr", nameAr)
+                cmd.Parameters.AddWithValue("@CountryID", CInt(countryId))
+                con.Open()
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+        Return newId
+    End Function
+
+    ''' <summary>
+    ''' "Add" above Stay: asks for country, city, name, category and an optional
+    ''' star rating, inserts the stay into Stay and, if its city is ticked,
+    ''' shows it in the Stay list.
+    ''' </summary>
+    Private Sub lnkAddStay_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles lnkAddStay.LinkClicked
+        Dim tickedCountries As List(Of TextValueParent) = Nothing, allCountries As List(Of TextValueParent) = Nothing
+        Dim tickedCities As List(Of TextValueParent) = Nothing, countryId As String = "", cityId As String = ""
+        GatherCityChoices(tickedCountries, allCountries, tickedCities, countryId, cityId)
+
+        Using dlg As New AddStayDialog()
+            dlg.SetChoices(tickedCountries, allCountries, tickedCities, countryId, cityId)
+            If dlg.ShowDialog(Me) <> DialogResult.OK Then Exit Sub
+
+            Dim newId As Integer
+            Try
+                newId = InsertStay(dlg.StayName, dlg.City.ID, dlg.Country.ID, dlg.StarRating, dlg.Category)
+            Catch ex As Exception
+                MessageBox.Show("Could not add the stay to the database:" & vbCrLf & ex.Message, "Add Stay",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            End Try
+
+            Dim shown As Boolean = AddUnderHeader(CheckedListBox3, New TextValueParent(Text:=dlg.StayName, ID:=newId.ToString(), ParentID:=dlg.City.ID))
+            SetStatus("Stay """ & dlg.StayName & """ added to " & dlg.City.Text & " (ID " & newId & "). " &
+                      If(shown, "Tick it to use it in this trip.", "Tick " & dlg.City.Text & " on the Cities list to see it."))
+        End Using
+    End Sub
+
+    ''' <summary>
+    ''' Inserts a stay into Stay and returns its new StayID (the highest
+    ''' existing ID + 1). StarRating and Category may be Nothing (stored as
+    ''' NULL). Category is stored as its ID when Stay.Category is a number
+    ''' column, otherwise as its name.
+    ''' </summary>
+    Private Function InsertStay(stayName As String, cityId As String, countryId As String,
+                                starRating As Integer?, category As TextValueParent) As Integer
+        Dim newId As Integer = 1
+        Dim dt As DataTable = GetDataTable("SELECT MAX(StayID) AS MaxID FROM Stay")
+        If dt.Rows.Count > 0 AndAlso Not IsDBNull(dt.Rows(0)("MaxID")) Then newId = CInt(dt.Rows(0)("MaxID")) + 1
+
+        Dim categoryValue As Object = DBNull.Value
+        If category IsNot Nothing Then
+            Dim categoryType As Type = GetDataTable("SELECT Category FROM Stay WHERE 1 = 0").Columns("Category").DataType
+            Dim n As Integer
+            If categoryType Is GetType(String) OrElse Not Integer.TryParse(category.ID, n) Then
+                categoryValue = category.Text
+            Else
+                categoryValue = n
+            End If
+        End If
+
+        Using con As New Data.OleDb.OleDbConnection(DBConnection)
+            Using cmd As New Data.OleDb.OleDbCommand(
+                    "INSERT INTO Stay (StayID, CityID, StayName, StarRating, Category, CountryID) VALUES (?, ?, ?, ?, ?, ?)", con)
+                cmd.Parameters.AddWithValue("@StayID", newId)
+                cmd.Parameters.AddWithValue("@CityID", CInt(cityId))
+                cmd.Parameters.AddWithValue("@StayName", stayName)
+                cmd.Parameters.AddWithValue("@StarRating", If(starRating.HasValue, CObj(starRating.Value), CObj(DBNull.Value)))
+                cmd.Parameters.AddWithValue("@Category", categoryValue)
+                cmd.Parameters.AddWithValue("@CountryID", CInt(countryId))
+                con.Open()
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+        Return newId
+    End Function
+
+    ''' <summary>
+    ''' What the Stay / Attraction dialogs offer: ticked and all countries,
+    ''' ticked cities (checked or grey, not the "----Country----" headers),
+    ''' and what to preselect: the highlighted city if ticked, else the first
+    ''' ticked city, with its country.
+    ''' </summary>
+    Private Sub GatherCityChoices(ByRef tickedCountries As List(Of TextValueParent), ByRef allCountries As List(Of TextValueParent),
+                                  ByRef tickedCities As List(Of TextValueParent), ByRef countryId As String, ByRef cityId As String)
+        tickedCountries = CheckedListBox1.CheckedItems.Cast(Of Object)().OfType(Of TextValueParent)().ToList()
+        allCountries = CheckedListBox1.Items.Cast(Of Object)().OfType(Of TextValueParent)().ToList()
+        tickedCities = New List(Of TextValueParent)
+        For i As Integer = 0 To CheckedListBox2.Items.Count - 1
+            Dim c As TextValueParent = TryCast(CheckedListBox2.Items(i), TextValueParent)
+            If c IsNot Nothing AndAlso c.ID <> "" AndAlso CheckedListBox2.GetItemCheckState(i) <> CheckState.Unchecked Then tickedCities.Add(c)
+        Next
+        Dim highlighted As TextValueParent = TryCast(CheckedListBox2.SelectedItem, TextValueParent)
+        Dim city As TextValueParent = If(highlighted IsNot Nothing AndAlso tickedCities.Contains(highlighted), highlighted, tickedCities.FirstOrDefault())
+        cityId = If(city Is Nothing, "", city.ID)
+        countryId = If(city IsNot Nothing, city.parentID, If(tickedCountries.Count > 0, tickedCountries(0).ID, ""))
+    End Sub
+
+    ''' <summary>
+    ''' "Add" above Attraction: asks for country, city and the English / Arabic
+    ''' names, inserts the attraction into DesAttractions and, if its city is
+    ''' ticked, shows it in the Attraction list.
+    ''' </summary>
+    Private Sub lnkAddAttraction_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles lnkAddAttraction.LinkClicked
+        Dim tickedCountries As List(Of TextValueParent) = Nothing, allCountries As List(Of TextValueParent) = Nothing
+        Dim tickedCities As List(Of TextValueParent) = Nothing, countryId As String = "", cityId As String = ""
+        GatherCityChoices(tickedCountries, allCountries, tickedCities, countryId, cityId)
+
+        Using dlg As New AddAttractionDialog()
+            dlg.SetChoices(tickedCountries, allCountries, tickedCities, countryId, cityId)
+            If dlg.ShowDialog(Me) <> DialogResult.OK Then Exit Sub
+
+            Dim newId As Integer
+            Try
+                newId = InsertAttraction(dlg.NameEn, dlg.NameAr, dlg.Country.ID, dlg.City.ID)
+            Catch ex As Exception
+                MessageBox.Show("Could not add the attraction to the database:" & vbCrLf & ex.Message, "Add Attraction",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            End Try
+
+            Dim shown As Boolean = AddUnderHeader(CheckedListBox4, New TextValueParent(Text:=dlg.NameEn, ID:=newId.ToString(), ParentID:=dlg.City.ID))
+            SetStatus("Attraction """ & dlg.NameEn & """ added to " & dlg.City.Text & " (ID " & newId & "). " &
+                      If(shown, "Tick it to use it in this trip.", "Tick " & dlg.City.Text & " on the Cities list to see it."))
+        End Using
+    End Sub
+
+    ''' <summary>
+    ''' Inserts an attraction into DesAttractions and returns its new
+    ''' AttractionID (the highest existing ID + 1). Values are passed as
+    ''' parameters (safe for quotes and Arabic).
+    ''' </summary>
+    Private Function InsertAttraction(nameEn As String, nameAr As String, countryId As String, cityId As String) As Integer
+        Dim newId As Integer = 1
+        Dim dt As DataTable = GetDataTable("SELECT MAX(AttractionID) AS MaxID FROM DesAttractions")
+        If dt.Rows.Count > 0 AndAlso Not IsDBNull(dt.Rows(0)("MaxID")) Then newId = CInt(dt.Rows(0)("MaxID")) + 1
+
+        Using con As New Data.OleDb.OleDbConnection(DBConnection)
+            Using cmd As New Data.OleDb.OleDbCommand(
+                    "INSERT INTO DesAttractions (AttractionID, AttractionNameEn, AttractionNameAr, CountryID, CityID) VALUES (?, ?, ?, ?, ?)", con)
+                cmd.Parameters.AddWithValue("@AttractionID", newId)
+                cmd.Parameters.AddWithValue("@AttractionNameEn", nameEn)
+                cmd.Parameters.AddWithValue("@AttractionNameAr", nameAr)
+                cmd.Parameters.AddWithValue("@CountryID", CInt(countryId))
+                cmd.Parameters.AddWithValue("@CityID", CInt(cityId))
+                con.Open()
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+        Return newId
+    End Function
 
     Private Sub CheckedListBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CheckedListBox1.SelectedIndexChanged
         HandleCheckedListBox(
@@ -2180,7 +2620,7 @@ Public Class Form1
             .TransferWays = CopyTransferWays(_transferWayLines),
             .Laces = TypedLineControls().Select(Function(c) TypedLine.FromControl(c)).ToList(),
             .Prices = ListBox3.Items.OfType(Of PriceEntry)().Select(Function(p) p.Clone()).ToList(),
-            .Vendor = If(_selectedVendor Is Nothing, Nothing, _selectedVendor.Clone())}
+            .Vendor = VendorFromBoxes()}
         Return data
     End Function
 
@@ -3281,6 +3721,62 @@ Public Class VendorInfo
     Public Property Whatsapp2 As String = ""
     Public Property Whatsapp3 As String = ""
 
+    ''' <summary>
+    ''' Keys (see GetField) of the fields that are unticked on the Vendor tab:
+    ''' they are kept but left out of "Show in Text" and "Compare".
+    ''' </summary>
+    Public Property InactiveFields As New List(Of String)
+
+    Public Function IsActive(key As String) As Boolean
+        Return Not InactiveFields.Contains(key)
+    End Function
+
+    ''' <summary>Unticks the empty fields and ticks the rest (used when a vendor is picked from the list).</summary>
+    Public Sub TickFilledFields()
+        InactiveFields = FieldKeys.Where(Function(k) GetField(k).Trim() = "").ToList()
+    End Sub
+
+    ''' <summary>Field keys, named after the Vendors table columns.</summary>
+    Public Shared ReadOnly FieldKeys As String() = {"ID", "TitleAr", "TitleEn", "Nationality", "arNationality",
+        "Instegram", "WebSite", "Contact1", "Contact2", "Contact3", "Whatsapp1", "Whatsapp2", "Whatsapp3"}
+
+    Public Function GetField(key As String) As String
+        Select Case key
+            Case "ID" : Return Id
+            Case "TitleAr" : Return TitleAr
+            Case "TitleEn" : Return TitleEn
+            Case "Nationality" : Return Nationality
+            Case "arNationality" : Return ArNationality
+            Case "Instegram" : Return Instagram
+            Case "WebSite" : Return WebSite
+            Case "Contact1" : Return Contact1
+            Case "Contact2" : Return Contact2
+            Case "Contact3" : Return Contact3
+            Case "Whatsapp1" : Return Whatsapp1
+            Case "Whatsapp2" : Return Whatsapp2
+            Case "Whatsapp3" : Return Whatsapp3
+        End Select
+        Return ""
+    End Function
+
+    Public Sub SetField(key As String, value As String)
+        Select Case key
+            Case "ID" : Id = value
+            Case "TitleAr" : TitleAr = value
+            Case "TitleEn" : TitleEn = value
+            Case "Nationality" : Nationality = value
+            Case "arNationality" : ArNationality = value
+            Case "Instegram" : Instagram = value
+            Case "WebSite" : WebSite = value
+            Case "Contact1" : Contact1 = value
+            Case "Contact2" : Contact2 = value
+            Case "Contact3" : Contact3 = value
+            Case "Whatsapp1" : Whatsapp1 = value
+            Case "Whatsapp2" : Whatsapp2 = value
+            Case "Whatsapp3" : Whatsapp3 = value
+        End Select
+    End Sub
+
     ''' <summary>"English name (Arabic name)", or whichever exists.</summary>
     Public ReadOnly Property DisplayName As String
         Get
@@ -3307,7 +3803,9 @@ Public Class VendorInfo
     End Function
 
     Public Function Clone() As VendorInfo
-        Return DirectCast(Me.MemberwiseClone(), VendorInfo)
+        Dim copy As VendorInfo = DirectCast(Me.MemberwiseClone(), VendorInfo)
+        copy.InactiveFields = New List(Of String)(InactiveFields)
+        Return copy
     End Function
 
     Public Overrides Function ToString() As String
